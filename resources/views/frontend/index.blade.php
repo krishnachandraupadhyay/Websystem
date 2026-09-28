@@ -75,45 +75,82 @@
                 
                 <!-- School Brand / Logo -->
                 <a href="{{ url('/') }}" class="flex items-center gap-3 group shrink-0">
-                    <!-- Crest / Shield Logo -->
-                    <div class="relative w-11 h-12 sm:w-13 sm:h-14 rounded-md bg-gradient-to-b from-blue-700 via-blue-900 to-indigo-950 border border-amber-400/80 shadow-md flex flex-col items-center justify-center p-1 overflow-hidden">
-                        <div class="absolute inset-0 bg-amber-400/10 pointer-events-none"></div>
-                        <!-- Shield Emblem SVG -->
-                        <svg class="w-6 h-6 text-amber-400" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm0 2.18l6 2.25v4.66c0 4.1-2.67 7.9-6 8.91-3.33-1.01-6-4.81-6-8.91V6.43l6-2.25zM12 6.5a2.5 2.5 0 00-2.5 2.5c0 1.05.65 1.95 1.57 2.31L10 14h4l-1.07-2.69c.92-.36 1.57-1.26 1.57-2.31A2.5 2.5 0 0012 6.5z"/>
-                        </svg>
-                        <span class="text-[8px] font-black text-amber-300 tracking-widest uppercase mt-0.5">GVS</span>
-                    </div>
+                    @if(!empty($headerData['logo']) && file_exists(public_path($headerData['logo'])))
+                        <img src="{{ asset($headerData['logo']) }}" alt="{{ $headerData['heading'] ?? 'Logo' }}" class="w-11 h-11 sm:w-13 sm:h-13 object-contain rounded-md shadow-xs">
+                    @else
+                        <!-- Crest / Shield Logo Fallback -->
+                        <div class="relative w-11 h-12 sm:w-13 sm:h-14 rounded-md bg-gradient-to-b from-blue-700 via-blue-900 to-indigo-950 border border-amber-400/80 shadow-md flex flex-col items-center justify-center p-1 overflow-hidden">
+                            <div class="absolute inset-0 bg-amber-400/10 pointer-events-none"></div>
+                            <!-- Shield Emblem SVG -->
+                            <svg class="w-6 h-6 text-amber-400" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm0 2.18l6 2.25v4.66c0 4.1-2.67 7.9-6 8.91-3.33-1.01-6-4.81-6-8.91V6.43l6-2.25zM12 6.5a2.5 2.5 0 00-2.5 2.5c0 1.05.65 1.95 1.57 2.31L10 14h4l-1.07-2.69c.92-.36 1.57-1.26 1.57-2.31A2.5 2.5 0 0012 6.5z"/>
+                            </svg>
+                            <span class="text-[8px] font-black text-amber-300 tracking-widest uppercase mt-0.5">GVS</span>
+                        </div>
+                    @endif
 
                     <!-- Names in Hindi & English -->
                     <div class="flex flex-col justify-center">
-                        <span class="font-hindi text-amber-400 font-extrabold text-sm sm:text-base leading-tight tracking-wide drop-shadow-xs">ज्ञान विकास स्कूल</span>
-                        <span class="text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase leading-tight font-heading">GYAN VIKAS SCHOOL</span>
+                        @if(!empty($headerData['subheading']) || !empty($headerData['heading']))
+                            @if(!empty($headerData['subheading']))
+                                <span class="font-hindi text-amber-400 font-extrabold text-sm sm:text-base leading-tight tracking-wide drop-shadow-xs">{{ $headerData['subheading'] }}</span>
+                            @endif
+                            <span class="text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase leading-tight font-heading">{{ $headerData['heading'] ?? 'GYAN VIKAS SCHOOL' }}</span>
+                        @else
+                            <span class="font-hindi text-amber-400 font-extrabold text-sm sm:text-base leading-tight tracking-wide drop-shadow-xs">ज्ञान विकास स्कूल</span>
+                            <span class="text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase leading-tight font-heading">GYAN VIKAS SCHOOL</span>
+                        @endif
                     </div>
                 </a>
 
                 <!-- Desktop Navigation Links -->
                 <nav class="hidden xl:flex items-center gap-1 2xl:gap-3 text-xs sm:text-[13px] font-semibold text-slate-200">
-                    <a href="{{ url('/') }}" class="px-2.5 py-1.5 text-amber-400 font-bold border-b-2 border-amber-400 transition-colors">Home</a>
-                    <a href="#about" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">About Us</a>
-                    <a href="#academics" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Academics</a>
-                    <a href="#admissions" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Admissions</a>
-                    <a href="#placement" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Placement</a>
-                    <a href="#gallery" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Gallery</a>
-                    <a href="#events" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Events</a>
-                    <a href="#notices" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Notice Board</a>
-                    <a href="#contact" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Contact Us</a>
+                    @if(!empty($headerData['nav_links']))
+                        @foreach($headerData['nav_links'] as $i => $link)
+                            <a 
+                                href="{{ $link['url'] }}" 
+                                target="{{ $link['target'] ?? '_self' }}"
+                                title="{{ $link['title'] ?? '' }}"
+                                class="px-2.5 py-1.5 transition-colors @if($i === 0) text-amber-400 font-bold border-b-2 border-amber-400 @else hover:text-white hover:text-amber-300 @endif"
+                            >{{ $link['text'] }}</a>
+                        @endforeach
+                    @else
+                        <a href="{{ url('/') }}" class="px-2.5 py-1.5 text-amber-400 font-bold border-b-2 border-amber-400 transition-colors">Home</a>
+                        <a href="#about" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">About Us</a>
+                        <a href="#academics" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Academics</a>
+                        <a href="#admissions" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Admissions</a>
+                        <a href="#placement" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Placement</a>
+                        <a href="#gallery" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Gallery</a>
+                        <a href="#events" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Events</a>
+                        <a href="#notices" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Notice Board</a>
+                        <a href="#contact" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Contact Us</a>
+                    @endif
                 </nav>
 
                 <!-- Right Action Buttons -->
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <!-- PARENT LOGIN BUTTON -->
-                    <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 bg-[#fbb500] hover:bg-[#e6a500] text-slate-950 font-black text-xs sm:text-xs px-3 sm:px-4 py-2 rounded-lg uppercase tracking-wider shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        <span>PARENT LOGIN</span>
-                    </a>
+                    @if(!empty($headerData['buttons']))
+                        @foreach($headerData['buttons'] as $btn)
+                            <a 
+                                href="{{ $btn['url'] }}" 
+                                target="{{ $btn['target'] ?? '_self' }}"
+                                class="inline-flex items-center gap-1.5 bg-[#fbb500] hover:bg-[#e6a500] text-slate-950 font-black text-xs sm:text-xs px-3 sm:px-4 py-2 rounded-lg uppercase tracking-wider shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
+                            >
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                <span>{{ $btn['text'] }}</span>
+                            </a>
+                        @endforeach
+                    @else
+                        <!-- PARENT LOGIN BUTTON Fallback -->
+                        <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 bg-[#fbb500] hover:bg-[#e6a500] text-slate-950 font-black text-xs sm:text-xs px-3 sm:px-4 py-2 rounded-lg uppercase tracking-wider shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            <span>PARENT LOGIN</span>
+                        </a>
+                    @endif
 
                     <!-- Search Button -->
                     <button @click="searchOpen = !searchOpen" class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer" title="Search">
@@ -141,15 +178,26 @@
 
         <!-- Mobile Navigation Menu -->
         <div x-show="mobileMenuOpen" x-transition class="xl:hidden bg-[#0a1b2d] border-t border-slate-800 px-4 pt-2 pb-4 space-y-1 text-sm font-semibold">
-            <a href="{{ url('/') }}" class="block px-3 py-2 rounded-md text-amber-400 bg-slate-800/60 font-bold">Home</a>
-            <a href="#about" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">About Us</a>
-            <a href="#academics" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Academics</a>
-            <a href="#admissions" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Admissions</a>
-            <a href="#placement" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Placement</a>
-            <a href="#gallery" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Gallery</a>
-            <a href="#events" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Events</a>
-            <a href="#notices" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Notice Board</a>
-            <a href="#contact" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Contact Us</a>
+            @if(!empty($headerData['nav_links']))
+                @foreach($headerData['nav_links'] as $i => $link)
+                    <a 
+                        href="{{ $link['url'] }}" 
+                        target="{{ $link['target'] ?? '_self' }}"
+                        @click="mobileMenuOpen = false" 
+                        class="block px-3 py-2 rounded-md @if($i === 0) text-amber-400 bg-slate-800/60 font-bold @else text-slate-200 hover:bg-slate-800 @endif"
+                    >{{ $link['text'] }}</a>
+                @endforeach
+            @else
+                <a href="{{ url('/') }}" class="block px-3 py-2 rounded-md text-amber-400 bg-slate-800/60 font-bold">Home</a>
+                <a href="#about" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">About Us</a>
+                <a href="#academics" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Academics</a>
+                <a href="#admissions" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Admissions</a>
+                <a href="#placement" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Placement</a>
+                <a href="#gallery" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Gallery</a>
+                <a href="#events" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Events</a>
+                <a href="#notices" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Notice Board</a>
+                <a href="#contact" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Contact Us</a>
+            @endif
         </div>
     </header>
 

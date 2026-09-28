@@ -5,16 +5,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\ComponentFieldController;
+use App\Http\Controllers\FrontendController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('frontend.index');
-})->name('home');
-
-Route::get('/frontend', function () {
-    return view('frontend.index');
-})->name('frontend.index');
+Route::get('/', [FrontendController::class, 'index'])->name('home');
+Route::get('/frontend', [FrontendController::class, 'index'])->name('frontend.index');
 
 Route::get('/dashboard', function () {
     $user = Illuminate\Support\Facades\Auth::user();
