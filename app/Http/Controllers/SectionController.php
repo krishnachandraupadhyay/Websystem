@@ -246,6 +246,42 @@ class SectionController extends Controller
     }
 
     /**
+     * Toggle the status of the specified subsection or set it as the single active variant.
+     */
+    public function toggleSubsectionStatus(Request $request, SubSection $subsection)
+    {
+        $mode = $request->input('mode', 'toggle'); // 'toggle' or 'single'
+
+        if ($mode === 'single') {
+            // Activate this subsection and deactivate all others in the parent section
+            SubSection::where('section_id', $subsection->section_id)->update(['status' => false]);
+            SubSection::where('id', $subsection->id)->update(['status' => true]);
+            $subsection->refresh();
+        } else {
+            $newStatus = !$subsection->status;
+            $subsection->status = $newStatus;
+            $subsection->save();
+        }
+
+        $allSubsections = SubSection::with('components')
+            ->where('section_id', $subsection->section_id)
+            ->orderBy('order')
+            ->get();
+
+        if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success'     => true,
+                'status'      => (bool)$subsection->status,
+                'subsections' => $allSubsections,
+                'message'     => 'Subsection "' . $subsection->subsection_name . '" status updated successfully!',
+            ]);
+        }
+
+        $label = $subsection->status ? 'Active' : 'Inactive';
+        return back()->with('success', 'Subsection "' . $subsection->subsection_name . '" status changed to ' . $label . ' successfully!');
+    }
+
+    /**
      * Assign / toggle components for a specific subsection.
      */
     public function assignSubsectionComponents(Request $request, SubSection $subsection)

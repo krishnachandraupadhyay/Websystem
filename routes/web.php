@@ -63,6 +63,7 @@ Route::middleware(['auth', 'role:Super Admin'])->group(function () {
     Route::patch('/sections/{section}/toggle-status', [SectionController::class, 'toggleStatus'])->name('sections.toggleStatus');
     Route::delete('/sections/{section}', [SectionController::class, 'destroy'])->name('sections.destroy');
     Route::post('/sections/{section}/subsections', [SectionController::class, 'saveSubsections'])->name('sections.saveSubsections');
+    Route::patch('/subsections/{subsection}/toggle-status', [SectionController::class, 'toggleSubsectionStatus'])->name('subsections.toggleStatus');
     Route::post('/subsections/{subsection}/components', [SectionController::class, 'assignSubsectionComponents'])->name('subsections.assignComponents');
     // Per-section, per-component sub-component configuration (independent per section)
     Route::get('/sections/{section}/components/{component}/subcomponents', [SectionController::class, 'getSectionComponentSubcomponents'])->name('sections.components.subcomponents.get');

@@ -154,6 +154,43 @@
                     this.openSubCompModal = false;
                 }
             });
+    },
+    toggleSubsectionStatus(sub, mode = 'toggle') {
+        if (!sub || !sub.id) return;
+        sub._loading = true;
+        let form = new FormData();
+        form.append('_token', document.querySelector('meta[name=csrf-token]').content);
+        form.append('_method', 'PATCH');
+        form.append('mode', mode);
+
+        fetch('/subsections/' + sub.id + '/toggle-status', {
+            method: 'POST',
+            body: form,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            sub._loading = false;
+            if (data.success) {
+                if (mode === 'single') {
+                    this.viewSubsectionsList.forEach(s => {
+                        s.status = (s.id === sub.id) ? 1 : 0;
+                    });
+                } else {
+                    sub.status = data.status ? 1 : 0;
+                }
+                if (this.viewParentSection) {
+                    this.viewParentSection.subsections = data.subsections;
+                }
+            }
+        })
+        .catch(err => {
+            sub._loading = false;
+            console.error('Failed to toggle subsection:', err);
+        });
     }
 }">
 
@@ -960,18 +997,71 @@
 
                             <div class="space-y-3">
                                 <template x-for="(sub, idx) in viewSubsectionsList" :key="sub.id || idx">
-                                    <div class="rounded-xl border border-slate-200/90 overflow-hidden bg-white shadow-2xs">
+                                    <div 
+                                        class="rounded-xl border overflow-hidden bg-white shadow-2xs transition-all"
+                                        :class="sub.status ? 'border-emerald-300 ring-2 ring-emerald-500/15' : 'border-slate-200/90'"
+                                    >
                                         <!-- Subsection Header Bar -->
-                                        <div class="flex items-center justify-between px-4 py-3 bg-white hover:bg-slate-50/50 transition-colors">
+                                        <div 
+                                            class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 transition-colors"
+                                            :class="sub.status ? 'bg-emerald-50/30 hover:bg-emerald-50/50' : 'bg-white hover:bg-slate-50/50'"
+                                        >
                                             <div class="flex items-center gap-3">
-                                                <span class="w-6 h-6 rounded-md bg-purple-50 text-purple-600 flex items-center justify-center text-xs font-bold shrink-0" x-text="idx + 1"></span>
+                                                <span 
+                                                    class="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 transition-colors"
+                                                    :class="sub.status ? 'bg-emerald-600 text-white shadow-xs' : 'bg-purple-50 text-purple-600'"
+                                                    x-text="idx + 1"
+                                                ></span>
                                                 <div>
-                                                    <h5 class="text-sm font-bold text-slate-900" x-text="sub.subsection_name"></h5>
+                                                    <div class="flex items-center gap-2">
+                                                        <h5 class="text-sm font-bold text-slate-900" x-text="sub.subsection_name"></h5>
+                                                        <span x-show="sub.status" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                                                            In Use
+                                                        </span>
+                                                    </div>
                                                     <p class="text-xs text-slate-400" x-show="sub.subsection_title" x-text="sub.subsection_title"></p>
                                                     <p class="text-xs text-slate-400 font-mono" x-show="sub.subsection_slug" x-text="'/' + sub.subsection_slug"></p>
                                                 </div>
                                             </div>
-                                            <div class="flex items-center gap-2">
+                                            <div class="flex items-center gap-2.5">
+                                                <!-- "Use This" Single-Select Option Button -->
+                                                <button
+                                                    type="button"
+                                                    @click="toggleSubsectionStatus(sub, 'single')"
+                                                    :disabled="sub._loading"
+                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-2xs disabled:opacity-50"
+                                                    :class="sub.status ? 'bg-emerald-600 text-white shadow-emerald-500/25 ring-2 ring-emerald-600/30' : 'bg-white text-slate-600 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300'"
+                                                    :title="sub.status ? 'Currently Selected' : 'Set as the only active variant'"
+                                                >
+                                                    <svg x-show="sub.status" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                                    </svg>
+                                                    <span x-text="sub.status ? 'Selected' : 'Use This'"></span>
+                                                </button>
+
+                                                <!-- Interactive Toggle Switch -->
+                                                <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 px-2 py-1 rounded-lg">
+                                                    <button 
+                                                        type="button" 
+                                                        @click="toggleSubsectionStatus(sub, 'toggle')"
+                                                        :disabled="sub._loading"
+                                                        class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 disabled:opacity-50"
+                                                        :class="sub.status ? 'bg-emerald-500' : 'bg-slate-300'"
+                                                        :title="sub.status ? 'Active - Click to toggle off' : 'Inactive - Click to toggle on'"
+                                                    >
+                                                        <span 
+                                                            class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                                                            :class="sub.status ? 'translate-x-4' : 'translate-x-0'"
+                                                        ></span>
+                                                    </button>
+                                                    <span 
+                                                        class="text-[11px] font-bold select-none cursor-pointer" 
+                                                        :class="sub.status ? 'text-emerald-700' : 'text-slate-400'"
+                                                        @click="toggleSubsectionStatus(sub, 'toggle')"
+                                                        x-text="sub.status ? 'Active' : 'Off'"
+                                                    ></span>
+                                                </div>
+
                                                 <!-- Add Component Button -->
                                                 <button
                                                     type="button"
@@ -984,13 +1074,6 @@
                                                     </svg>
                                                     <span>Add Component</span>
                                                 </button>
-                                                <span 
-                                                    class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border"
-                                                    :class="sub.status ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'"
-                                                >
-                                                    <span class="w-1.5 h-1.5 rounded-full" :class="sub.status ? 'bg-emerald-500' : 'bg-slate-400'"></span>
-                                                    <span x-text="sub.status ? 'Active' : 'Inactive'"></span>
-                                                </span>
                                             </div>
                                         </div>
 
