@@ -1,0 +1,1 @@
+@include('superadmin.pages.addpages')
