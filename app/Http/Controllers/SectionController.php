@@ -180,11 +180,13 @@ class SectionController extends Controller
         // Fetch all section-component mappings
         $allMappings = SectionComponent::all();
         $sectionComponentsMap = [];
+        $sectionComponentsMultipleMap = [];
         foreach ($allMappings as $mapping) {
             $sectionComponentsMap[$mapping->section_id][$mapping->component_id] = (bool) $mapping->status;
+            $sectionComponentsMultipleMap[$mapping->section_id][$mapping->component_id] = (bool) $mapping->is_multiple;
         }
 
-        return view('superadmin.pages.managesection', compact('sections', 'components', 'selectedSectionId', 'sectionComponentsMap'));
+        return view('superadmin.pages.managesection', compact('sections', 'components', 'selectedSectionId', 'sectionComponentsMap', 'sectionComponentsMultipleMap'));
     }
 
     /**
@@ -199,18 +201,22 @@ class SectionController extends Controller
 
         $sectionId = $validated['section_id'];
         $submittedComponents = $request->input('components', []);
+        $submittedMultiple   = $request->input('is_multiple', []);
 
-        // Save status for all available components
+        // Save status and is_multiple for all available components
         $allComponents = Component::all();
         foreach ($allComponents as $comp) {
-            $status = isset($submittedComponents[$comp->id]) && (string)$submittedComponents[$comp->id] === '1';
+            $status     = isset($submittedComponents[$comp->id]) && (string)$submittedComponents[$comp->id] === '1';
+            $isMultiple = isset($submittedMultiple[$comp->id]) && (string)$submittedMultiple[$comp->id] === '1';
+
             SectionComponent::updateOrCreate(
                 [
                     'section_id'   => $sectionId,
                     'component_id' => $comp->id,
                 ],
                 [
-                    'status' => $status,
+                    'status'      => $status,
+                    'is_multiple' => $isMultiple,
                 ]
             );
         }
@@ -278,6 +284,7 @@ class SectionController extends Controller
         ]);
 
         $ids = $request->input('sub_component_ids', []);
+        $multipleMap = $request->input('is_multiple', []);
 
         // Delete existing entries for this section+component pair
         SectionComponentSubcomponent::where('section_id', $section->id)
@@ -290,12 +297,14 @@ class SectionController extends Controller
             if ((int)$subCompId === $component->id) {
                 continue; // skip self-reference
             }
+            $isMultiple = !empty($multipleMap[$subCompId]);
             SectionComponentSubcomponent::create([
                 'section_id'       => $section->id,
                 'component_id'     => $component->id,
                 'sub_component_id' => (int)$subCompId,
                 'status'           => true,
                 'order'            => $order++,
+                'is_multiple'      => $isMultiple,
             ]);
         }
 

@@ -13,17 +13,19 @@ class Component extends Model
         'description',
         'status',
         'is_subcomponent',
+        'is_multiple',
     ];
 
     protected $casts = [
         'status'          => 'boolean',
         'is_subcomponent' => 'boolean',
+        'is_multiple'     => 'boolean',
     ];
 
     public function sections()
     {
         return $this->belongsToMany(Section::class, 'section_components')
-                    ->withPivot('status')
+                    ->withPivot('status', 'is_multiple')
                     ->withTimestamps();
     }
 

@@ -311,57 +311,80 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                             @foreach($components as $component)
                                 <div 
-                                    class="p-3.5 rounded-xl border transition-all duration-200 flex items-center justify-between gap-3 cursor-pointer select-none"
+                                    class="p-3.5 rounded-xl border transition-all duration-200 flex flex-col justify-between gap-3 cursor-pointer select-none"
                                     :class="activeComponents[{{ $component->id }}] ? 'border-blue-500 bg-blue-50/50 ring-1 ring-blue-500/20' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/40'"
                                     @click="activeComponents[{{ $component->id }}] = !activeComponents[{{ $component->id }}]"
                                 >
-                                    <div class="flex items-center gap-2.5 min-w-0 pointer-events-none">
-                                        <div 
-                                            class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-200"
-                                            :class="activeComponents[{{ $component->id }}] ? 'bg-blue-600 text-white shadow-xs shadow-blue-500/30' : 'bg-slate-100 text-slate-500'"
-                                        >
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-                                            </svg>
-                                        </div>
-                                        <div class="truncate">
-                                            <div class="flex items-center gap-1.5">
-                                                <h4 class="text-xs font-bold text-slate-900 truncate">
-                                                    {{ $component->component_name }}
-                                                </h4>
-                                                <span 
-                                                    class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider transition-colors duration-200"
-                                                    :class="activeComponents[{{ $component->id }}] ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'"
-                                                    x-text="activeComponents[{{ $component->id }}] ? 'Active' : 'Inactive'"
-                                                >Inactive</span>
+                                    <div class="flex items-center justify-between gap-3">
+                                        <div class="flex items-center gap-2.5 min-w-0 pointer-events-none">
+                                            <div 
+                                                class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-200"
+                                                :class="activeComponents[{{ $component->id }}] ? 'bg-blue-600 text-white shadow-xs shadow-blue-500/30' : 'bg-slate-100 text-slate-500'"
+                                            >
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                                                </svg>
                                             </div>
-                                            <p class="text-[11px] text-slate-400 font-mono truncate mt-0.5">
-                                                /{{ $component->component_slug }}
-                                            </p>
+                                            <div class="truncate">
+                                                <div class="flex items-center gap-1.5">
+                                                    <h4 class="text-xs font-bold text-slate-900 truncate">
+                                                        {{ $component->component_name }}
+                                                    </h4>
+                                                    <span 
+                                                        class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider transition-colors duration-200"
+                                                        :class="activeComponents[{{ $component->id }}] ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'"
+                                                        x-text="activeComponents[{{ $component->id }}] ? 'Active' : 'Inactive'"
+                                                    >Inactive</span>
+                                                </div>
+                                                <p class="text-[11px] text-slate-400 font-mono truncate mt-0.5">
+                                                    /{{ $component->component_slug }}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Toggle Switch Button -->
+                                        <div class="shrink-0 flex items-center">
+                                            <input 
+                                                type="hidden" 
+                                                name="components[{{ $component->id }}]" 
+                                                :value="activeComponents[{{ $component->id }}] ? '1' : '0'"
+                                            >
+                                            <button 
+                                                type="button" 
+                                                @click.stop="activeComponents[{{ $component->id }}] = !activeComponents[{{ $component->id }}]"
+                                                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                                                :class="activeComponents[{{ $component->id }}] ? 'bg-blue-600' : 'bg-slate-300'"
+                                                role="switch" 
+                                                :aria-checked="activeComponents[{{ $component->id }}]"
+                                            >
+                                                <span 
+                                                    aria-hidden="true" 
+                                                    class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                                                    :class="activeComponents[{{ $component->id }}] ? 'translate-x-5' : 'translate-x-0'"
+                                                ></span>
+                                            </button>
                                         </div>
                                     </div>
 
-                                    <!-- Toggle Switch Button -->
-                                    <div class="shrink-0 flex items-center">
-                                        <input 
-                                            type="hidden" 
-                                            name="components[{{ $component->id }}]" 
-                                            :value="activeComponents[{{ $component->id }}] ? '1' : '0'"
-                                        >
-                                        <button 
-                                            type="button" 
-                                            @click.stop="activeComponents[{{ $component->id }}] = !activeComponents[{{ $component->id }}]"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-                                            :class="activeComponents[{{ $component->id }}] ? 'bg-blue-600' : 'bg-slate-300'"
-                                            role="switch" 
-                                            :aria-checked="activeComponents[{{ $component->id }}]"
-                                        >
-                                            <span 
-                                                aria-hidden="true" 
-                                                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                                                :class="activeComponents[{{ $component->id }}] ? 'translate-x-5' : 'translate-x-0'"
-                                            ></span>
-                                        </button>
+                                    <!-- Allow Multiple Checkbox (When Active) -->
+                                    <div 
+                                        x-show="activeComponents[{{ $component->id }}]" 
+                                        x-transition 
+                                        @click.stop
+                                        class="pt-2 border-t border-blue-200/60 flex items-center justify-between"
+                                    >
+                                        <input type="hidden" name="is_multiple[{{ $component->id }}]" :value="multipleComponents[{{ $component->id }}] ? '1' : '0'">
+                                        <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                                            <input 
+                                                type="checkbox" 
+                                                x-model="multipleComponents[{{ $component->id }}]"
+                                                class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
+                                            >
+                                            <span>Allow Multiple (Repeater)</span>
+                                        </label>
+                                        <span class="text-[10px] text-blue-600 font-semibold bg-blue-100/60 px-2 py-0.5 rounded-full" x-show="multipleComponents[{{ $component->id }}]">
+                                            + Add Enabled
+                                        </span>
                                     </div>
                                 </div>
                             @endforeach
@@ -860,7 +883,9 @@ function manageSectionApp() {
         currentSubsection: null,
         sectionsData: @json($sections->load(['subsections.components', 'components.subcomponents'])->keyBy('id')),
         mappings: @json($sectionComponentsMap ?? []),
+        multipleMappings: @json($sectionComponentsMultipleMap ?? []),
         activeComponents: {},
+        multipleComponents: {},
         openView(sectionId) {
             let section = this.sectionsData[sectionId];
             if (!section) return;
@@ -941,8 +966,10 @@ function manageSectionApp() {
             this.editSectionName = sectionName;
             this.editSectionTitle = sectionTitle;
             let secMap = this.mappings[sectionId] || {};
+            let mulMap = this.multipleMappings[sectionId] || {};
             @foreach($components as $comp)
                 this.activeComponents[{{ $comp->id }}] = secMap[{{ $comp->id }}] !== undefined ? Boolean(secMap[{{ $comp->id }}]) : false;
+                this.multipleComponents[{{ $comp->id }}] = mulMap[{{ $comp->id }}] !== undefined ? Boolean(mulMap[{{ $comp->id }}]) : {{ $comp->is_multiple ? 'true' : 'false' }};
             @endforeach
             this.openModal = true;
         },

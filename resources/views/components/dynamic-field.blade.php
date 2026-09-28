@@ -6,25 +6,43 @@
     'value' => null,
     'filePath' => null,
     'disabledCondition' => null,
+    'instanceIndex' => null,
 ])
 
 @php
     $comp = $comp ?? $component;
     $isSub = !is_null($subComp);
+    $hasInstance = !is_null($instanceIndex);
     
     // Naming for normal fields vs file fields
     if ($isSub && $comp) {
-        $inputName = "components[{$comp->id}][subcomponents][{$subComp->id}][fields][{$field->id}]";
-        $fileInputName = "components[{$comp->id}][subcomponents][{$subComp->id}][files][{$field->id}]";
-        $errorKey = "components.{$comp->id}.subcomponents.{$subComp->id}.fields.{$field->id}";
-        $fileErrorKey = "components.{$comp->id}.subcomponents.{$subComp->id}.files.{$field->id}";
-        $currentVal = old("components.{$comp->id}.subcomponents.{$subComp->id}.fields.{$field->id}", $value ?? $field->default_value);
+        if ($hasInstance) {
+            $inputName = "components[{$comp->id}][subcomponents][{$subComp->id}][instances][{$instanceIndex}][fields][{$field->id}]";
+            $fileInputName = "components[{$comp->id}][subcomponents][{$subComp->id}][instances][{$instanceIndex}][files][{$field->id}]";
+            $errorKey = "components.{$comp->id}.subcomponents.{$subComp->id}.instances.{$instanceIndex}.fields.{$field->id}";
+            $fileErrorKey = "components.{$comp->id}.subcomponents.{$subComp->id}.instances.{$instanceIndex}.files.{$field->id}";
+            $currentVal = old("components.{$comp->id}.subcomponents.{$subComp->id}.instances.{$instanceIndex}.fields.{$field->id}", $value ?? $field->default_value);
+        } else {
+            $inputName = "components[{$comp->id}][subcomponents][{$subComp->id}][fields][{$field->id}]";
+            $fileInputName = "components[{$comp->id}][subcomponents][{$subComp->id}][files][{$field->id}]";
+            $errorKey = "components.{$comp->id}.subcomponents.{$subComp->id}.fields.{$field->id}";
+            $fileErrorKey = "components.{$comp->id}.subcomponents.{$subComp->id}.files.{$field->id}";
+            $currentVal = old("components.{$comp->id}.subcomponents.{$subComp->id}.fields.{$field->id}", $value ?? $field->default_value);
+        }
     } elseif ($comp) {
-        $inputName = "components[{$comp->id}][fields][{$field->id}]";
-        $fileInputName = "components[{$comp->id}][files][{$field->id}]";
-        $errorKey = "components.{$comp->id}.fields.{$field->id}";
-        $fileErrorKey = "components.{$comp->id}.files.{$field->id}";
-        $currentVal = old("components.{$comp->id}.fields.{$field->id}", $value ?? $field->default_value);
+        if ($hasInstance) {
+            $inputName = "components[{$comp->id}][instances][{$instanceIndex}][fields][{$field->id}]";
+            $fileInputName = "components[{$comp->id}][instances][{$instanceIndex}][files][{$field->id}]";
+            $errorKey = "components.{$comp->id}.instances.{$instanceIndex}.fields.{$field->id}";
+            $fileErrorKey = "components.{$comp->id}.instances.{$instanceIndex}.files.{$field->id}";
+            $currentVal = old("components.{$comp->id}.instances.{$instanceIndex}.fields.{$field->id}", $value ?? $field->default_value);
+        } else {
+            $inputName = "components[{$comp->id}][fields][{$field->id}]";
+            $fileInputName = "components[{$comp->id}][files][{$field->id}]";
+            $errorKey = "components.{$comp->id}.fields.{$field->id}";
+            $fileErrorKey = "components.{$comp->id}.files.{$field->id}";
+            $currentVal = old("components.{$comp->id}.fields.{$field->id}", $value ?? $field->default_value);
+        }
     } else {
         $inputName = "fields[{$field->field_name}]";
         $fileInputName = "files[{$field->field_name}]";

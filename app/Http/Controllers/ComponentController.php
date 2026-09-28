@@ -38,12 +38,14 @@ class ComponentController extends Controller
             'description'     => 'nullable|string',
             'status'          => 'required|in:0,1',
             'is_subcomponent' => 'nullable|boolean',
+            'is_multiple'     => 'nullable|boolean',
         ], [
             'component_name.unique' => 'Component is already exist.',
             'component_slug.unique' => 'Component is already exist.',
         ]);
 
         $validated['is_subcomponent'] = $request->boolean('is_subcomponent');
+        $validated['is_multiple']     = $request->boolean('is_multiple');
 
         Component::create($validated);
 
@@ -68,12 +70,14 @@ class ComponentController extends Controller
             'description'     => 'nullable|string',
             'status'          => 'required|in:0,1',
             'is_subcomponent' => 'nullable|boolean',
+            'is_multiple'     => 'nullable|boolean',
         ], [
             'component_name.unique' => 'Component is already exist.',
             'component_slug.unique' => 'Component is already exist.',
         ]);
 
         $validated['is_subcomponent'] = $request->boolean('is_subcomponent');
+        $validated['is_multiple']     = $request->boolean('is_multiple');
 
         $component->update($validated);
 

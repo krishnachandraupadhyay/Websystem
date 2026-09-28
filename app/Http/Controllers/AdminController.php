@@ -112,11 +112,13 @@ class AdminController extends Controller
         $components = \App\Models\Component::latest()->get();
         $allSecCompMappings = \App\Models\SectionComponent::all();
         $sectionComponentsMap = [];
+        $sectionComponentsMultipleMap = [];
         foreach ($allSecCompMappings as $mapping) {
             $sectionComponentsMap[$mapping->section_id][$mapping->component_id] = (bool) $mapping->status;
+            $sectionComponentsMultipleMap[$mapping->section_id][$mapping->component_id] = (bool) $mapping->is_multiple;
         }
 
-        return view('superadmin.pages.assignsection', compact('admins', 'sections', 'components', 'adminSectionsMap', 'sectionComponentsMap'));
+        return view('superadmin.pages.assignsection', compact('admins', 'sections', 'components', 'adminSectionsMap', 'sectionComponentsMap', 'sectionComponentsMultipleMap'));
     }
 
     /**
@@ -201,19 +203,31 @@ class AdminController extends Controller
         }
 
         // Load existing content data from database, separating field-based data and legacy data
-        $allData = SectionComponentData::where('section_id', $section->id)->get();
+        $allData = SectionComponentData::where('section_id', $section->id)->orderBy('instance_index', 'asc')->get();
         $contentData = [];
         $fieldData = [];
+        $multiFieldData = [];
+        $multiContentData = [];
         foreach ($allData as $item) {
             $key = $item->sub_component_id ? ($item->component_id . '_' . $item->sub_component_id) : (string)$item->component_id;
+            $idx = (int)($item->instance_index ?? 0);
+
+            if ($idx === 0) {
+                if ($item->component_field_id) {
+                    $fieldData[$key][$item->component_field_id] = $item;
+                } else {
+                    $contentData[$key] = $item;
+                }
+            }
+
             if ($item->component_field_id) {
-                $fieldData[$key][$item->component_field_id] = $item;
+                $multiFieldData[$key][$idx][$item->component_field_id] = $item;
             } else {
-                $contentData[$key] = $item;
+                $multiContentData[$key][$idx] = $item;
             }
         }
 
-        return view('admin.section_view', compact('section', 'contentData', 'fieldData'));
+        return view('admin.section_view', compact('section', 'contentData', 'fieldData', 'multiFieldData', 'multiContentData'));
     }
 
     /**
@@ -426,7 +440,7 @@ class AdminController extends Controller
         }
 
         // ----------------------------------------------------
-        // PHASE 2: DYNAMIC DATA STORAGE
+        // PHASE 2: DYNAMIC DATA STORAGE WITH REPEATER SUPPORT
         // ----------------------------------------------------
         foreach ($activeComponents as $comp) {
             if ($activeComponentId && (int)$activeComponentId !== (int)$comp->id) {
@@ -452,30 +466,217 @@ class AdminController extends Controller
 
             $compData = $submittedComponents[$comp->id] ?? [];
 
+            // Case 1: Top-level Repeater (instances submitted, e.g. multiple Images, Buttons, Cards)
+            if (isset($compData['instances']) && is_array($compData['instances'])) {
+                $instances = $compData['instances'];
+                $processedIndices = [];
+
+                foreach ($instances as $instIdx => $instData) {
+                    $idx = (int)$instIdx;
+                    $processedIndices[] = $idx;
+
+                    if ($secSubComps->isNotEmpty()) {
+                        // Multi-instance container (e.g. multiple Cards/Slides)
+                        $subDataList = $instData['subcomponents'] ?? [];
+                        foreach ($secSubComps as $subComp) {
+                            $subFields = $subComp->fields()->where('is_active', true)->orderBy('sort_order', 'asc')->get();
+                            foreach ($subFields as $field) {
+                                $isFile = in_array($field->field_type, ['image', 'video', 'file'], true);
+                                if ($isFile) {
+                                    $fileKey = "components.{$comp->id}.instances.{$idx}.subcomponents.{$subComp->id}.files.{$field->id}";
+                                    if ($request->hasFile($fileKey)) {
+                                        $file = $request->file($fileKey);
+                                        $ext = $file->getClientOriginalExtension();
+                                        $filename = 'sec_' . $section->id . '_comp_' . $comp->id . '_inst_' . $idx . '_sub_' . $subComp->id . '_f_' . $field->id . '_' . time() . '.' . $ext;
+                                        $dest = public_path('uploads/sections');
+                                        if (!file_exists($dest)) mkdir($dest, 0755, true);
+                                        $file->move($dest, $filename);
+                                        $filePath = 'uploads/sections/' . $filename;
+
+                                        SectionComponentData::updateOrCreate(
+                                            [
+                                                'section_id'         => $section->id,
+                                                'component_id'       => $comp->id,
+                                                'sub_component_id'   => $subComp->id,
+                                                'component_field_id' => $field->id,
+                                                'instance_index'     => $idx,
+                                            ],
+                                            [
+                                                'field_name'    => $field->field_name,
+                                                'file_path'     => $filePath,
+                                                'content_value' => $file->getClientOriginalName(),
+                                            ]
+                                        );
+                                    }
+                                } else {
+                                    if (isset($subDataList[$subComp->id]['fields']) && array_key_exists($field->id, $subDataList[$subComp->id]['fields'])) {
+                                        $val = $subDataList[$subComp->id]['fields'][$field->id];
+                                        SectionComponentData::updateOrCreate(
+                                            [
+                                                'section_id'         => $section->id,
+                                                'component_id'       => $comp->id,
+                                                'sub_component_id'   => $subComp->id,
+                                                'component_field_id' => $field->id,
+                                                'instance_index'     => $idx,
+                                            ],
+                                            [
+                                                'field_name'    => $field->field_name,
+                                                'content_value' => $val,
+                                            ]
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        // Multi-instance top component (e.g. Gallery Images or Buttons)
+                        $compFields = $comp->fields()->where('is_active', true)->orderBy('sort_order', 'asc')->get();
+                        foreach ($compFields as $field) {
+                            $isFile = in_array($field->field_type, ['image', 'video', 'file'], true);
+                            if ($isFile) {
+                                $fileKey = "components.{$comp->id}.instances.{$idx}.files.{$field->id}";
+                                if ($request->hasFile($fileKey)) {
+                                    $file = $request->file($fileKey);
+                                    $ext = $file->getClientOriginalExtension();
+                                    $filename = 'sec_' . $section->id . '_comp_' . $comp->id . '_inst_' . $idx . '_f_' . $field->id . '_' . time() . '.' . $ext;
+                                    $dest = public_path('uploads/sections');
+                                    if (!file_exists($dest)) mkdir($dest, 0755, true);
+                                    $file->move($dest, $filename);
+                                    $filePath = 'uploads/sections/' . $filename;
+
+                                    SectionComponentData::updateOrCreate(
+                                        [
+                                            'section_id'         => $section->id,
+                                            'component_id'       => $comp->id,
+                                            'sub_component_id'   => null,
+                                            'component_field_id' => $field->id,
+                                            'instance_index'     => $idx,
+                                        ],
+                                        [
+                                            'field_name'    => $field->field_name,
+                                            'file_path'     => $filePath,
+                                            'content_value' => $file->getClientOriginalName(),
+                                        ]
+                                    );
+                                }
+                            } else {
+                                if (isset($instData['fields']) && array_key_exists($field->id, $instData['fields'])) {
+                                    $val = $instData['fields'][$field->id];
+                                    SectionComponentData::updateOrCreate(
+                                        [
+                                            'section_id'         => $section->id,
+                                            'component_id'       => $comp->id,
+                                            'sub_component_id'   => null,
+                                            'component_field_id' => $field->id,
+                                            'instance_index'     => $idx,
+                                        ],
+                                        [
+                                            'field_name'    => $field->field_name,
+                                            'content_value' => $val,
+                                        ]
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Delete any removed instances
+                SectionComponentData::where('section_id', $section->id)
+                    ->where('component_id', $comp->id)
+                    ->whereNotIn('instance_index', $processedIndices)
+                    ->delete();
+
+                continue;
+            }
+
+            // Case 2: Container with Subcomponents
             if ($secSubComps->isNotEmpty()) {
-                // Container with Subcomponents
                 $subDataList = $compData['subcomponents'] ?? [];
 
                 foreach ($secSubComps as $subComp) {
                     $subFields = $subComp->fields()->where('is_active', true)->orderBy('sort_order', 'asc')->get();
 
+                    if (isset($subDataList[$subComp->id]['instances']) && is_array($subDataList[$subComp->id]['instances'])) {
+                        // Subcomponent has multiple instances! (e.g. Nav Links / Anchors)
+                        $subInstances = $subDataList[$subComp->id]['instances'];
+                        $subProcessed = [];
+
+                        foreach ($subInstances as $sIdx => $sInstData) {
+                            $idx = (int)$sIdx;
+                            $subProcessed[] = $idx;
+
+                            foreach ($subFields as $field) {
+                                $isFile = in_array($field->field_type, ['image', 'video', 'file'], true);
+                                if ($isFile) {
+                                    $fileKey = "components.{$comp->id}.subcomponents.{$subComp->id}.instances.{$idx}.files.{$field->id}";
+                                    if ($request->hasFile($fileKey)) {
+                                        $file = $request->file($fileKey);
+                                        $ext = $file->getClientOriginalExtension();
+                                        $filename = 'sec_' . $section->id . '_comp_' . $comp->id . '_sub_' . $subComp->id . '_inst_' . $idx . '_f_' . $field->id . '_' . time() . '.' . $ext;
+                                        $dest = public_path('uploads/sections');
+                                        if (!file_exists($dest)) mkdir($dest, 0755, true);
+                                        $file->move($dest, $filename);
+                                        $filePath = 'uploads/sections/' . $filename;
+
+                                        SectionComponentData::updateOrCreate(
+                                            [
+                                                'section_id'         => $section->id,
+                                                'component_id'       => $comp->id,
+                                                'sub_component_id'   => $subComp->id,
+                                                'component_field_id' => $field->id,
+                                                'instance_index'     => $idx,
+                                            ],
+                                            [
+                                                'field_name'    => $field->field_name,
+                                                'file_path'     => $filePath,
+                                                'content_value' => $file->getClientOriginalName(),
+                                            ]
+                                        );
+                                    }
+                                } else {
+                                    if (isset($sInstData['fields']) && array_key_exists($field->id, $sInstData['fields'])) {
+                                        $val = $sInstData['fields'][$field->id];
+                                        SectionComponentData::updateOrCreate(
+                                            [
+                                                'section_id'         => $section->id,
+                                                'component_id'       => $comp->id,
+                                                'sub_component_id'   => $subComp->id,
+                                                'component_field_id' => $field->id,
+                                                'instance_index'     => $idx,
+                                            ],
+                                            [
+                                                'field_name'    => $field->field_name,
+                                                'content_value' => $val,
+                                            ]
+                                        );
+                                    }
+                                }
+                            }
+                        }
+
+                        // Delete removed instances for this subcomponent
+                        SectionComponentData::where('section_id', $section->id)
+                            ->where('component_id', $comp->id)
+                            ->where('sub_component_id', $subComp->id)
+                            ->whereNotIn('instance_index', $subProcessed)
+                            ->delete();
+
+                        continue;
+                    }
+
+                    // Otherwise single subcomponent instance (idx = 0)
                     if ($subFields->isNotEmpty()) {
-                        // Dynamic fields processing for this subcomponent
                         foreach ($subFields as $field) {
                             $isFile = in_array($field->field_type, ['image', 'video', 'file'], true);
-
                             if ($isFile) {
                                 if ($request->hasFile("components.{$comp->id}.subcomponents.{$subComp->id}.files.{$field->id}")) {
                                     $file = $request->file("components.{$comp->id}.subcomponents.{$subComp->id}.files.{$field->id}");
                                     $extension = $file->getClientOriginalExtension();
                                     $filename = 'sec_' . $section->id . '_comp_' . $comp->id . '_sub_' . $subComp->id . '_f_' . $field->id . '_' . time() . '.' . $extension;
-
-                                    $destinationPath = public_path('uploads/sections');
-                                    if (!file_exists($destinationPath)) {
-                                        mkdir($destinationPath, 0755, true);
-                                    }
-
-                                    $file->move($destinationPath, $filename);
+                                    $dest = public_path('uploads/sections');
+                                    if (!file_exists($dest)) mkdir($dest, 0755, true);
+                                    $file->move($dest, $filename);
                                     $filePath = 'uploads/sections/' . $filename;
 
                                     SectionComponentData::updateOrCreate(
@@ -484,6 +685,7 @@ class AdminController extends Controller
                                             'component_id'       => $comp->id,
                                             'sub_component_id'   => $subComp->id,
                                             'component_field_id' => $field->id,
+                                            'instance_index'     => 0,
                                         ],
                                         [
                                             'field_name'    => $field->field_name,
@@ -495,13 +697,13 @@ class AdminController extends Controller
                             } else {
                                 if (isset($subDataList[$subComp->id]['fields']) && array_key_exists($field->id, $subDataList[$subComp->id]['fields'])) {
                                     $val = $subDataList[$subComp->id]['fields'][$field->id];
-
                                     SectionComponentData::updateOrCreate(
                                         [
                                             'section_id'         => $section->id,
                                             'component_id'       => $comp->id,
                                             'sub_component_id'   => $subComp->id,
                                             'component_field_id' => $field->id,
+                                            'instance_index'     => 0,
                                         ],
                                         [
                                             'field_name'    => $field->field_name,
@@ -546,6 +748,7 @@ class AdminController extends Controller
                                     'component_id'       => $comp->id,
                                     'sub_component_id'   => $subComp->id,
                                     'component_field_id' => null,
+                                    'instance_index'     => 0,
                                 ],
                                 [
                                     'content_value' => $subContentValue,
@@ -557,14 +760,12 @@ class AdminController extends Controller
                     }
                 }
             } else {
-                // Top-Level Component (no subcomponents)
+                // Top-Level Component (Single, idx = 0)
                 $compFields = $comp->fields()->where('is_active', true)->orderBy('sort_order', 'asc')->get();
 
                 if ($compFields->isNotEmpty()) {
-                    // Dynamic fields processing
                     foreach ($compFields as $field) {
                         $isFile = in_array($field->field_type, ['image', 'video', 'file'], true);
-
                         if ($isFile) {
                             $fileKey = $request->hasFile("components.{$comp->id}.files.{$field->field_name}")
                                 ? "components.{$comp->id}.files.{$field->field_name}"
@@ -574,13 +775,9 @@ class AdminController extends Controller
                                 $file = $request->file($fileKey);
                                 $extension = $file->getClientOriginalExtension();
                                 $filename = 'sec_' . $section->id . '_comp_' . $comp->id . '_f_' . $field->id . '_' . time() . '.' . $extension;
-
-                                $destinationPath = public_path('uploads/sections');
-                                if (!file_exists($destinationPath)) {
-                                    mkdir($destinationPath, 0755, true);
-                                }
-
-                                $file->move($destinationPath, $filename);
+                                $dest = public_path('uploads/sections');
+                                if (!file_exists($dest)) mkdir($dest, 0755, true);
+                                $file->move($dest, $filename);
                                 $filePath = 'uploads/sections/' . $filename;
 
                                 SectionComponentData::updateOrCreate(
@@ -589,6 +786,7 @@ class AdminController extends Controller
                                         'component_id'       => $comp->id,
                                         'sub_component_id'   => null,
                                         'component_field_id' => $field->id,
+                                        'instance_index'     => 0,
                                     ],
                                     [
                                         'field_name'    => $field->field_name,
@@ -617,6 +815,7 @@ class AdminController extends Controller
                                         'component_id'       => $comp->id,
                                         'sub_component_id'   => null,
                                         'component_field_id' => $field->id,
+                                        'instance_index'     => 0,
                                     ],
                                     [
                                         'field_name'    => $field->field_name,
@@ -663,6 +862,7 @@ class AdminController extends Controller
                             'component_id'       => $comp->id,
                             'sub_component_id'   => null,
                             'component_field_id' => null,
+                            'instance_index'     => 0,
                         ],
                         [
                             'content_value' => $contentValue,

@@ -10,10 +10,12 @@ class SectionComponent extends Model
         'section_id',
         'component_id',
         'status',
+        'is_multiple',
     ];
 
     protected $casts = [
-        'status' => 'boolean',
+        'status'      => 'boolean',
+        'is_multiple' => 'boolean',
     ];
 
     public function section()

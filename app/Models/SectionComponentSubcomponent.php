@@ -14,11 +14,13 @@ class SectionComponentSubcomponent extends Model
         'sub_component_id',
         'status',
         'order',
+        'is_multiple',
     ];
 
     protected $casts = [
-        'status' => 'boolean',
-        'order'  => 'integer',
+        'status'      => 'boolean',
+        'order'       => 'integer',
+        'is_multiple' => 'boolean',
     ];
 
     /** The parent section */

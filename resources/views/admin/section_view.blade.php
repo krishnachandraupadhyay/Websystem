@@ -160,8 +160,11 @@
                                 @foreach($comp->effective_subcomponents as $subIndex => $subComp)
                                     @php
                                         $subNameAndSlug = strtolower($subComp->component_name . ' ' . $subComp->component_slug);
+                                        $isSubMultiple = (bool)($subComp->pivot->is_multiple ?? $subComp->is_multiple);
                                         $subExisting = $contentData[$comp->id . '_' . $subComp->id] ?? null;
                                         $subFields = $subComp->fields->where('is_active', true)->sortBy('sort_order');
+                                        $subInstMap = $multiFieldData[$comp->id . '_' . $subComp->id] ?? [];
+                                        $subInstCount = count($subInstMap);
                                     @endphp
                                     <tr class="bg-slate-50/40 hover:bg-slate-50 transition-colors border-l-4 border-l-indigo-500">
                                         <td class="px-5 py-3 text-[11px] font-semibold text-slate-400 pl-8">
@@ -181,7 +184,11 @@
                                             </div>
                                         </td>
                                         <td class="px-5 py-3">
-                                            @if($subFields->isNotEmpty())
+                                            @if($isSubMultiple)
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                                    Repeater ({{ $subInstCount }})
+                                                </span>
+                                            @elseif($subFields->isNotEmpty())
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
                                                     {{ $subFields->count() }} {{ \Illuminate\Support\Str::plural('Field', $subFields->count()) }}
                                                 </span>
@@ -216,7 +223,22 @@
                                             @endif
                                         </td>
                                         <td class="px-5 py-3">
-                                            @if($subFields->isNotEmpty())
+                                            @if($isSubMultiple && $subInstCount > 0)
+                                                <div class="space-y-1">
+                                                    <div class="flex flex-wrap items-center gap-1.5">
+                                                        @foreach($subInstMap as $sIdx => $fList)
+                                                            @php
+                                                                $firstField = is_array($fList) ? ($fList[array_key_first($fList)] ?? null) : $fList;
+                                                            @endphp
+                                                            @if($firstField?->content_value)
+                                                                <span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-semibold">
+                                                                    {{ $firstField->content_value }}
+                                                                </span>
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @elseif($subFields->isNotEmpty())
                                                 <div class="space-y-1">
                                                     @foreach($subFields as $f)
                                                         @php
@@ -343,7 +365,11 @@
                                     </td>
 
                                     @php
+                                        $nameAndSlug = strtolower($comp->component_name . ' ' . $comp->component_slug);
+                                        $isCompMultiple = (bool)($comp->pivot->is_multiple ?? $comp->is_multiple);
                                         $compFields = $comp->fields->where('is_active', true)->sortBy('sort_order');
+                                        $compInstMap = $multiFieldData[$comp->id] ?? [];
+                                        $compInstCount = count($compInstMap);
                                     @endphp
 
                                     <!-- Component Type Badge -->
@@ -385,7 +411,24 @@
 
                                     <!-- Configured Content / Preview -->
                                     <td class="px-5 py-4">
-                                        @if($compFields->isNotEmpty())
+                                        @if($isCompMultiple && $compInstCount > 0)
+                                            <div class="space-y-1.5">
+                                                <div class="flex flex-wrap items-center gap-2">
+                                                    @foreach($compInstMap as $instIdx => $fList)
+                                                        @php
+                                                            $primaryItem = is_array($fList) ? ($fList[array_key_first($fList)] ?? null) : $fList;
+                                                        @endphp
+                                                        @if($primaryItem?->file_path && file_exists(public_path($primaryItem->file_path)))
+                                                            <img src="{{ asset($primaryItem->file_path) }}" class="w-10 h-10 object-cover rounded-lg border border-slate-200 shadow-2xs" title="Item #{{ $instIdx + 1 }}">
+                                                        @elseif($primaryItem?->content_value)
+                                                            <span class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold">
+                                                                {{ $primaryItem->content_value }}
+                                                            </span>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @elseif($compFields->isNotEmpty())
                                             <div class="space-y-1">
                                                 @foreach($compFields as $f)
                                                     @php
@@ -626,7 +669,92 @@
                                                         $subFields = $subComp->fields->where('is_active', true)->sortBy('sort_order');
                                                     @endphp
 
-                                                    @if($subFields->isNotEmpty())
+                                                    @php
+                                                        $isSubMultiple = (bool)($subComp->pivot->is_multiple ?? $subComp->is_multiple);
+                                                        $subInstMap = $multiFieldData[$comp->id . '_' . $subComp->id] ?? [];
+                                                        $subInstKeys = array_keys($subInstMap);
+                                                        if (empty($subInstKeys)) {
+                                                            $subInstKeys = [0];
+                                                        }
+                                                    @endphp
+
+                                                    @if($isSubMultiple && $subFields->isNotEmpty())
+                                                        {{-- Repeater Subcomponent (e.g. Nav Anchors) --}}
+                                                        <div class="p-3.5 bg-white rounded-xl border border-indigo-100 shadow-2xs space-y-3">
+                                                            <div class="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                                                                <div class="flex items-center gap-2">
+                                                                    <h5 class="text-xs font-bold text-slate-800 uppercase tracking-wider">{{ $subComp->component_name }}</h5>
+                                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">Repeater</span>
+                                                                </div>
+                                                                <span class="text-[10px] font-mono text-slate-400">/{{ $subComp->component_slug }}</span>
+                                                            </div>
+
+                                                            <div id="repeater-subcomp-{{ $comp->id }}-{{ $subComp->id }}" data-next-index="{{ count($subInstKeys) }}" class="space-y-3">
+                                                                @foreach($subInstKeys as $sPos => $instIdx)
+                                                                    <div class="repeater-sub-item p-3 bg-slate-50/70 rounded-xl border border-slate-200 relative space-y-2.5">
+                                                                        <div class="flex items-center justify-between pb-1 border-b border-slate-200/60">
+                                                                            <span class="text-[11px] font-bold text-slate-700">#{{ $sPos + 1 }} {{ $subComp->component_name }}</span>
+                                                                            @if($sPos > 0 || count($subInstKeys) > 1)
+                                                                                <button type="button" onclick="this.closest('.repeater-sub-item').remove()" class="text-rose-500 hover:text-rose-700 text-xs font-semibold cursor-pointer">
+                                                                                    🗑 Remove
+                                                                                </button>
+                                                                            @endif
+                                                                        </div>
+                                                                        <div class="space-y-2.5">
+                                                                            @foreach($subFields as $field)
+                                                                                @php
+                                                                                    $fData = $multiFieldData[$comp->id . '_' . $subComp->id][$instIdx][$field->id] ?? null;
+                                                                                @endphp
+                                                                                <x-dynamic-field 
+                                                                                    :field="$field" 
+                                                                                    :comp="$comp" 
+                                                                                    :subComp="$subComp" 
+                                                                                    :instanceIndex="$instIdx"
+                                                                                    :value="$fData?->content_value" 
+                                                                                    :filePath="$fData?->file_path" 
+                                                                                    :disabledCondition="'activeComponentId && activeComponentId !== ' . $comp->id" 
+                                                                                />
+                                                                            @endforeach
+                                                                        </div>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+
+                                                            <!-- Template for dynamic add -->
+                                                            <template id="template-subcomp-{{ $comp->id }}-{{ $subComp->id }}">
+                                                                <div class="repeater-sub-item p-3 bg-slate-50/70 rounded-xl border border-slate-200 relative space-y-2.5">
+                                                                    <div class="flex items-center justify-between pb-1 border-b border-slate-200/60">
+                                                                        <span class="text-[11px] font-bold text-slate-700">#__DISPLAY_INDEX__ {{ $subComp->component_name }}</span>
+                                                                        <button type="button" onclick="this.closest('.repeater-sub-item').remove()" class="text-rose-500 hover:text-rose-700 text-xs font-semibold cursor-pointer">
+                                                                            🗑 Remove
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="space-y-2.5">
+                                                                        @foreach($subFields as $field)
+                                                                            <x-dynamic-field 
+                                                                                :field="$field" 
+                                                                                :comp="$comp" 
+                                                                                :subComp="$subComp" 
+                                                                                instanceIndex="__INDEX__"
+                                                                                :value="null" 
+                                                                                :filePath="null" 
+                                                                                :disabledCondition="'activeComponentId && activeComponentId !== ' . $comp->id" 
+                                                                            />
+                                                                        @endforeach
+                                                                    </div>
+                                                                </div>
+                                                            </template>
+
+                                                            <button 
+                                                                type="button" 
+                                                                onclick="addSubRepeaterItem({{ $comp->id }}, {{ $subComp->id }})" 
+                                                                class="w-full py-2 px-3 rounded-lg border border-dashed border-indigo-300 bg-indigo-50/40 hover:bg-indigo-50 text-indigo-700 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                                                            >
+                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                                                <span>+ Add Another {{ $subComp->component_name }}</span>
+                                                            </button>
+                                                        </div>
+                                                    @elseif($subFields->isNotEmpty())
                                                         <div class="p-3.5 bg-white rounded-xl border border-indigo-100 shadow-2xs space-y-3">
                                                             <div class="flex items-center justify-between pb-1.5 border-b border-slate-100">
                                                                 <h5 class="text-xs font-bold text-slate-800 uppercase tracking-wider">{{ $subComp->component_name }}</h5>
@@ -734,8 +862,91 @@
                                     @else
                                         @php
                                             $compFields = $comp->fields->where('is_active', true)->sortBy('sort_order');
+                                            $isCompMultiple = (bool)($comp->pivot->is_multiple ?? $comp->is_multiple);
+                                            $compInstMap = $multiFieldData[$comp->id] ?? [];
+                                            $compInstKeys = array_keys($compInstMap);
+                                            if (empty($compInstKeys)) {
+                                                $compInstKeys = [0];
+                                            }
                                         @endphp
-                                        @if($compFields->isNotEmpty())
+
+                                        @if($isCompMultiple && $compFields->isNotEmpty())
+                                            {{-- Top-Level Repeater Component (e.g. Gallery Images, Buttons, Cards) --}}
+                                            <div class="p-4 rounded-xl border border-slate-200/90 bg-white space-y-3.5">
+                                                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                                    <div class="flex items-center gap-2">
+                                                        <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">{{ $comp->component_name }}</h4>
+                                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">Repeater</span>
+                                                    </div>
+                                                    <span class="text-[10px] font-mono text-slate-400">/{{ $comp->component_slug }}</span>
+                                                </div>
+
+                                                <div id="repeater-comp-{{ $comp->id }}" data-next-index="{{ count($compInstKeys) }}" class="space-y-3.5">
+                                                    @foreach($compInstKeys as $pos => $instIdx)
+                                                        <div class="repeater-item p-3.5 bg-slate-50/70 rounded-xl border border-slate-200 relative space-y-3">
+                                                            <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/60">
+                                                                <span class="text-xs font-bold text-slate-700">#{{ $pos + 1 }} {{ $comp->component_name }}</span>
+                                                                @if($pos > 0 || count($compInstKeys) > 1)
+                                                                    <button type="button" onclick="this.closest('.repeater-item').remove()" class="text-rose-500 hover:text-rose-700 text-xs font-semibold cursor-pointer">
+                                                                        🗑 Remove
+                                                                    </button>
+                                                                @endif
+                                                            </div>
+                                                            <div class="space-y-3">
+                                                                @foreach($compFields as $field)
+                                                                    @php
+                                                                        $fData = $multiFieldData[$comp->id][$instIdx][$field->id] ?? null;
+                                                                    @endphp
+                                                                    <x-dynamic-field 
+                                                                        :field="$field" 
+                                                                        :comp="$comp" 
+                                                                        :subComp="null" 
+                                                                        :instanceIndex="$instIdx"
+                                                                        :value="$fData?->content_value" 
+                                                                        :filePath="$fData?->file_path" 
+                                                                        :disabledCondition="'activeComponentId && activeComponentId !== ' . $comp->id" 
+                                                                    />
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+
+                                                <!-- Template for dynamic add -->
+                                                <template id="template-comp-{{ $comp->id }}">
+                                                    <div class="repeater-item p-3.5 bg-slate-50/70 rounded-xl border border-slate-200 relative space-y-3">
+                                                        <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/60">
+                                                            <span class="text-xs font-bold text-slate-700">#__DISPLAY_INDEX__ {{ $comp->component_name }}</span>
+                                                            <button type="button" onclick="this.closest('.repeater-item').remove()" class="text-rose-500 hover:text-rose-700 text-xs font-semibold cursor-pointer">
+                                                                🗑 Remove
+                                                            </button>
+                                                        </div>
+                                                        <div class="space-y-3">
+                                                            @foreach($compFields as $field)
+                                                                <x-dynamic-field 
+                                                                    :field="$field" 
+                                                                    :comp="$comp" 
+                                                                    :subComp="null" 
+                                                                    instanceIndex="__INDEX__"
+                                                                    :value="null" 
+                                                                    :filePath="null" 
+                                                                    :disabledCondition="'activeComponentId && activeComponentId !== ' . $comp->id" 
+                                                                />
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </template>
+
+                                                <button 
+                                                    type="button" 
+                                                    onclick="addRepeaterItem({{ $comp->id }})" 
+                                                    class="w-full py-2.5 px-4 rounded-xl border-2 border-dashed border-blue-400 bg-blue-50/40 hover:bg-blue-50 text-blue-600 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-2xs"
+                                                >
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                                    <span>+ Add Another {{ $comp->component_name }}</span>
+                                                </button>
+                                            </div>
+                                        @elseif($compFields->isNotEmpty())
                                             <div class="p-4 rounded-xl border border-slate-200/90 bg-white space-y-3.5">
                                                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                                                     <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">{{ $comp->component_name }}</h4>
@@ -869,4 +1080,48 @@
     </div>
 
 </div>
+@push('scripts')
+<script>
+function addRepeaterItem(compId) {
+    const container = document.getElementById('repeater-comp-' + compId);
+    const template = document.getElementById('template-comp-' + compId);
+    if (!container || !template) return;
+    
+    let nextIndex = parseInt(container.dataset.nextIndex || '0');
+    const existingItems = container.querySelectorAll('.repeater-item');
+    const displayIndex = existingItems.length + 1;
+    
+    let html = template.innerHTML
+        .replace(/__INDEX__/g, nextIndex)
+        .replace(/__DISPLAY_INDEX__/g, displayIndex);
+        
+    container.dataset.nextIndex = nextIndex + 1;
+    
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html.trim();
+    container.appendChild(wrapper.firstElementChild);
+}
+
+function addSubRepeaterItem(compId, subCompId) {
+    const container = document.getElementById('repeater-subcomp-' + compId + '-' + subCompId);
+    const template = document.getElementById('template-subcomp-' + compId + '-' + subCompId);
+    if (!container || !template) return;
+    
+    let nextIndex = parseInt(container.dataset.nextIndex || '0');
+    const existingItems = container.querySelectorAll('.repeater-sub-item');
+    const displayIndex = existingItems.length + 1;
+    
+    let html = template.innerHTML
+        .replace(/__INDEX__/g, nextIndex)
+        .replace(/__DISPLAY_INDEX__/g, displayIndex);
+        
+    container.dataset.nextIndex = nextIndex + 1;
+    
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html.trim();
+    container.appendChild(wrapper.firstElementChild);
+}
+</script>
+@endpush
+
 @endsection

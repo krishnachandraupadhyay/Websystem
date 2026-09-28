@@ -16,10 +16,15 @@ class SectionComponentData extends Model
         'component_id',
         'sub_component_id',
         'component_field_id',
+        'instance_index',
         'field_name',
         'content_value',
         'extra_value',
         'file_path',
+    ];
+
+    protected $casts = [
+        'instance_index' => 'integer',
     ];
 
     public function section()
