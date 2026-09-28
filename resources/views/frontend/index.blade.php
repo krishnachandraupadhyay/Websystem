@@ -317,111 +317,200 @@
     </section>
 
 
+    <!-- ==================================================== -->
+    <!-- FULL SCREEN / FULL WIDTH ABOUT US SECTION -->
+    <!-- ==================================================== -->
+    <section id="about" class="w-full bg-white border-y border-slate-200/90 py-12 sm:py-16 my-6 shadow-xs">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Section Header -->
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <div class="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold px-3.5 py-1.5 rounded-full mb-3 shadow-2xs">
+                    <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                    <span class="font-hindi">संस्कारयुक्त आधुनिक शिक्षा</span>
+                    <span>•</span>
+                    <span class="tracking-wider">25+ YEARS OF EXCELLENCE</span>
+                </div>
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight font-heading uppercase">
+                    ABOUT GYAN VIKAS SCHOOL
+                </h2>
+                <h3 class="font-hindi text-base sm:text-xl font-bold text-amber-600 mt-1">
+                    ज्ञान विकास स्कूल — प्रेरित मन, सर्वांगीण विकास एवं उज्ज्वल भविष्य
+                </h3>
+                <p class="text-slate-600 text-xs sm:text-sm mt-3 leading-relaxed">
+                    Welcome to Gyan Vikas School. Located in New Delhi, our campus is an inspiring hub of intellectual discovery, academic distinction, and character building where traditional Indian values merge seamlessly with modern international pedagogy.
+                </p>
+            </div>
+
+            <!-- Two-Column Grid: Left Story & Stats | Right 9-Pillars Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                
+                <!-- Left Column: Story, Image Preview & Key Stats (lg:col-span-5) -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="relative rounded-2xl overflow-hidden shadow-lg border border-slate-200 group">
+                        <img 
+                            src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=800&q=80" 
+                            alt="Gyan Vikas School Campus" 
+                            class="w-full h-56 sm:h-64 object-cover transform group-hover:scale-105 transition-transform duration-700"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/40 to-transparent flex items-end p-5">
+                            <div>
+                                <span class="bg-amber-400 text-slate-950 text-[10px] font-black uppercase px-2.5 py-1 rounded-md tracking-wider">CBSE Affiliated</span>
+                                <h4 class="text-white font-bold text-base sm:text-lg mt-1 font-heading">Inspiring Campus & Future-Ready Learning</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed text-justify">
+                        Our institution stands committed to holistic pedagogy, academic distinction, and state-of-the-art facilities that empower students to discover their potential through innovative teaching, character development, and future-ready education. From STEM robotics to athletic arenas, we nurture tomorrow's leaders today.
+                    </p>
+
+                    <!-- 4 Metric Cards -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                        <div class="bg-slate-50 border border-slate-200/90 rounded-xl p-3 shadow-2xs hover:border-blue-300 transition-colors">
+                            <span class="block text-xl sm:text-2xl font-black text-blue-700 font-heading">25+</span>
+                            <span class="text-[11px] font-semibold text-slate-600">Years Legacy</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200/90 rounded-xl p-3 shadow-2xs hover:border-emerald-300 transition-colors">
+                            <span class="block text-xl sm:text-2xl font-black text-emerald-600 font-heading">5,000+</span>
+                            <span class="text-[11px] font-semibold text-slate-600">Alumni</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200/90 rounded-xl p-3 shadow-2xs hover:border-amber-300 transition-colors">
+                            <span class="block text-xl sm:text-2xl font-black text-amber-500 font-heading">100%</span>
+                            <span class="text-[11px] font-semibold text-slate-600">Board Pass</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200/90 rounded-xl p-3 shadow-2xs hover:border-indigo-300 transition-colors">
+                            <span class="block text-xl sm:text-2xl font-black text-indigo-600 font-heading">150+</span>
+                            <span class="text-[11px] font-semibold text-slate-600">Expert Faculty</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 pt-2">
+                        <a href="#academics" class="inline-flex items-center gap-2 bg-[#0070e0] hover:bg-[#005bb5] text-white text-xs sm:text-sm font-bold px-6 py-3 rounded-full shadow-sm hover:shadow-md transition-all">
+                            <span>Explore Our Heritage & Mission</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </a>
+                        <a href="#admissions" class="inline-flex items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs sm:text-sm font-bold px-5 py-3 rounded-full border border-amber-300 transition-all">
+                            <span>Admissions 2024-25</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Column: 9 Circular Feature Badges (Expanded & Spacious) (lg:col-span-7) -->
+                <div class="lg:col-span-7">
+                    <div class="bg-slate-50/80 border border-slate-200 rounded-2xl p-5 sm:p-7 shadow-xs">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-5">
+                            <h4 class="font-extrabold text-slate-900 text-sm sm:text-base uppercase tracking-wider font-heading flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                <span>Core Pillars of Excellence</span>
+                            </h4>
+                            <span class="text-xs text-slate-500 font-medium">9 Institutional Standards</span>
+                        </div>
+
+                        <!-- 3x3 Feature Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            
+                            <!-- 1. Our Mission -->
+                            <div class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white border border-slate-200/80 hover:border-emerald-300 hover:shadow-md transition-all group cursor-pointer">
+                                <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-xs group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                </div>
+                                <span class="text-xs font-bold text-slate-900 mt-2.5 leading-tight">Our Mission</span>
+                                <span class="text-[11px] text-slate-500 mt-1 leading-snug">Inspiring purposeful growth & values</span>
+                            </div>
+
+                            <!-- 2. Top Academic Excellence -->
+                            <div class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white border border-slate-200/80 hover:border-blue-300 hover:shadow-md transition-all group cursor-pointer">
+                                <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shadow-xs group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 7l-9-5 9-5 9 5-9 5z"/></svg>
+                                </div>
+                                <span class="text-xs font-bold text-slate-900 mt-2.5 leading-tight">Top Academic Excellence</span>
+                                <span class="text-[11px] text-slate-500 mt-1 leading-snug">CBSE curriculum & board toppers</span>
+                            </div>
+
+                            <!-- 3. Holistic Development -->
+                            <div class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white border border-slate-200/80 hover:border-teal-300 hover:shadow-md transition-all group cursor-pointer">
+                                <div class="w-12 h-12 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center shadow-xs group-hover:bg-teal-600 group-hover:text-white transition-all">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                                </div>
+                                <span class="text-xs font-bold text-slate-900 mt-2.5 leading-tight">Holistic Development</span>
+                                <span class="text-[11px] text-slate-500 mt-1 leading-snug">Emotional intelligence & life skills</span>
+                            </div>
+
+                            <!-- 4. Faculty & Building -->
+                            <div class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white border border-slate-200/80 hover:border-indigo-300 hover:shadow-md transition-all group cursor-pointer">
+                                <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center shadow-xs group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                </div>
+                                <span class="text-xs font-bold text-slate-900 mt-2.5 leading-tight">Faculty & Building</span>
+                                <span class="text-[11px] text-slate-500 mt-1 leading-snug">Experienced mentors & green campus</span>
+                            </div>
+
+                            <!-- 5. Sports & Activities -->
+                            <div class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white border border-slate-200/80 hover:border-amber-300 hover:shadow-md transition-all group cursor-pointer">
+                                <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shadow-xs group-hover:bg-amber-600 group-hover:text-white transition-all">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <span class="text-xs font-bold text-slate-900 mt-2.5 leading-tight">Sports, Activities</span>
+                                <span class="text-[11px] text-slate-500 mt-1 leading-snug">Athletics arenas & championship coaching</span>
+                            </div>
+
+                            <!-- 6. Modern Infrastructure -->
+                            <div class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white border border-slate-200/80 hover:border-cyan-300 hover:shadow-md transition-all group cursor-pointer">
+                                <div class="w-12 h-12 rounded-full bg-cyan-100 text-cyan-700 flex items-center justify-center shadow-xs group-hover:bg-cyan-600 group-hover:text-white transition-all">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                </div>
+                                <span class="text-xs font-bold text-slate-900 mt-2.5 leading-tight">Modern Infrastructure</span>
+                                <span class="text-[11px] text-slate-500 mt-1 leading-snug">Smart boards & high-tech robotics labs</span>
+                            </div>
+
+                            <!-- 7. Communication -->
+                            <div class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white border border-slate-200/80 hover:border-sky-300 hover:shadow-md transition-all group cursor-pointer">
+                                <div class="w-12 h-12 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center shadow-xs group-hover:bg-sky-600 group-hover:text-white transition-all">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                </div>
+                                <span class="text-xs font-bold text-slate-900 mt-2.5 leading-tight">Communication</span>
+                                <span class="text-[11px] text-slate-500 mt-1 leading-snug">Bilingual mastery & public speaking</span>
+                            </div>
+
+                            <!-- 8. Learning -->
+                            <div class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white border border-slate-200/80 hover:border-purple-300 hover:shadow-md transition-all group cursor-pointer">
+                                <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center shadow-xs group-hover:bg-purple-600 group-hover:text-white transition-all">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                </div>
+                                <span class="text-xs font-bold text-slate-900 mt-2.5 leading-tight">Learning</span>
+                                <span class="text-[11px] text-slate-500 mt-1 leading-snug">Inquiry-driven experiential learning</span>
+                            </div>
+
+                            <!-- 9. Contact Us -->
+                            <div class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white border border-slate-200/80 hover:border-emerald-300 hover:shadow-md transition-all group cursor-pointer">
+                                <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-xs group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                                </div>
+                                <span class="text-xs font-bold text-slate-900 mt-2.5 leading-tight">Contact Us</span>
+                                <span class="text-[11px] text-slate-500 mt-1 leading-snug">Direct parent-school partnership</span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+
     <!-- MAIN 3-COLUMN CONTENT GRID -->
     <main class="max-w-[1440px] mx-auto px-3 sm:px-5 lg:px-6 pb-12">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             
             <!-- ============================================== -->
-            <!-- COLUMN 1: ABOUT US & LEADERSHIP (lg:col-span-4) -->
+            <!-- COLUMN 1: MESSAGE FROM LEADERSHIP (lg:col-span-4) -->
             <!-- ============================================== -->
             <div class="lg:col-span-4 space-y-5">
                 
-                <!-- CARD 1: ABOUT US -->
-                <section id="about" class="bg-white rounded-xl shadow-xs border border-slate-200/90 p-5 transition-shadow hover:shadow-md">
-                    <h3 class="font-black text-slate-900 text-sm sm:text-base tracking-wider uppercase border-b border-slate-100 pb-2.5 mb-3 font-heading flex items-center justify-between">
-                        <span>ABOUT US</span>
-                        <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-                    </h3>
-
-                    <p class="text-slate-600 text-xs sm:text-[13px] leading-relaxed mb-4 text-justify">
-                        Welcome to Gyan Vikas School. Our institution stands committed to holistic pedagogy, academic distinction, and state-of-the-art facilities that empower students to discover their potential through innovative teaching, character development, and future-ready education.
-                    </p>
-
-                    <!-- Circular Feature Icons Grid (3x3 matching layout) -->
-                    <div class="grid grid-cols-3 gap-3 my-4 py-2 border-y border-slate-100 bg-slate-50/50 rounded-lg p-2.5">
-                        
-                        <!-- 1. Our Mission -->
-                        <div class="flex flex-col items-center text-center group cursor-pointer">
-                            <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-2xs group-hover:bg-emerald-600 group-hover:text-white transition-all">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                            </div>
-                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Our Mission</span>
-                        </div>
-
-                        <!-- 2. Top Academic Excellence -->
-                        <div class="flex flex-col items-center text-center group cursor-pointer">
-                            <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shadow-2xs group-hover:bg-blue-600 group-hover:text-white transition-all">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 7l-9-5 9-5 9 5-9 5z"/></svg>
-                            </div>
-                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Top Academic Excellence</span>
-                        </div>
-
-                        <!-- 3. Holistic Development -->
-                        <div class="flex flex-col items-center text-center group cursor-pointer">
-                            <div class="w-10 h-10 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center shadow-2xs group-hover:bg-teal-600 group-hover:text-white transition-all">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
-                            </div>
-                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Holistic Development</span>
-                        </div>
-
-                        <!-- 4. Faculty & Building -->
-                        <div class="flex flex-col items-center text-center group cursor-pointer">
-                            <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center shadow-2xs group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                            </div>
-                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Faculty & Building</span>
-                        </div>
-
-                        <!-- 5. Sports & Activities -->
-                        <div class="flex flex-col items-center text-center group cursor-pointer">
-                            <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shadow-2xs group-hover:bg-amber-600 group-hover:text-white transition-all">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            </div>
-                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Sports, Activities</span>
-                        </div>
-
-                        <!-- 6. Modern Infrastructure -->
-                        <div class="flex flex-col items-center text-center group cursor-pointer">
-                            <div class="w-10 h-10 rounded-full bg-cyan-100 text-cyan-700 flex items-center justify-center shadow-2xs group-hover:bg-cyan-600 group-hover:text-white transition-all">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                            </div>
-                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Modern Infrastructure</span>
-                        </div>
-
-                        <!-- 7. Communication -->
-                        <div class="flex flex-col items-center text-center group cursor-pointer">
-                            <div class="w-10 h-10 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center shadow-2xs group-hover:bg-sky-600 group-hover:text-white transition-all">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                            </div>
-                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Communication</span>
-                        </div>
-
-                        <!-- 8. Learning -->
-                        <div class="flex flex-col items-center text-center group cursor-pointer">
-                            <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center shadow-2xs group-hover:bg-purple-600 group-hover:text-white transition-all">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                            </div>
-                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Learning</span>
-                        </div>
-
-                        <!-- 9. Contact Us -->
-                        <div class="flex flex-col items-center text-center group cursor-pointer">
-                            <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-2xs group-hover:bg-emerald-600 group-hover:text-white transition-all">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                            </div>
-                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Contact Us</span>
-                        </div>
-
-                    </div>
-
-                    <a href="#about" class="inline-flex items-center gap-1.5 bg-[#0070e0] hover:bg-[#005bb5] text-white text-xs font-bold px-4 py-2 rounded-full shadow-xs transition-colors">
-                        <span>Read More</span>
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                    </a>
-                </section>
-
-
-                <!-- CARD 2: MESSAGE FROM LEADERSHIP -->
+                <!-- CARD: MESSAGE FROM LEADERSHIP -->
                 <section class="bg-white rounded-xl shadow-xs border border-slate-200/90 p-5 transition-shadow hover:shadow-md">
                     <h3 class="font-black text-slate-900 text-sm sm:text-base tracking-wider uppercase border-b border-slate-100 pb-2.5 mb-4 font-heading flex items-center justify-between">
                         <span>MESSAGE FROM LEADERSHIP</span>
