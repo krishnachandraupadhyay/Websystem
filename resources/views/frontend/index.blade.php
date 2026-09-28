@@ -248,8 +248,8 @@
                     hindiTitle: '100% बोर्ड परिणाम एवं प्रतिष्ठित संस्थाओं में चयन',
                     tagline: 'Nurturing Moral Character, Academic Distinction & Lifelong Leadership',
                     hindiTagline: '“संस्कार, अनुशासन एवं उत्कृष्ट सफलता का पर्याय”',
-                    badgeText: 'VIEW ACHIEVEMENTS',
-                    badgeHindi: 'उपलब्धियां देखें',
+                    badgeText: 'VIEW PLACEMENTS',
+                    badgeHindi: 'प्लेसमेंट देखें',
                     badgeLink: '#placement'
                 }
             ],
@@ -550,186 +550,435 @@
 
 
     <!-- ==================================================== -->
-    <!-- FULL SCREEN / FULL WIDTH PLACEMENT & ACHIEVEMENTS -->
+    <!-- FULL SCREEN / FULL WIDTH CAMPUS PLACEMENTS -->
     <!-- ==================================================== -->
     <section id="placement" class="w-full bg-[#f8fafc] border-y border-slate-200/90 py-12 sm:py-16 my-6 shadow-xs">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
             
             <!-- Section Header -->
             <div class="text-center max-w-3xl mx-auto mb-10">
-                <div class="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold px-3.5 py-1.5 rounded-full mb-3 shadow-2xs">
-                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                    <span class="font-hindi">उपलब्धियां एवं करियर सफलता</span>
+                <div class="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-900 text-xs font-bold px-3.5 py-1.5 rounded-full mb-3 shadow-2xs">
+                    <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                    <span class="font-hindi">करियर एवं कैंपस प्लेसमेंट</span>
                     <span>•</span>
-                    <span class="tracking-wider uppercase">CAREER EXCELLENCE & ACHIEVEMENTS</span>
+                    <span class="tracking-wider uppercase">CAMPUS PLACEMENT SUCCESS</span>
                 </div>
                 <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight font-heading uppercase">
-                    PLACEMENT & ACHIEVEMENTS
+                    CAMPUS PLACEMENTS
                 </h2>
                 <p class="text-slate-600 text-xs sm:text-sm mt-2 leading-relaxed">
-                    Equipping Gyan Vikas students with top academic distinctions, multinational recruiter selections, and lifelong leadership competencies.
+                    Celebrating our brilliant students who secured dream job opportunities and premier packages at leading multinational corporations.
                 </p>
             </div>
 
             <!-- Key Placement Highlight Counters -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-2xs text-center hover:border-amber-300 transition-colors">
-                    <span class="text-2xl sm:text-3xl font-black text-amber-500 font-heading block">98%</span>
-                    <span class="text-xs font-semibold text-slate-600 mt-1 block">Campus Placement & Merit Rate</span>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-2xs text-center hover:border-emerald-300 transition-colors">
+                    <span class="text-2xl sm:text-3xl font-black text-emerald-600 font-heading block">₹36.5 LPA</span>
+                    <span class="text-xs font-semibold text-slate-600 mt-1 block">Highest Package Offered</span>
                 </div>
                 <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-2xs text-center hover:border-blue-300 transition-colors">
-                    <span class="text-2xl sm:text-3xl font-black text-blue-600 font-heading block">100+</span>
-                    <span class="text-xs font-semibold text-slate-600 mt-1 block">Corporate & Higher Ed Partners</span>
+                    <span class="text-2xl sm:text-3xl font-black text-blue-600 font-heading block">₹12.4 LPA</span>
+                    <span class="text-xs font-semibold text-slate-600 mt-1 block">Average Annual Package</span>
                 </div>
-                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-2xs text-center hover:border-emerald-300 transition-colors">
-                    <span class="text-2xl sm:text-3xl font-black text-emerald-600 font-heading block">66+</span>
-                    <span class="text-xs font-semibold text-slate-600 mt-1 block">Premier Tech Placements</span>
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-2xs text-center hover:border-amber-300 transition-colors">
+                    <span class="text-2xl sm:text-3xl font-black text-amber-500 font-heading block">450+</span>
+                    <span class="text-xs font-semibold text-slate-600 mt-1 block">Total Campus Offers</span>
                 </div>
                 <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-2xs text-center hover:border-indigo-300 transition-colors">
-                    <span class="text-2xl sm:text-3xl font-black text-indigo-600 font-heading block">+24%</span>
-                    <span class="text-xs font-semibold text-slate-600 mt-1 block">Year-on-Year Growth</span>
+                    <span class="text-2xl sm:text-3xl font-black text-indigo-600 font-heading block">100+</span>
+                    <span class="text-xs font-semibold text-slate-600 mt-1 block">Corporate Hiring Partners</span>
                 </div>
             </div>
 
-            <!-- Placement Cards Grid (4 Columns in Full Width) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <!-- Student Placement Cards Grid (8 Students) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                 
-                <!-- Card 1: Featured Alumni Success Story -->
-                <div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between hover:shadow-md transition-shadow">
-                    <div>
-                        <div class="relative rounded-lg overflow-hidden mb-3">
-                            <img 
-                                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80" 
-                                alt="Alumni Success Story" 
-                                class="w-full h-36 object-cover"
-                            />
-                            <span class="absolute top-2 left-2 bg-slate-900/70 backdrop-blur-md text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded">Alumni Spotlight</span>
-                        </div>
-                        <h4 class="font-bold text-slate-900 text-sm leading-tight font-heading">Alumni Success Stories</h4>
-                        <p class="text-slate-600 text-xs mt-1.5 leading-relaxed">
-                            Alumni from Gyan Vikas holding distinguished leadership roles across top global multinational corporations and scientific institutions.
-                        </p>
-                    </div>
-                    <div class="pt-3 border-t border-slate-100 mt-3">
-                        <a href="#placement" class="text-blue-600 font-bold text-xs hover:underline inline-flex items-center gap-1">
-                            <span>Read Full Story</span>
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Card 2: Top Recruiters (Amazon, Microsoft) -->
-                <div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between hover:shadow-md transition-shadow">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 class="font-bold text-slate-900 text-sm font-heading">Top Recruiters</h4>
-                            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">Fortune 500</span>
-                        </div>
+                <!-- Card 1: Aarav Sharma (Google) -->
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group">
+                    <div class="relative overflow-hidden">
+                        <img 
+                            src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=600&q=80" 
+                            alt="Aarav Sharma" 
+                            class="w-full h-52 object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30"></div>
                         
-                        <div class="space-y-2.5">
-                            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-lg border border-slate-200/80">
-                                <span class="font-black text-sm text-slate-900 tracking-tight">amazon</span>
-                                <span class="text-xs font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded">15+ Placed</span>
-                            </div>
-                            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-lg border border-slate-200/80">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="w-3 h-3 grid grid-cols-2 gap-0.5">
-                                        <span class="bg-red-500 rounded-[1px]"></span>
-                                        <span class="bg-green-500 rounded-[1px]"></span>
-                                        <span class="bg-blue-500 rounded-[1px]"></span>
-                                        <span class="bg-amber-500 rounded-[1px]"></span>
-                                    </span>
-                                    <span class="font-semibold text-xs text-slate-800">Microsoft</span>
-                                </div>
-                                <span class="text-xs font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded">48 Placed</span>
-                            </div>
-                            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-lg border border-slate-200/80">
-                                <span class="font-bold text-xs text-slate-800 tracking-tight">Google / Deloitte</span>
-                                <span class="text-xs font-bold text-purple-700 bg-purple-100/70 px-2 py-0.5 rounded">24+ Placed</span>
-                            </div>
+                        <!-- Company Badge (Top-Left) -->
+                        <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5 border border-slate-200">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            <span class="text-[11px] font-black text-slate-900 tracking-tight font-heading">Google</span>
+                        </div>
+
+                        <!-- Package Badge (Top-Right) -->
+                        <div class="absolute top-3 right-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+                            <span>₹36.5 LPA</span>
+                        </div>
+
+                        <!-- Floating Name overlay at bottom of image -->
+                        <div class="absolute bottom-2.5 left-3 right-3 text-white">
+                            <h3 class="text-base font-extrabold font-heading leading-tight drop-shadow-sm">Aarav Sharma</h3>
+                            <span class="text-[11px] text-amber-300 font-semibold drop-shadow-xs">Software Engineer (SDE-1)</span>
                         </div>
                     </div>
 
-                    <div class="pt-3 border-t border-slate-100 mt-3 flex items-center justify-between text-xs text-slate-500">
-                        <span>Career Counseling Cell</span>
-                        <span class="text-emerald-600 font-bold">100% Mentorship</span>
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <!-- Package Callout -->
+                            <div class="flex items-center justify-between py-2 px-3 bg-emerald-50/70 rounded-xl border border-emerald-200/70 mb-3">
+                                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Offered Package</span>
+                                <span class="text-sm font-black text-emerald-700 font-heading">₹36.50 LPA</span>
+                            </div>
+
+                            <!-- Description -->
+                            <p class="text-slate-600 text-xs leading-relaxed line-clamp-3 mb-4">
+                                Selected at Google Core Search team. Excelled in advanced data structures, algorithmic design, and campus innovation lab projects.
+                            </p>
+                        </div>
+
+                        <!-- Action Button -->
+                        <div class="pt-2 border-t border-slate-100 mt-auto">
+                            <a href="#contact" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0e233a] to-[#1b3b5f] hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs hover:shadow-md transition-all group/btn">
+                                <span>View Placement Story</span>
+                                <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Card 3: Top Recruiters (Tecruiters) -->
-                <div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between hover:shadow-md transition-shadow">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 class="font-bold text-slate-900 text-sm font-heading">Corporate Alliances</h4>
-                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                        </div>
+                <!-- Card 2: Priya Patel (Microsoft) -->
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group">
+                    <div class="relative overflow-hidden">
+                        <img 
+                            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80" 
+                            alt="Priya Patel" 
+                            class="w-full h-52 object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30"></div>
                         
-                        <div class="flex items-center gap-2 mb-3 bg-red-50/60 p-2 rounded-lg border border-red-100">
-                            <span class="w-7 h-7 rounded-full bg-red-600 text-white font-black text-sm flex items-center justify-center shadow-xs">R</span>
-                            <div>
-                                <span class="font-extrabold text-sm text-slate-900 tracking-tight block">Tecruiters</span>
-                                <span class="text-[10px] text-slate-500">National Placement Partner</span>
-                            </div>
+                        <!-- Company Badge (Top-Left) -->
+                        <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5 border border-slate-200">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span class="text-[11px] font-black text-slate-900 tracking-tight font-heading">Microsoft</span>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2 text-center">
-                            <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                                <span class="block text-lg font-black text-slate-900 font-heading">66+</span>
-                                <span class="text-[10px] font-semibold text-slate-500">Placements</span>
-                            </div>
-                            <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                                <span class="block text-lg font-black text-slate-900 font-heading">18+</span>
-                                <span class="text-[10px] font-semibold text-slate-500">Global Offers</span>
-                            </div>
+                        <!-- Package Badge (Top-Right) -->
+                        <div class="absolute top-3 right-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+                            <span>₹32.0 LPA</span>
+                        </div>
+
+                        <div class="absolute bottom-2.5 left-3 right-3 text-white">
+                            <h3 class="text-base font-extrabold font-heading leading-tight drop-shadow-sm">Priya Patel</h3>
+                            <span class="text-[11px] text-amber-300 font-semibold drop-shadow-xs">Cloud Solutions Architect</span>
                         </div>
                     </div>
 
-                    <div class="pt-3 border-t border-slate-100 mt-3">
-                        <a href="#placement" class="text-blue-600 font-bold text-xs hover:underline">View Recruitment Partners →</a>
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between py-2 px-3 bg-emerald-50/70 rounded-xl border border-emerald-200/70 mb-3">
+                                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Offered Package</span>
+                                <span class="text-sm font-black text-emerald-700 font-heading">₹32.00 LPA</span>
+                            </div>
+
+                            <p class="text-slate-600 text-xs leading-relaxed line-clamp-3 mb-4">
+                                Recruited for the Azure Cloud Platform team. Active student leader of the Gyan Vikas Coding Club and Women-in-Tech mentorship drive.
+                            </p>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100 mt-auto">
+                            <a href="#contact" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0e233a] to-[#1b3b5f] hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs hover:shadow-md transition-all group/btn">
+                                <span>View Placement Story</span>
+                                <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Card 4: Placement Stats Bar Chart -->
-                <div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between hover:shadow-md transition-shadow">
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <h4 class="font-bold text-slate-900 text-sm font-heading">Placement Stats</h4>
-                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">↑ +24% YoY</span>
+                <!-- Card 3: Rohan Verma (Amazon) -->
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group">
+                    <div class="relative overflow-hidden">
+                        <img 
+                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80" 
+                            alt="Rohan Verma" 
+                            class="w-full h-52 object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30"></div>
+                        
+                        <!-- Company Badge (Top-Left) -->
+                        <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5 border border-slate-200">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                            <span class="text-[11px] font-black text-slate-900 tracking-tight font-heading">Amazon AWS</span>
                         </div>
-                        <p class="text-[11px] text-slate-500 mb-3">Annual placement growth metrics</p>
 
-                        <!-- Graphical Bar Chart -->
-                        <div class="h-28 flex items-end justify-between gap-2 px-2 py-2 bg-slate-50 rounded-lg border border-slate-200">
-                            <div class="w-full flex flex-col items-center">
-                                <span class="text-[9px] font-bold text-slate-600">32</span>
-                                <div class="w-4 bg-amber-400 rounded-t shadow-2xs" style="height: 40px;"></div>
-                                <span class="text-[9px] text-slate-500 font-medium mt-1">2021</span>
-                            </div>
-                            <div class="w-full flex flex-col items-center">
-                                <span class="text-[9px] font-bold text-slate-600">46</span>
-                                <div class="w-4 bg-emerald-500 rounded-t shadow-2xs" style="height: 55px;"></div>
-                                <span class="text-[9px] text-slate-500 font-medium mt-1">2022</span>
-                            </div>
-                            <div class="w-full flex flex-col items-center">
-                                <span class="text-[9px] font-bold text-slate-600">54</span>
-                                <div class="w-4 bg-sky-500 rounded-t shadow-2xs" style="height: 65px;"></div>
-                                <span class="text-[9px] text-slate-500 font-medium mt-1">2023</span>
-                            </div>
-                            <div class="w-full flex flex-col items-center">
-                                <span class="text-[9px] font-bold text-slate-600">72</span>
-                                <div class="w-4 bg-blue-600 rounded-t shadow-2xs" style="height: 80px;"></div>
-                                <span class="text-[9px] text-slate-500 font-medium mt-1">2024</span>
-                            </div>
-                            <div class="w-full flex flex-col items-center">
-                                <span class="text-[9px] font-bold text-slate-600">95</span>
-                                <div class="w-4 bg-indigo-700 rounded-t shadow-2xs" style="height: 95px;"></div>
-                                <span class="text-[9px] text-slate-500 font-medium mt-1">2025</span>
-                            </div>
+                        <!-- Package Badge (Top-Right) -->
+                        <div class="absolute top-3 right-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+                            <span>₹28.4 LPA</span>
+                        </div>
+
+                        <div class="absolute bottom-2.5 left-3 right-3 text-white">
+                            <h3 class="text-base font-extrabold font-heading leading-tight drop-shadow-sm">Rohan Verma</h3>
+                            <span class="text-[11px] text-amber-300 font-semibold drop-shadow-xs">Backend Systems Engineer</span>
                         </div>
                     </div>
 
-                    <div class="pt-3 border-t border-slate-100 mt-3 text-right">
-                        <span class="text-[11px] text-slate-500 font-medium">Record 95% Top Tier Offers</span>
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between py-2 px-3 bg-emerald-50/70 rounded-xl border border-emerald-200/70 mb-3">
+                                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Offered Package</span>
+                                <span class="text-sm font-black text-emerald-700 font-heading">₹28.40 LPA</span>
+                            </div>
+
+                            <p class="text-slate-600 text-xs leading-relaxed line-clamp-3 mb-4">
+                                Placed in Amazon AWS distributed computing division. Winner of Smart India Hackathon and lead developer for campus portal systems.
+                            </p>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100 mt-auto">
+                            <a href="#contact" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0e233a] to-[#1b3b5f] hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs hover:shadow-md transition-all group/btn">
+                                <span>View Placement Story</span>
+                                <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Ananya Singh (Goldman Sachs) -->
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group">
+                    <div class="relative overflow-hidden">
+                        <img 
+                            src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80" 
+                            alt="Ananya Singh" 
+                            class="w-full h-52 object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30"></div>
+                        
+                        <!-- Company Badge (Top-Left) -->
+                        <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5 border border-slate-200">
+                            <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+                            <span class="text-[11px] font-black text-slate-900 tracking-tight font-heading">Goldman Sachs</span>
+                        </div>
+
+                        <!-- Package Badge (Top-Right) -->
+                        <div class="absolute top-3 right-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+                            <span>₹25.0 LPA</span>
+                        </div>
+
+                        <div class="absolute bottom-2.5 left-3 right-3 text-white">
+                            <h3 class="text-base font-extrabold font-heading leading-tight drop-shadow-sm">Ananya Singh</h3>
+                            <span class="text-[11px] text-amber-300 font-semibold drop-shadow-xs">Quantitative Analyst</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between py-2 px-3 bg-emerald-50/70 rounded-xl border border-emerald-200/70 mb-3">
+                                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Offered Package</span>
+                                <span class="text-sm font-black text-emerald-700 font-heading">₹25.00 LPA</span>
+                            </div>
+
+                            <p class="text-slate-600 text-xs leading-relaxed line-clamp-3 mb-4">
+                                Selected as Quantitative Financial Analyst. Specialized in machine learning models and predictive analytics under faculty supervision.
+                            </p>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100 mt-auto">
+                            <a href="#contact" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0e233a] to-[#1b3b5f] hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs hover:shadow-md transition-all group/btn">
+                                <span>View Placement Story</span>
+                                <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5: Vikramaditya Roy (Adobe) -->
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group">
+                    <div class="relative overflow-hidden">
+                        <img 
+                            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80" 
+                            alt="Vikramaditya Roy" 
+                            class="w-full h-52 object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30"></div>
+                        
+                        <!-- Company Badge (Top-Left) -->
+                        <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5 border border-slate-200">
+                            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                            <span class="text-[11px] font-black text-slate-900 tracking-tight font-heading">Adobe</span>
+                        </div>
+
+                        <!-- Package Badge (Top-Right) -->
+                        <div class="absolute top-3 right-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+                            <span>₹22.5 LPA</span>
+                        </div>
+
+                        <div class="absolute bottom-2.5 left-3 right-3 text-white">
+                            <h3 class="text-base font-extrabold font-heading leading-tight drop-shadow-sm">Vikramaditya Roy</h3>
+                            <span class="text-[11px] text-amber-300 font-semibold drop-shadow-xs">Full Stack Product Engineer</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between py-2 px-3 bg-emerald-50/70 rounded-xl border border-emerald-200/70 mb-3">
+                                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Offered Package</span>
+                                <span class="text-sm font-black text-emerald-700 font-heading">₹22.50 LPA</span>
+                            </div>
+
+                            <p class="text-slate-600 text-xs leading-relaxed line-clamp-3 mb-4">
+                                Joined Adobe Creative Suite engineering team. Trained extensively in reactive frameworks, microservices, and modern UI engineering.
+                            </p>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100 mt-auto">
+                            <a href="#contact" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0e233a] to-[#1b3b5f] hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs hover:shadow-md transition-all group/btn">
+                                <span>View Placement Story</span>
+                                <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6: Neha Kulkarni (Deloitte) -->
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group">
+                    <div class="relative overflow-hidden">
+                        <img 
+                            src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80" 
+                            alt="Neha Kulkarni" 
+                            class="w-full h-52 object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30"></div>
+                        
+                        <!-- Company Badge (Top-Left) -->
+                        <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5 border border-slate-200">
+                            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                            <span class="text-[11px] font-black text-slate-900 tracking-tight font-heading">Deloitte</span>
+                        </div>
+
+                        <!-- Package Badge (Top-Right) -->
+                        <div class="absolute top-3 right-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+                            <span>₹18.0 LPA</span>
+                        </div>
+
+                        <div class="absolute bottom-2.5 left-3 right-3 text-white">
+                            <h3 class="text-base font-extrabold font-heading leading-tight drop-shadow-sm">Neha Kulkarni</h3>
+                            <span class="text-[11px] text-amber-300 font-semibold drop-shadow-xs">Technology Consultant</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between py-2 px-3 bg-emerald-50/70 rounded-xl border border-emerald-200/70 mb-3">
+                                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Offered Package</span>
+                                <span class="text-sm font-black text-emerald-700 font-heading">₹18.00 LPA</span>
+                            </div>
+
+                            <p class="text-slate-600 text-xs leading-relaxed line-clamp-3 mb-4">
+                                Recruited for Enterprise Strategy & IT Advisory. Led campus cyber consulting projects and represented Gyan Vikas in national case competitions.
+                            </p>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100 mt-auto">
+                            <a href="#contact" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0e233a] to-[#1b3b5f] hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs hover:shadow-md transition-all group/btn">
+                                <span>View Placement Story</span>
+                                <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 7: Aditya Rathore (Siemens) -->
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group">
+                    <div class="relative overflow-hidden">
+                        <img 
+                            src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=600&q=80" 
+                            alt="Aditya Rathore" 
+                            class="w-full h-52 object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30"></div>
+                        
+                        <!-- Company Badge (Top-Left) -->
+                        <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5 border border-slate-200">
+                            <span class="w-2 h-2 rounded-full bg-cyan-600"></span>
+                            <span class="text-[11px] font-black text-slate-900 tracking-tight font-heading">Siemens</span>
+                        </div>
+
+                        <!-- Package Badge (Top-Right) -->
+                        <div class="absolute top-3 right-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+                            <span>₹16.5 LPA</span>
+                        </div>
+
+                        <div class="absolute bottom-2.5 left-3 right-3 text-white">
+                            <h3 class="text-base font-extrabold font-heading leading-tight drop-shadow-sm">Aditya Rathore</h3>
+                            <span class="text-[11px] text-amber-300 font-semibold drop-shadow-xs">Robotics & Automation Specialist</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between py-2 px-3 bg-emerald-50/70 rounded-xl border border-emerald-200/70 mb-3">
+                                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Offered Package</span>
+                                <span class="text-sm font-black text-emerald-700 font-heading">₹16.50 LPA</span>
+                            </div>
+
+                            <p class="text-slate-600 text-xs leading-relaxed line-clamp-3 mb-4">
+                                Selected as Automation Engineer. Built autonomous warehouse inspection robots in Gyan Vikas Robotics Lab with faculty research sponsorship.
+                            </p>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100 mt-auto">
+                            <a href="#contact" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0e233a] to-[#1b3b5f] hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs hover:shadow-md transition-all group/btn">
+                                <span>View Placement Story</span>
+                                <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 8: Sneha Gupta (Oracle) -->
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group">
+                    <div class="relative overflow-hidden">
+                        <img 
+                            src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80" 
+                            alt="Sneha Gupta" 
+                            class="w-full h-52 object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30"></div>
+                        
+                        <!-- Company Badge (Top-Left) -->
+                        <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5 border border-slate-200">
+                            <span class="w-2 h-2 rounded-full bg-red-600"></span>
+                            <span class="text-[11px] font-black text-slate-900 tracking-tight font-heading">Oracle</span>
+                        </div>
+
+                        <!-- Package Badge (Top-Right) -->
+                        <div class="absolute top-3 right-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+                            <span>₹15.2 LPA</span>
+                        </div>
+
+                        <div class="absolute bottom-2.5 left-3 right-3 text-white">
+                            <h3 class="text-base font-extrabold font-heading leading-tight drop-shadow-sm">Sneha Gupta</h3>
+                            <span class="text-[11px] text-amber-300 font-semibold drop-shadow-xs">Cloud Database Specialist</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between py-2 px-3 bg-emerald-50/70 rounded-xl border border-emerald-200/70 mb-3">
+                                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Offered Package</span>
+                                <span class="text-sm font-black text-emerald-700 font-heading">₹15.20 LPA</span>
+                            </div>
+
+                            <p class="text-slate-600 text-xs leading-relaxed line-clamp-3 mb-4">
+                                Placed as Cloud Database Engineer. Cleared industry certifications with distinction through the Gyan Vikas Corporate Training Cell.
+                            </p>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100 mt-auto">
+                            <a href="#contact" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0e233a] to-[#1b3b5f] hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs hover:shadow-md transition-all group/btn">
+                                <span>View Placement Story</span>
+                                <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
