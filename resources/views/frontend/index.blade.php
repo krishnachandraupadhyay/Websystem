@@ -154,90 +154,163 @@
     </header>
 
 
-    <!-- HERO SECTION - DUAL CARD SHOWCASE (MATCHING IMAGE BANNER) -->
-    <section class="max-w-[1440px] mx-auto p-3 sm:p-5 lg:p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
+    <!-- HERO CAROUSEL SECTION -->
+    <section 
+        class="max-w-[1440px] mx-auto p-3 sm:p-5 lg:p-6"
+        x-data="{
+            active: 0,
+            slides: [
+                {
+                    image: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1600&q=80',
+                    welcome: 'WELCOME TO',
+                    title: 'GYAN VIKAS SCHOOL',
+                    hindiTitle: 'ज्ञान विकास स्कूल में आपका स्वागत है',
+                    tagline: 'Inspiring Minds, Building Futures',
+                    hindiTagline: '“प्रेरित मन, उज्ज्वल भविष्य”',
+                    badgeText: 'ADMISSIONS OPEN 2024-25',
+                    badgeHindi: 'प्रवेश 2024-25 प्रारंभ',
+                    badgeLink: '#admissions'
+                },
+                {
+                    image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1600&q=80',
+                    welcome: 'CENTRE OF EXCELLENCE',
+                    title: 'NURTURING FUTURE INNOVATORS',
+                    hindiTitle: 'ज्ञान विकास स्कूल - आधुनिक व संस्कारी शिक्षा',
+                    tagline: 'Modern Digital Smart Classrooms & High-Tech Science Labs',
+                    hindiTagline: '“आधुनिक स्मार्ट कक्षाएं एवं विज्ञान प्रयोगशालाएं”',
+                    badgeText: 'EXPLORE ACADEMICS',
+                    badgeHindi: 'शिक्षा व्यवस्था जानें',
+                    badgeLink: '#academics'
+                },
+                {
+                    image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80',
+                    welcome: 'HOLISTIC ENVIRONMENT',
+                    title: 'SPORTS, CULTURE & INNOVATION',
+                    hindiTitle: 'खेल, संस्कृति एवं समग्र व्यक्तित्व विकास',
+                    tagline: 'Robotics Hub, Cultural Drama & Championship Athletic Grounds',
+                    hindiTagline: '“रोबोटिक्स, रंगमंच एवं खेलकूद में अग्रणी”',
+                    badgeText: 'CAMPUS LIFE & CLUBS',
+                    badgeHindi: 'क्लब्स एवं खेल गतिविधियां',
+                    badgeLink: '#gallery'
+                },
+                {
+                    image: 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=1600&q=80',
+                    welcome: 'PROUD HERITAGE',
+                    title: 'OUTSTANDING RESULTS & PLACEMENTS',
+                    hindiTitle: '100% बोर्ड परिणाम एवं प्रतिष्ठित संस्थाओं में चयन',
+                    tagline: 'Nurturing Moral Character, Academic Distinction & Lifelong Leadership',
+                    hindiTagline: '“संस्कार, अनुशासन एवं उत्कृष्ट सफलता का पर्याय”',
+                    badgeText: 'VIEW ACHIEVEMENTS',
+                    badgeHindi: 'उपलब्धियां देखें',
+                    badgeLink: '#placement'
+                }
+            ],
+            timer: null,
+            startAutoPlay() {
+                this.timer = setInterval(() => {
+                    this.next();
+                }, 5000);
+            },
+            stopAutoPlay() {
+                clearInterval(this.timer);
+            },
+            next() {
+                this.active = (this.active + 1) % this.slides.length;
+            },
+            prev() {
+                this.active = (this.active - 1 + this.slides.length) % this.slides.length;
+            },
+            goTo(i) {
+                this.active = i;
+            }
+        }"
+        x-init="startAutoPlay()"
+        @mouseenter="stopAutoPlay()"
+        @mouseleave="startAutoPlay()"
+    >
+        <div class="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-700/40 min-h-[350px] sm:min-h-[420px] lg:min-h-[460px] bg-slate-950 flex items-center justify-center">
             
-            <!-- Hero Card 1 (Left Banner) -->
-            <div class="relative rounded-2xl overflow-hidden shadow-lg border border-slate-700/30 min-h-[300px] sm:min-h-[360px] lg:min-h-[400px] flex items-center justify-center p-6 text-center group">
-                <!-- Background Image -->
-                <img 
-                    src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=80" 
-                    alt="Gyan Vikas School Classroom Students" 
-                    class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
-                />
-                <!-- Gradient Overlay -->
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/65 to-slate-900/40"></div>
-
-                <!-- Text Content Badge Overlay -->
-                <div class="relative z-10 max-w-lg mx-auto flex flex-col items-center">
-                    <span class="text-xs sm:text-sm font-black text-amber-300 tracking-widest uppercase mb-1 drop-shadow-sm font-heading">
-                        WELCOME TO
-                    </span>
-                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-wide uppercase font-heading drop-shadow-md">
-                        GYAN VIKAS SCHOOL
-                    </h1>
-                    <h2 class="font-hindi text-base sm:text-xl font-bold text-amber-200 mt-1 drop-shadow-sm">
-                        ज्ञान विकास स्कूल में आपका स्वागत है
-                    </h2>
-                    
-                    <p class="text-xs sm:text-sm text-slate-200 mt-2 font-medium tracking-wide">
-                        Inspiring Minds, Building Futures
-                    </p>
-                    <p class="font-hindi text-xs sm:text-sm text-slate-300 italic font-medium">
-                        “प्रेरित मन, उज्ज्वल भविष्य”
-                    </p>
-
-                    <!-- Admissions Pill Button -->
-                    <div class="mt-5">
-                        <a href="#admissions" class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-lg border border-emerald-300/40 transform hover:scale-105 transition-all">
-                            <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
-                            <span class="uppercase">ADMISSIONS OPEN 2024-25</span>
-                            <span class="font-hindi text-[11px] sm:text-xs font-semibold pl-1 border-l border-emerald-300/40">प्रवेश 2024-25 प्रारंभ</span>
-                        </a>
-                    </div>
-                </div>
+            <!-- Slide Counter Badge -->
+            <div class="absolute top-4 right-4 z-20 px-3 py-1 rounded-full bg-slate-950/70 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold tracking-wider font-heading flex items-center gap-1.5 shadow-md">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span x-text="(active + 1)">1</span>
+                <span class="text-slate-400">/</span>
+                <span class="text-slate-400" x-text="slides.length">4</span>
             </div>
 
-            <!-- Hero Card 2 (Right Banner) -->
-            <div class="relative rounded-2xl overflow-hidden shadow-lg border border-slate-700/30 min-h-[300px] sm:min-h-[360px] lg:min-h-[400px] flex items-center justify-center p-6 text-center group">
-                <!-- Background Image -->
-                <img 
-                    src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80" 
-                    alt="Gyan Vikas School Students Learning" 
-                    class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
-                />
-                <!-- Gradient Overlay -->
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/65 to-slate-900/40"></div>
+            <!-- Slides Loop -->
+            <template x-for="(slide, index) in slides" :key="index">
+                <div 
+                    x-show="active === index"
+                    x-transition:enter="transition-all ease-out duration-700"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition-all ease-in duration-500 absolute inset-0"
+                    x-transition:leave-start="opacity-100 scale-100"
+                    x-transition:leave-end="opacity-0 scale-105"
+                    class="absolute inset-0 w-full h-full flex items-center justify-center p-6 text-center select-none"
+                >
+                    <!-- Background Image -->
+                    <img 
+                        :src="slide.image" 
+                        :alt="slide.title" 
+                        class="absolute inset-0 w-full h-full object-cover transform hover:scale-105 transition-transform duration-1000"
+                    />
+                    <!-- Gradient Overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-900/70 to-slate-900/45"></div>
 
-                <!-- Text Content Badge Overlay -->
-                <div class="relative z-10 max-w-lg mx-auto flex flex-col items-center">
-                    <span class="text-xs sm:text-sm font-black text-amber-300 tracking-widest uppercase mb-1 drop-shadow-sm font-heading">
-                        WELCOME TO
-                    </span>
-                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-wide uppercase font-heading drop-shadow-md">
-                        GYAN VIKAS SCHOOL
-                    </h2>
-                    <p class="font-hindi text-base sm:text-xl font-bold text-amber-200 mt-1 drop-shadow-sm">
-                        ज्ञान विकास स्कूल में आपका स्वागत है
-                    </p>
-                    
-                    <p class="text-xs sm:text-sm text-slate-200 mt-2 font-medium tracking-wide">
-                        Inspiring Minds, Building Futures
-                    </p>
-                    <p class="font-hindi text-xs sm:text-sm text-slate-300 italic font-medium">
-                        “प्रेरित मन, उज्ज्वल भविष्य”
-                    </p>
+                    <!-- Slide Content -->
+                    <div class="relative z-10 max-w-2xl mx-auto flex flex-col items-center">
+                        <span class="text-xs sm:text-sm font-black text-amber-300 tracking-widest uppercase mb-1 drop-shadow-sm font-heading" x-text="slide.welcome"></span>
+                        <h1 class="text-2xl sm:text-3xl lg:text-4xl 2xl:text-5xl font-extrabold text-white tracking-wide uppercase font-heading drop-shadow-md leading-tight" x-text="slide.title"></h1>
+                        <h2 class="font-hindi text-base sm:text-xl lg:text-2xl font-bold text-amber-200 mt-1.5 drop-shadow-sm" x-text="slide.hindiTitle"></h2>
+                        
+                        <p class="text-xs sm:text-sm text-slate-200 mt-2.5 font-medium tracking-wide max-w-xl drop-shadow-xs" x-text="slide.tagline"></p>
+                        <p class="font-hindi text-xs sm:text-sm text-slate-300 italic font-medium mt-0.5" x-text="slide.hindiTagline"></p>
 
-                    <!-- Admissions Pill Button -->
-                    <div class="mt-5">
-                        <a href="#admissions" class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-lg border border-emerald-300/40 transform hover:scale-105 transition-all">
-                            <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
-                            <span class="uppercase">ADMISSIONS OPEN 2024-25</span>
-                            <span class="font-hindi text-[11px] sm:text-xs font-semibold pl-1 border-l border-emerald-300/40">प्रवेश 2024-25 प्रारंभ</span>
-                        </a>
+                        <!-- Admissions Pill Button -->
+                        <div class="mt-6">
+                            <a :href="slide.badgeLink" class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm px-6 py-2.5 rounded-full shadow-lg border border-emerald-300/40 transform hover:scale-105 transition-all">
+                                <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                                <span class="uppercase" x-text="slide.badgeText"></span>
+                                <span class="font-hindi text-[11px] sm:text-xs font-semibold pl-1.5 border-l border-emerald-300/40" x-text="slide.badgeHindi"></span>
+                            </a>
+                        </div>
                     </div>
                 </div>
+            </template>
+
+            <!-- Navigation Arrow Left -->
+            <button 
+                type="button" 
+                @click="prev()" 
+                class="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900/60 hover:bg-amber-400 text-white hover:text-slate-950 backdrop-blur-md border border-white/20 hover:border-amber-400 flex items-center justify-center shadow-lg transition-all duration-200 transform hover:scale-110 cursor-pointer"
+                title="Previous Slide"
+            >
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+
+            <!-- Navigation Arrow Right -->
+            <button 
+                type="button" 
+                @click="next()" 
+                class="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900/60 hover:bg-amber-400 text-white hover:text-slate-950 backdrop-blur-md border border-white/20 hover:border-amber-400 flex items-center justify-center shadow-lg transition-all duration-200 transform hover:scale-110 cursor-pointer"
+                title="Next Slide"
+            >
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </button>
+
+            <!-- Bottom Indicator Dots / Pills -->
+            <div class="absolute bottom-4 inset-x-0 z-20 flex items-center justify-center gap-2">
+                <template x-for="(slide, index) in slides" :key="index">
+                    <button 
+                        type="button"
+                        @click="goTo(index)" 
+                        :class="active === index ? 'w-8 bg-amber-400 shadow-md' : 'w-2.5 bg-white/50 hover:bg-white/80'"
+                        class="h-2.5 rounded-full transition-all duration-300 cursor-pointer"
+                        :title="'Go to slide ' + (index + 1)"
+                    ></button>
+                </template>
             </div>
 
         </div>
