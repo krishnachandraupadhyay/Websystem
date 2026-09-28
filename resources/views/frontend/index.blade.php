@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ज्ञान विकास स्कूल - Gyan Vikas School - Inspiring Minds, Building Futures. Admissions Open 2024-25.">
+    <title>ज्ञान विकास स्कूल | GYAN VIKAS SCHOOL</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#142c4b',
+                            900: '#0e233a',
+                            950: '#091829',
+                        },
+                        school: {
+                            gold: '#f59e0b',
+                            yellow: '#fbb500',
+                            teal: '#0d9488',
+                            emerald: '#059669',
+                            blue: '#1e40af',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        devanagari: ['"Noto Sans Devanagari"', 'sans-serif'],
+                        heading: ['"Outfit"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .font-hindi {
+            font-family: 'Noto Sans Devanagari', sans-serif;
+        }
+        .font-heading {
+            font-family: 'Outfit', sans-serif;
+        }
+        .hero-gradient-overlay {
+            background: linear-gradient(180deg, rgba(8, 23, 40, 0.45) 0%, rgba(8, 23, 40, 0.75) 70%, rgba(8, 23, 40, 0.92) 100%);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="bg-[#eef2f6] text-slate-800 antialiased" x-data="{ mobileMenuOpen: false, searchOpen: false }">
+
+    <!-- TOP HEADER / NAVBAR -->
+    <header class="sticky top-0 z-50 bg-[#0e233a] border-b border-[#1b3b5f] shadow-md">
+        <div class="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20">
+                
+                <!-- School Brand / Logo -->
+                <a href="{{ url('/') }}" class="flex items-center gap-3 group shrink-0">
+                    <!-- Crest / Shield Logo -->
+                    <div class="relative w-11 h-12 sm:w-13 sm:h-14 rounded-md bg-gradient-to-b from-blue-700 via-blue-900 to-indigo-950 border border-amber-400/80 shadow-md flex flex-col items-center justify-center p-1 overflow-hidden">
+                        <div class="absolute inset-0 bg-amber-400/10 pointer-events-none"></div>
+                        <!-- Shield Emblem SVG -->
+                        <svg class="w-6 h-6 text-amber-400" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm0 2.18l6 2.25v4.66c0 4.1-2.67 7.9-6 8.91-3.33-1.01-6-4.81-6-8.91V6.43l6-2.25zM12 6.5a2.5 2.5 0 00-2.5 2.5c0 1.05.65 1.95 1.57 2.31L10 14h4l-1.07-2.69c.92-.36 1.57-1.26 1.57-2.31A2.5 2.5 0 0012 6.5z"/>
+                        </svg>
+                        <span class="text-[8px] font-black text-amber-300 tracking-widest uppercase mt-0.5">GVS</span>
+                    </div>
+
+                    <!-- Names in Hindi & English -->
+                    <div class="flex flex-col justify-center">
+                        <span class="font-hindi text-amber-400 font-extrabold text-sm sm:text-base leading-tight tracking-wide drop-shadow-xs">ज्ञान विकास स्कूल</span>
+                        <span class="text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase leading-tight font-heading">GYAN VIKAS SCHOOL</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden xl:flex items-center gap-1 2xl:gap-3 text-xs sm:text-[13px] font-semibold text-slate-200">
+                    <a href="{{ url('/') }}" class="px-2.5 py-1.5 text-amber-400 font-bold border-b-2 border-amber-400 transition-colors">Home</a>
+                    <a href="#about" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">About Us</a>
+                    <a href="#academics" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Academics</a>
+                    <a href="#admissions" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Admissions</a>
+                    <a href="#placement" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Placement</a>
+                    <a href="#gallery" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Gallery</a>
+                    <a href="#events" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Events</a>
+                    <a href="#notices" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Notice Board</a>
+                    <a href="#contact" class="px-2.5 py-1.5 hover:text-white hover:text-amber-300 transition-colors">Contact Us</a>
+                </nav>
+
+                <!-- Right Action Buttons -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <!-- PARENT LOGIN BUTTON -->
+                    <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 bg-[#fbb500] hover:bg-[#e6a500] text-slate-950 font-black text-xs sm:text-xs px-3 sm:px-4 py-2 rounded-lg uppercase tracking-wider shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span>PARENT LOGIN</span>
+                    </a>
+
+                    <!-- Search Button -->
+                    <button @click="searchOpen = !searchOpen" class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer" title="Search">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+
+                    <!-- Mobile Menu Hamburger -->
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="xl:hidden p-2 text-slate-300 hover:text-white rounded-lg focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Dropdown Box -->
+            <div x-show="searchOpen" x-transition class="py-3 px-2 border-t border-slate-700/60 flex items-center gap-2">
+                <input type="text" placeholder="Search notices, faculty, curriculum, admissions..." class="w-full bg-slate-900 text-white placeholder-slate-400 text-xs sm:text-sm px-4 py-2 rounded-lg border border-slate-700 focus:outline-none focus:border-amber-400">
+                <button class="bg-amber-400 text-slate-900 px-4 py-2 rounded-lg text-xs font-bold uppercase shrink-0">Search</button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div x-show="mobileMenuOpen" x-transition class="xl:hidden bg-[#0a1b2d] border-t border-slate-800 px-4 pt-2 pb-4 space-y-1 text-sm font-semibold">
+            <a href="{{ url('/') }}" class="block px-3 py-2 rounded-md text-amber-400 bg-slate-800/60 font-bold">Home</a>
+            <a href="#about" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">About Us</a>
+            <a href="#academics" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Academics</a>
+            <a href="#admissions" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Admissions</a>
+            <a href="#placement" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Placement</a>
+            <a href="#gallery" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Gallery</a>
+            <a href="#events" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Events</a>
+            <a href="#notices" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Notice Board</a>
+            <a href="#contact" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800">Contact Us</a>
+        </div>
+    </header>
+
+
+    <!-- HERO SECTION - DUAL CARD SHOWCASE (MATCHING IMAGE BANNER) -->
+    <section class="max-w-[1440px] mx-auto p-3 sm:p-5 lg:p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
+            
+            <!-- Hero Card 1 (Left Banner) -->
+            <div class="relative rounded-2xl overflow-hidden shadow-lg border border-slate-700/30 min-h-[300px] sm:min-h-[360px] lg:min-h-[400px] flex items-center justify-center p-6 text-center group">
+                <!-- Background Image -->
+                <img 
+                    src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=80" 
+                    alt="Gyan Vikas School Classroom Students" 
+                    class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                />
+                <!-- Gradient Overlay -->
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/65 to-slate-900/40"></div>
+
+                <!-- Text Content Badge Overlay -->
+                <div class="relative z-10 max-w-lg mx-auto flex flex-col items-center">
+                    <span class="text-xs sm:text-sm font-black text-amber-300 tracking-widest uppercase mb-1 drop-shadow-sm font-heading">
+                        WELCOME TO
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-wide uppercase font-heading drop-shadow-md">
+                        GYAN VIKAS SCHOOL
+                    </h1>
+                    <h2 class="font-hindi text-base sm:text-xl font-bold text-amber-200 mt-1 drop-shadow-sm">
+                        ज्ञान विकास स्कूल में आपका स्वागत है
+                    </h2>
+                    
+                    <p class="text-xs sm:text-sm text-slate-200 mt-2 font-medium tracking-wide">
+                        Inspiring Minds, Building Futures
+                    </p>
+                    <p class="font-hindi text-xs sm:text-sm text-slate-300 italic font-medium">
+                        “प्रेरित मन, उज्ज्वल भविष्य”
+                    </p>
+
+                    <!-- Admissions Pill Button -->
+                    <div class="mt-5">
+                        <a href="#admissions" class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-lg border border-emerald-300/40 transform hover:scale-105 transition-all">
+                            <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                            <span class="uppercase">ADMISSIONS OPEN 2024-25</span>
+                            <span class="font-hindi text-[11px] sm:text-xs font-semibold pl-1 border-l border-emerald-300/40">प्रवेश 2024-25 प्रारंभ</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hero Card 2 (Right Banner) -->
+            <div class="relative rounded-2xl overflow-hidden shadow-lg border border-slate-700/30 min-h-[300px] sm:min-h-[360px] lg:min-h-[400px] flex items-center justify-center p-6 text-center group">
+                <!-- Background Image -->
+                <img 
+                    src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80" 
+                    alt="Gyan Vikas School Students Learning" 
+                    class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                />
+                <!-- Gradient Overlay -->
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/65 to-slate-900/40"></div>
+
+                <!-- Text Content Badge Overlay -->
+                <div class="relative z-10 max-w-lg mx-auto flex flex-col items-center">
+                    <span class="text-xs sm:text-sm font-black text-amber-300 tracking-widest uppercase mb-1 drop-shadow-sm font-heading">
+                        WELCOME TO
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-wide uppercase font-heading drop-shadow-md">
+                        GYAN VIKAS SCHOOL
+                    </h2>
+                    <p class="font-hindi text-base sm:text-xl font-bold text-amber-200 mt-1 drop-shadow-sm">
+                        ज्ञान विकास स्कूल में आपका स्वागत है
+                    </p>
+                    
+                    <p class="text-xs sm:text-sm text-slate-200 mt-2 font-medium tracking-wide">
+                        Inspiring Minds, Building Futures
+                    </p>
+                    <p class="font-hindi text-xs sm:text-sm text-slate-300 italic font-medium">
+                        “प्रेरित मन, उज्ज्वल भविष्य”
+                    </p>
+
+                    <!-- Admissions Pill Button -->
+                    <div class="mt-5">
+                        <a href="#admissions" class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-lg border border-emerald-300/40 transform hover:scale-105 transition-all">
+                            <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                            <span class="uppercase">ADMISSIONS OPEN 2024-25</span>
+                            <span class="font-hindi text-[11px] sm:text-xs font-semibold pl-1 border-l border-emerald-300/40">प्रवेश 2024-25 प्रारंभ</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- MAIN 3-COLUMN CONTENT GRID -->
+    <main class="max-w-[1440px] mx-auto px-3 sm:px-5 lg:px-6 pb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            
+            <!-- ============================================== -->
+            <!-- COLUMN 1: ABOUT US & LEADERSHIP (lg:col-span-4) -->
+            <!-- ============================================== -->
+            <div class="lg:col-span-4 space-y-5">
+                
+                <!-- CARD 1: ABOUT US -->
+                <section id="about" class="bg-white rounded-xl shadow-xs border border-slate-200/90 p-5 transition-shadow hover:shadow-md">
+                    <h3 class="font-black text-slate-900 text-sm sm:text-base tracking-wider uppercase border-b border-slate-100 pb-2.5 mb-3 font-heading flex items-center justify-between">
+                        <span>ABOUT US</span>
+                        <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                    </h3>
+
+                    <p class="text-slate-600 text-xs sm:text-[13px] leading-relaxed mb-4 text-justify">
+                        Welcome to Gyan Vikas School. Our institution stands committed to holistic pedagogy, academic distinction, and state-of-the-art facilities that empower students to discover their potential through innovative teaching, character development, and future-ready education.
+                    </p>
+
+                    <!-- Circular Feature Icons Grid (3x3 matching layout) -->
+                    <div class="grid grid-cols-3 gap-3 my-4 py-2 border-y border-slate-100 bg-slate-50/50 rounded-lg p-2.5">
+                        
+                        <!-- 1. Our Mission -->
+                        <div class="flex flex-col items-center text-center group cursor-pointer">
+                            <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-2xs group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Our Mission</span>
+                        </div>
+
+                        <!-- 2. Top Academic Excellence -->
+                        <div class="flex flex-col items-center text-center group cursor-pointer">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shadow-2xs group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 7l-9-5 9-5 9 5-9 5z"/></svg>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Top Academic Excellence</span>
+                        </div>
+
+                        <!-- 3. Holistic Development -->
+                        <div class="flex flex-col items-center text-center group cursor-pointer">
+                            <div class="w-10 h-10 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center shadow-2xs group-hover:bg-teal-600 group-hover:text-white transition-all">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Holistic Development</span>
+                        </div>
+
+                        <!-- 4. Faculty & Building -->
+                        <div class="flex flex-col items-center text-center group cursor-pointer">
+                            <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center shadow-2xs group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Faculty & Building</span>
+                        </div>
+
+                        <!-- 5. Sports & Activities -->
+                        <div class="flex flex-col items-center text-center group cursor-pointer">
+                            <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shadow-2xs group-hover:bg-amber-600 group-hover:text-white transition-all">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Sports, Activities</span>
+                        </div>
+
+                        <!-- 6. Modern Infrastructure -->
+                        <div class="flex flex-col items-center text-center group cursor-pointer">
+                            <div class="w-10 h-10 rounded-full bg-cyan-100 text-cyan-700 flex items-center justify-center shadow-2xs group-hover:bg-cyan-600 group-hover:text-white transition-all">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Modern Infrastructure</span>
+                        </div>
+
+                        <!-- 7. Communication -->
+                        <div class="flex flex-col items-center text-center group cursor-pointer">
+                            <div class="w-10 h-10 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center shadow-2xs group-hover:bg-sky-600 group-hover:text-white transition-all">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Communication</span>
+                        </div>
+
+                        <!-- 8. Learning -->
+                        <div class="flex flex-col items-center text-center group cursor-pointer">
+                            <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center shadow-2xs group-hover:bg-purple-600 group-hover:text-white transition-all">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Learning</span>
+                        </div>
+
+                        <!-- 9. Contact Us -->
+                        <div class="flex flex-col items-center text-center group cursor-pointer">
+                            <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-2xs group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-700 mt-1 leading-tight">Contact Us</span>
+                        </div>
+
+                    </div>
+
+                    <a href="#about" class="inline-flex items-center gap-1.5 bg-[#0070e0] hover:bg-[#005bb5] text-white text-xs font-bold px-4 py-2 rounded-full shadow-xs transition-colors">
+                        <span>Read More</span>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </section>
+
+
+                <!-- CARD 2: MESSAGE FROM LEADERSHIP -->
+                <section class="bg-white rounded-xl shadow-xs border border-slate-200/90 p-5 transition-shadow hover:shadow-md">
+                    <h3 class="font-black text-slate-900 text-sm sm:text-base tracking-wider uppercase border-b border-slate-100 pb-2.5 mb-4 font-heading flex items-center justify-between">
+                        <span>MESSAGE FROM LEADERSHIP</span>
+                        <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                    </h3>
+
+                    <!-- Profile 1: Dr. Sarita Sharma (Principal) - Emerald Theme -->
+                    <div class="bg-gradient-to-br from-[#059669] to-[#047857] text-white rounded-xl p-4 shadow-sm mb-4">
+                        <div class="flex gap-3 items-start">
+                            <img 
+                                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80" 
+                                alt="Dr. Sarita Sharma - Principal" 
+                                class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border-2 border-white/80 shadow-md shrink-0"
+                            />
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-white text-sm sm:text-base leading-tight font-heading">Dr. Sarita Sharma</h4>
+                                <span class="text-emerald-100 text-xs font-semibold block mb-1">Principal</span>
+                                <p class="text-emerald-50 text-[11px] sm:text-xs leading-relaxed line-clamp-3">
+                                    Welcome to Gyan Vikas School. We meet passionate commitment and holistic enrichment. Our institution is dedicated to nurturing curiosity, discipline, and emotional strength in every student.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-emerald-400/30 flex justify-end">
+                            <button class="bg-emerald-900/60 hover:bg-emerald-950 text-emerald-100 hover:text-white text-[11px] font-bold px-3 py-1 rounded-md transition-colors">
+                                Read More
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Profile 2: Mr. Arun Khanna (Director) - Slate/Light Theme -->
+                    <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-4 shadow-2xs">
+                        <div class="flex gap-3 items-start">
+                            <img 
+                                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" 
+                                alt="Mr. Arun Khanna - Director" 
+                                class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border border-slate-300 shadow-sm shrink-0"
+                            />
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-slate-900 text-sm sm:text-base leading-tight font-heading">Mr. Arun Khanna</h4>
+                                <span class="text-slate-500 text-xs font-semibold block mb-1">Director</span>
+                                <p class="text-slate-600 text-[11px] sm:text-xs leading-relaxed line-clamp-3">
+                                    Gyan Vikas School stands as a beacon of academic leadership and value-based schooling. We nurture visionaries with global perspectives, cutting-edge technology, and enduring values.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-slate-200 flex justify-end">
+                            <button class="text-blue-700 hover:text-blue-900 text-[11px] font-bold hover:underline">
+                                Read More
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+
+            <!-- ============================================== -->
+            <!-- COLUMN 2: PLACEMENT & ACHIEVEMENTS (lg:col-span-4) -->
+            <!-- ============================================== -->
+            <div id="placement" class="lg:col-span-4 space-y-5">
+                
+                <!-- CARD 1: PLACEMENT & ACHIEVEMENTS -->
+                <section class="bg-white rounded-xl shadow-xs border border-slate-200/90 p-5 transition-shadow hover:shadow-md">
+                    <h3 class="font-black text-slate-900 text-sm sm:text-base tracking-wider uppercase border-b border-slate-100 pb-2.5 mb-4 font-heading flex items-center justify-between">
+                        <span>PLACEMENT & ACHIEVEMENTS</span>
+                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    </h3>
+
+                    <!-- Placement Highlights Sub-Grid -->
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        
+                        <!-- Mini Card 1: Alumni Featured Card -->
+                        <div class="col-span-1 bg-slate-50 rounded-lg border border-slate-200/80 p-2.5 flex flex-col justify-between">
+                            <img 
+                                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80" 
+                                alt="Alumni Success Story" 
+                                class="w-full h-24 object-cover rounded-md mb-2 shadow-2xs"
+                            />
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-xs leading-tight">Alumni Success Stories</h4>
+                                <p class="text-slate-500 text-[10px] mt-1 line-clamp-2">Alumni from Gyan Vikas in leadership roles across top multinational firms.</p>
+                            </div>
+                            <a href="#placement" class="text-blue-600 font-bold text-[10px] mt-2 inline-block hover:underline">Read More</a>
+                        </div>
+
+                        <!-- Mini Card 2: Top Recruiters (Amazon, Microsoft) -->
+                        <div class="col-span-1 bg-slate-50 rounded-lg border border-slate-200/80 p-2.5 flex flex-col justify-between">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-xs mb-2">Top Recruiters</h4>
+                                
+                                <!-- Brand Badges -->
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between bg-white px-2 py-1 rounded border border-slate-200">
+                                        <span class="font-black text-xs text-slate-800 tracking-tight">amazon</span>
+                                        <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">15+ Hired</span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-white px-2 py-1 rounded border border-slate-200">
+                                        <div class="flex items-center gap-1">
+                                            <span class="w-2.5 h-2.5 grid grid-cols-2 gap-0.5">
+                                                <span class="bg-red-500 rounded-[1px]"></span>
+                                                <span class="bg-green-500 rounded-[1px]"></span>
+                                                <span class="bg-blue-500 rounded-[1px]"></span>
+                                                <span class="bg-amber-500 rounded-[1px]"></span>
+                                            </span>
+                                            <span class="font-semibold text-[11px] text-slate-800">Microsoft</span>
+                                        </div>
+                                        <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">48 Hired</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-2 pt-1.5 border-t border-slate-200/80">
+                                <span class="text-[10px] text-slate-500 font-medium">98% Placement Rate</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Row 2: Recruiters & Stats -->
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        
+                        <!-- Tecruiters Card -->
+                        <div class="bg-slate-50 rounded-lg border border-slate-200/80 p-2.5">
+                            <h4 class="font-bold text-slate-800 text-xs mb-1.5">Top Recruiters</h4>
+                            <div class="flex items-center gap-1.5 mb-2">
+                                <span class="w-5 h-5 rounded-full bg-red-600 text-white font-black text-xs flex items-center justify-center">R</span>
+                                <span class="font-extrabold text-xs text-slate-800 tracking-tight">Tecruiters</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1 text-center">
+                                <div class="bg-white p-1 rounded border border-slate-200">
+                                    <span class="block text-xs font-black text-slate-900">66+</span>
+                                    <span class="text-[9px] text-slate-500">Placements</span>
+                                </div>
+                                <div class="bg-white p-1 rounded border border-slate-200">
+                                    <span class="block text-xs font-black text-slate-900">18+</span>
+                                    <span class="text-[9px] text-slate-500">Offers</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Placement Stats Bar Chart -->
+                        <div class="bg-slate-50 rounded-lg border border-slate-200/80 p-2.5 flex flex-col justify-between">
+                            <h4 class="font-bold text-slate-800 text-xs mb-1">Placement Stats</h4>
+                            
+                            <!-- Graphical Bar Chart Representation -->
+                            <div class="h-16 flex items-end justify-between gap-1.5 px-1 py-1 bg-white rounded border border-slate-200">
+                                <div class="w-full flex flex-col items-center">
+                                    <div class="w-2.5 bg-amber-400 rounded-t" style="height: 38px;"></div>
+                                    <span class="text-[8px] text-slate-400 mt-0.5">21</span>
+                                </div>
+                                <div class="w-full flex flex-col items-center">
+                                    <div class="w-2.5 bg-emerald-500 rounded-t" style="height: 48px;"></div>
+                                    <span class="text-[8px] text-slate-400 mt-0.5">22</span>
+                                </div>
+                                <div class="w-full flex flex-col items-center">
+                                    <div class="w-2.5 bg-sky-500 rounded-t" style="height: 42px;"></div>
+                                    <span class="text-[8px] text-slate-400 mt-0.5">23</span>
+                                </div>
+                                <div class="w-full flex flex-col items-center">
+                                    <div class="w-2.5 bg-blue-600 rounded-t" style="height: 56px;"></div>
+                                    <span class="text-[8px] text-slate-400 mt-0.5">24</span>
+                                </div>
+                                <div class="w-full flex flex-col items-center">
+                                    <div class="w-2.5 bg-indigo-700 rounded-t" style="height: 60px;"></div>
+                                    <span class="text-[8px] text-slate-400 mt-0.5">25</span>
+                                </div>
+                            </div>
+                            <span class="text-[9px] text-emerald-700 font-semibold text-right mt-1">↑ +24% YoY Growth</span>
+                        </div>
+
+                    </div>
+
+                    <!-- Lower Activity Cards & Highlights (Center Column Lower) -->
+                    <div class="grid grid-cols-2 gap-3">
+                        
+                        <!-- Activity 1: Robotics Workshop -->
+                        <div class="relative rounded-lg overflow-hidden group shadow-2xs border border-slate-200">
+                            <img 
+                                src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=400&q=80" 
+                                alt="Robotics Workshop" 
+                                class="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent flex items-end p-2">
+                                <span class="text-[11px] font-bold text-white leading-tight">Robotics Workshop</span>
+                            </div>
+                        </div>
+
+                        <!-- Activity 2: Drama Club Performance -->
+                        <div class="relative rounded-lg overflow-hidden group shadow-2xs border border-slate-200">
+                            <img 
+                                src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=400&q=80" 
+                                alt="Drama Club Performance" 
+                                class="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent flex items-end p-2">
+                                <span class="text-[11px] font-bold text-white leading-tight">Drama Club Performance</span>
+                            </div>
+                        </div>
+
+                        <!-- Activity 3: Video Play Card 1 -->
+                        <div class="relative rounded-lg overflow-hidden group shadow-2xs border border-slate-200">
+                            <img 
+                                src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=400&q=80" 
+                                alt="Drama Performance Video" 
+                                class="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                            <div class="absolute inset-0 bg-slate-950/40 flex items-center justify-center">
+                                <div class="w-8 h-8 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                                    <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                            </div>
+                            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 to-transparent p-1.5 text-center">
+                                <span class="text-[10px] font-bold text-white">Drama Club Performance</span>
+                            </div>
+                        </div>
+
+                        <!-- Activity 4: Video Play Card 2 -->
+                        <div class="relative rounded-lg overflow-hidden group shadow-2xs border border-slate-200">
+                            <img 
+                                src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=400&q=80" 
+                                alt="Vibrant Club Variety" 
+                                class="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                            <div class="absolute inset-0 bg-slate-950/40 flex items-center justify-center">
+                                <div class="w-8 h-8 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                                    <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                            </div>
+                            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 to-transparent p-1.5 text-center">
+                                <span class="text-[10px] font-bold text-white">Vibrant Club Variety</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Mini Notices Box in Center Column -->
+                    <div class="mt-4 bg-slate-50 border border-slate-200 rounded-lg p-3">
+                        <span class="text-[11px] font-bold uppercase text-slate-700 block mb-2 font-heading">Latest Notices</span>
+                        <div class="space-y-2 text-xs">
+                            <div class="border-l-2 border-blue-500 pl-2">
+                                <p class="text-slate-800 font-semibold text-[11px] leading-tight">Welcome to Gyan Vikas School, Near Rohini, New Delhi</p>
+                                <span class="text-[10px] text-slate-400">13 Jan 2024</span>
+                            </div>
+                            <div class="border-l-2 border-emerald-500 pl-2">
+                                <p class="text-slate-800 font-semibold text-[11px] leading-tight">Parent Teacher Interaction & Career Counseling Sessions</p>
+                                <span class="text-[10px] text-slate-400">15 Jan 2024</span>
+                            </div>
+                        </div>
+                        <a href="#notices" class="text-blue-600 font-bold text-[10px] mt-2 inline-block hover:underline">View All Notices</a>
+                    </div>
+                </section>
+
+            </div>
+
+
+            <!-- ============================================== -->
+            <!-- COLUMN 3: NOTICE BOARD & GALLERY (lg:col-span-4) -->
+            <!-- ============================================== -->
+            <div class="lg:col-span-4 space-y-5">
+                
+                <!-- CARD 1: NOTICE BOARD & EVENTS -->
+                <section id="notices" class="bg-white rounded-xl shadow-xs border border-slate-200/90 p-5 transition-shadow hover:shadow-md">
+                    <h3 class="font-black text-slate-900 text-sm sm:text-base tracking-wider uppercase border-b border-slate-100 pb-2.5 mb-4 font-heading flex items-center justify-between">
+                        <span>NOTICE BOARD & EVENTS</span>
+                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                    </h3>
+
+                    <!-- Events 2x2 Grid -->
+                    <div class="grid grid-cols-2 gap-2.5 mb-4">
+                        <div class="relative rounded-lg overflow-hidden group border border-slate-200">
+                            <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=350&q=80" alt="Robotics" class="w-full h-20 object-cover group-hover:scale-105 transition-transform">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 to-transparent flex items-end p-1.5">
+                                <span class="text-[10px] font-bold text-white">Robotics Workshop</span>
+                            </div>
+                        </div>
+                        <div class="relative rounded-lg overflow-hidden group border border-slate-200">
+                            <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=350&q=80" alt="Drama" class="w-full h-20 object-cover group-hover:scale-105 transition-transform">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 to-transparent flex items-end p-1.5">
+                                <span class="text-[10px] font-bold text-white">Drama Club Performance</span>
+                            </div>
+                        </div>
+                        <div class="relative rounded-lg overflow-hidden group border border-slate-200">
+                            <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=350&q=80" alt="Drama" class="w-full h-20 object-cover group-hover:scale-105 transition-transform">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 to-transparent flex items-end p-1.5">
+                                <span class="text-[10px] font-bold text-white">Drama Club Performance</span>
+                            </div>
+                        </div>
+                        <div class="relative rounded-lg overflow-hidden group border border-slate-200">
+                            <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=350&q=80" alt="Drama" class="w-full h-20 object-cover group-hover:scale-105 transition-transform">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 to-transparent flex items-end p-1.5">
+                                <span class="text-[10px] font-bold text-white">Drama Club Performance</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Latest Notices List Box (Matching Screenshot) -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-200/80 pb-1.5">
+                            <span class="text-xs font-bold text-slate-800 uppercase font-heading">Latest Notices</span>
+                            <span class="text-[10px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">New Updates</span>
+                        </div>
+
+                        <!-- Notice 1 -->
+                        <div class="space-y-0.5">
+                            <h5 class="text-xs font-bold text-slate-800 leading-snug hover:text-blue-600 cursor-pointer">
+                                Welcome to Gyan Vikas School, Near Rohini, Delhi, 110085.
+                            </h5>
+                            <span class="text-[10px] text-slate-400 font-medium">13 Jan 2024</span>
+                        </div>
+
+                        <!-- Notice 2 -->
+                        <div class="space-y-0.5 border-t border-slate-200/60 pt-2">
+                            <h5 class="text-xs font-bold text-slate-800 leading-snug hover:text-blue-600 cursor-pointer">
+                                Parent Teacher Alumni Club Interaction: Annual Performance Discussion & Feedback.
+                            </h5>
+                            <span class="text-[10px] text-slate-400 font-medium">14 Jan 2024</span>
+                        </div>
+
+                        <!-- Notice 3 -->
+                        <div class="space-y-0.5 border-t border-slate-200/60 pt-2">
+                            <h5 class="text-xs font-bold text-slate-800 leading-snug hover:text-blue-600 cursor-pointer">
+                                Drama Club Performance: The annual theatre showcase is a resounding cultural milestone.
+                            </h5>
+                            <span class="text-[10px] text-slate-400 font-medium">15 Jan 2024</span>
+                        </div>
+
+                        <div class="pt-1 text-right">
+                            <a href="#notices" class="text-blue-600 font-bold text-xs hover:underline">Read More →</a>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- CARD 2: GALLERY & INNOVATION -->
+                <section id="gallery" class="bg-white rounded-xl shadow-xs border border-slate-200/90 p-5 transition-shadow hover:shadow-md">
+                    <h3 class="font-black text-slate-900 text-sm sm:text-base tracking-wider uppercase border-b border-slate-100 pb-2.5 mb-4 font-heading flex items-center justify-between">
+                        <span>GALLERY & INNOVATION</span>
+                        <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
+                    </h3>
+
+                    <!-- 6-Photo Collage Grid (3 cols x 2 rows) -->
+                    <div class="grid grid-cols-3 gap-2 mb-3">
+                        <div class="rounded-md overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200">
+                            <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=300&q=80" alt="Students studying" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                        </div>
+                        <div class="rounded-md overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200">
+                            <img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=300&q=80" alt="Student writing" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                        </div>
+                        <div class="rounded-md overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200">
+                            <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=300&q=80" alt="Classroom joy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                        </div>
+                        <div class="rounded-md overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200">
+                            <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=300&q=80" alt="Collaborative learning" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                        </div>
+                        <div class="rounded-md overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200">
+                            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=300&q=80" alt="Library time" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                        </div>
+                        <!-- Video overlay item -->
+                        <div class="relative rounded-md overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200">
+                            <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=300&q=80" alt="Chemistry lab experiment" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-slate-950/40 flex items-center justify-center">
+                                <div class="w-7 h-7 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-md">
+                                    <svg class="w-3.5 h-3.5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2 Wide Banner Cards (Matching Lower Right in Image) -->
+                    <div class="grid grid-cols-2 gap-2.5">
+                        
+                        <!-- Wide Card 1 -->
+                        <div class="relative rounded-lg overflow-hidden group shadow-2xs cursor-pointer border border-slate-200">
+                            <img src="https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=450&q=80" alt="Student Innovation & Labs" class="w-full h-20 object-cover group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-transparent flex items-end p-2">
+                                <span class="text-[11px] font-bold text-white leading-tight">Student Innovation & Labs</span>
+                            </div>
+                        </div>
+
+                        <!-- Wide Card 2 -->
+                        <div class="relative rounded-lg overflow-hidden group shadow-2xs cursor-pointer border border-slate-200">
+                            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=450&q=80" alt="Vibrant Community" class="w-full h-20 object-cover group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-transparent flex items-end p-2">
+                                <span class="text-[11px] font-bold text-white leading-tight">Vibrant Community</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </div>
+    </main>
+
+
+    <!-- FOOTER (MATCHING DEEP NAVY BLUE FOOTER) -->
+    <footer id="contact" class="bg-[#0b1f33] text-slate-300 border-t border-[#183654] pt-10 pb-6">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                
+                <!-- Col 1: Home & Quick Links -->
+                <div>
+                    <h4 class="text-white font-extrabold text-sm uppercase tracking-wider mb-4 font-heading border-b border-slate-700/60 pb-1.5">Navigation</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="{{ url('/') }}" class="hover:text-amber-400 transition-colors">Home</a></li>
+                        <li><a href="#about" class="hover:text-amber-400 transition-colors">About Us</a></li>
+                        <li><a href="#academics" class="hover:text-amber-400 transition-colors">Academics</a></li>
+                        <li><a href="#admissions" class="hover:text-amber-400 transition-colors">Admissions</a></li>
+                        <li><a href="#careers" class="hover:text-amber-400 transition-colors">Careers</a></li>
+                        <li><a href="#contact" class="hover:text-amber-400 transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 2: CONTACT US -->
+                <div>
+                    <h4 class="text-white font-extrabold text-sm uppercase tracking-wider mb-4 font-heading border-b border-slate-700/60 pb-1.5">CONTACT US</h4>
+                    <div class="space-y-2.5 text-xs text-slate-300">
+                        <p class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span>Sector 10, Rohini, New Delhi, Delhi, 110085, India</span>
+                        </p>
+                        <p class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                            <span>+91 11 2345 6789 / +91 98765 43210</span>
+                        </p>
+                        <p class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <span>info@gyanvikas.edu.in</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Col 3: Quick Links -->
+                <div>
+                    <h4 class="text-white font-extrabold text-sm uppercase tracking-wider mb-4 font-heading border-b border-slate-700/60 pb-1.5">Quick Links</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="#placement" class="hover:text-amber-400 transition-colors">Alumni Network</a></li>
+                        <li><a href="#faq" class="hover:text-amber-400 transition-colors">Frequently Asked Questions (FAQ)</a></li>
+                        <li><a href="#gallery" class="hover:text-amber-400 transition-colors">Campus Photo Gallery</a></li>
+                        <li><a href="#admissions" class="hover:text-amber-400 transition-colors">Fee Structure & Scholarships</a></li>
+                        <li><a href="#notices" class="hover:text-amber-400 transition-colors">School Calendar 2024-25</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Social Media Icons & Parent Portal -->
+                <div>
+                    <h4 class="text-white font-extrabold text-sm uppercase tracking-wider mb-4 font-heading border-b border-slate-700/60 pb-1.5">Connect With Us</h4>
+                    <div class="flex items-center gap-3 mb-5">
+                        <!-- Facebook -->
+                        <a href="#" class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center hover:opacity-90 transition-opacity" title="Facebook">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
+                        </a>
+                        <!-- Twitter/X -->
+                        <a href="#" class="w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center hover:opacity-90 transition-opacity" title="Twitter">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"/></svg>
+                        </a>
+                        <!-- YouTube -->
+                        <a href="#" class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center hover:opacity-90 transition-opacity" title="YouTube">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </a>
+                        <!-- Instagram -->
+                        <a href="#" class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white flex items-center justify-center hover:opacity-90 transition-opacity" title="Instagram">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                        </a>
+                    </div>
+
+                    <!-- Direct Parent Portal Access -->
+                    <a href="{{ route('login') }}" class="block text-center bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs px-4 py-2.5 rounded-lg uppercase tracking-wider transition-colors shadow-sm">
+                        Access Parent Portal
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Bottom Copyright Bar -->
+            <div class="border-t border-slate-700/60 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400">
+                <p>Copyright © 2024 Gyan Vikas School. All Rights Reserved.</p>
+                <p class="mt-2 sm:mt-0 font-medium">Affiliated with CBSE Board, New Delhi</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -9,8 +9,12 @@ use App\Http\Controllers\ComponentFieldController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect()->route('login');
-});
+    return view('frontend.index');
+})->name('home');
+
+Route::get('/frontend', function () {
+    return view('frontend.index');
+})->name('frontend.index');
 
 Route::get('/dashboard', function () {
     $user = Illuminate\Support\Facades\Auth::user();
