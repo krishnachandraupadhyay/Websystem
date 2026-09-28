@@ -38,7 +38,7 @@ class ComponentFieldController extends Controller
         $validated = $request->validate([
             'field_label'      => 'required|string|max:255',
             'field_name'       => 'required|string|max:255',
-            'field_type'       => 'required|in:text,textarea,url,image,file,video,select,checkbox,number',
+            'field_type'       => 'required|in:' . implode(',', ComponentField::ALLOWED_TYPES),
             'placeholder'      => 'nullable|string|max:255',
             'default_value'    => 'nullable|string',
             'help_text'        => 'nullable|string|max:500',
@@ -108,7 +108,7 @@ class ComponentFieldController extends Controller
         $validated = $request->validate([
             'field_label'      => 'required|string|max:255',
             'field_name'       => 'required|string|max:255',
-            'field_type'       => 'required|in:text,textarea,url,image,file,video,select,checkbox,number',
+            'field_type'       => 'required|in:' . implode(',', ComponentField::ALLOWED_TYPES),
             'placeholder'      => 'nullable|string|max:255',
             'default_value'    => 'nullable|string',
             'help_text'        => 'nullable|string|max:500',

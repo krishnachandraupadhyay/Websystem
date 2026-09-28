@@ -390,8 +390,12 @@ class AdminController extends Controller
 
                         if ($field->field_type === 'url') {
                             $fieldRules[] = 'url';
-                        } elseif ($field->field_type === 'number') {
+                        } elseif (in_array($field->field_type, ['number', 'range'], true)) {
                             $fieldRules[] = 'numeric';
+                        } elseif ($field->field_type === 'email') {
+                            $fieldRules[] = 'email';
+                        } elseif (in_array($field->field_type, ['date', 'datetime-local'], true)) {
+                            $fieldRules[] = 'date';
                         }
                     }
 
@@ -409,6 +413,8 @@ class AdminController extends Controller
                     $messages["{$key}.required"] = "The {$field->field_label} field is required.";
                     $messages["{$key}.url"]      = "The {$field->field_label} must be a valid URL.";
                     $messages["{$key}.numeric"]  = "The {$field->field_label} must be a number.";
+                    $messages["{$key}.email"]    = "The {$field->field_label} must be a valid email address.";
+                    $messages["{$key}.date"]     = "The {$field->field_label} must be a valid date.";
                     $messages["{$key}.image"]    = "The {$field->field_label} must be an image.";
                     $messages["{$key}.mimes"]    = "The {$field->field_label} must be a valid file type.";
                 }

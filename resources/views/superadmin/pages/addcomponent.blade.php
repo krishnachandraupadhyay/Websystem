@@ -1158,15 +1158,42 @@
                                     x-model="fieldForm.field_type"
                                     class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                                 >
-                                    <option value="text">Text (Single-line input)</option>
-                                    <option value="textarea">Textarea (Multi-line text)</option>
-                                    <option value="url">URL (Link input)</option>
-                                    <option value="image">Image (File upload)</option>
-                                    <option value="file">File (Generic attachment)</option>
-                                    <option value="video">Video (Video file upload)</option>
-                                    <option value="select">Select (Dropdown options)</option>
-                                    <option value="checkbox">Checkbox (Toggle / Boolean)</option>
-                                    <option value="number">Number (Numeric input)</option>
+                                    <optgroup label="Standard Text & Contact">
+                                        <option value="text">Text (Single-line input)</option>
+                                        <option value="textarea">Textarea (Multi-line text)</option>
+                                        <option value="email">Email Address</option>
+                                        <option value="password">Password (Masked)</option>
+                                        <option value="number">Number (Numeric input)</option>
+                                        <option value="tel">Telephone / Phone</option>
+                                        <option value="url">URL (Link input)</option>
+                                        <option value="search">Search Box</option>
+                                    </optgroup>
+                                    <optgroup label="Choice & Selection">
+                                        <option value="select">Select (Dropdown options)</option>
+                                        <option value="radio">Radio Buttons (Single choice from list)</option>
+                                        <option value="checkbox">Checkbox (Toggle / Yes-No)</option>
+                                        <option value="range">Range (Slider 0-100)</option>
+                                        <option value="color">Color (Color Picker)</option>
+                                    </optgroup>
+                                    <optgroup label="Date & Time">
+                                        <option value="date">Date (YYYY-MM-DD)</option>
+                                        <option value="time">Time (HH:MM)</option>
+                                        <option value="datetime-local">Date & Time</option>
+                                        <option value="month">Month (YYYY-MM)</option>
+                                        <option value="week">Week (YYYY-Www)</option>
+                                    </optgroup>
+                                    <optgroup label="Media & Attachments">
+                                        <option value="image">Image (Single image file)</option>
+                                        <option value="file">File (Single document)</option>
+                                        <option value="multiple_file">Multiple Files (Batch attachment)</option>
+                                        <option value="video">Video (Video file upload)</option>
+                                    </optgroup>
+                                    <optgroup label="Buttons & Hidden">
+                                        <option value="button">Button (Frontend Button label)</option>
+                                        <option value="submit">Submit (Frontend Submit label)</option>
+                                        <option value="reset">Reset (Frontend Reset label)</option>
+                                        <option value="hidden">Hidden (Internal constant/token)</option>
+                                    </optgroup>
                                 </select>
                             </div>
 
@@ -1233,10 +1260,10 @@
                                 </label>
                             </div>
 
-                            <!-- Select Options Builder (Only shown when field_type === 'select') -->
-                            <div x-show="fieldForm.field_type === 'select'" x-cloak class="sm:col-span-2 p-3.5 rounded-xl bg-white border border-indigo-100 space-y-2.5">
+                            <!-- Select & Radio Options Builder -->
+                            <div x-show="['select', 'radio'].includes(fieldForm.field_type)" x-cloak class="sm:col-span-2 p-3.5 rounded-xl bg-white border border-indigo-100 space-y-2.5">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-xs font-bold text-indigo-950 uppercase tracking-wider">Dropdown Options</span>
+                                    <span class="text-xs font-bold text-indigo-950 uppercase tracking-wider" x-text="fieldForm.field_type === 'radio' ? 'Radio Button Options' : 'Dropdown Options'"></span>
                                     <button 
                                         type="button" 
                                         @click="addOptionRow()"
@@ -1358,11 +1385,12 @@
                                                 <span 
                                                     class="px-2 py-0.5 rounded-full font-bold uppercase text-[10px]"
                                                     :class="{
-                                                        'bg-blue-50 text-blue-700 border border-blue-200': ['text', 'textarea', 'number'].includes(f.field_type),
-                                                        'bg-emerald-50 text-emerald-700 border border-emerald-200': ['image', 'file', 'video'].includes(f.field_type),
-                                                        'bg-amber-50 text-amber-700 border border-amber-200': f.field_type === 'select',
-                                                        'bg-purple-50 text-purple-700 border border-purple-200': f.field_type === 'checkbox',
-                                                        'bg-cyan-50 text-cyan-700 border border-cyan-200': f.field_type === 'url'
+                                                        'bg-blue-50 text-blue-700 border border-blue-200': ['text', 'textarea', 'number', 'password', 'email', 'search', 'tel'].includes(f.field_type),
+                                                        'bg-emerald-50 text-emerald-700 border border-emerald-200': ['image', 'file', 'video', 'multiple_file'].includes(f.field_type),
+                                                        'bg-amber-50 text-amber-700 border border-amber-200': ['select', 'radio'].includes(f.field_type),
+                                                        'bg-purple-50 text-purple-700 border border-purple-200': ['checkbox', 'range', 'color'].includes(f.field_type),
+                                                        'bg-cyan-50 text-cyan-700 border border-cyan-200': ['url', 'date', 'time', 'datetime-local', 'month', 'week'].includes(f.field_type),
+                                                        'bg-slate-100 text-slate-700 border border-slate-200': ['button', 'submit', 'reset', 'hidden'].includes(f.field_type)
                                                     }"
                                                     x-text="f.field_type"
                                                 ></span>

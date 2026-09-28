@@ -9,6 +9,35 @@ class ComponentField extends Model
 {
     use HasFactory;
 
+    public const ALLOWED_TYPES = [
+        'text',
+        'password',
+        'email',
+        'number',
+        'search',
+        'tel',
+        'url',
+        'date',
+        'time',
+        'datetime-local',
+        'month',
+        'week',
+        'checkbox',
+        'radio',
+        'range',
+        'color',
+        'file',
+        'image',
+        'video',
+        'multiple_file',
+        'hidden',
+        'textarea',
+        'select',
+        'button',
+        'submit',
+        'reset',
+    ];
+
     protected $fillable = [
         'component_id',
         'field_name',
