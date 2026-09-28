@@ -504,13 +504,12 @@
                                         <button 
                                             type="button" 
                                             @click='openManageFields(@json($component))'
-                                            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold text-indigo-700 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 hover:border-indigo-300 transition-all cursor-pointer shadow-2xs"
-                                            title="Manage Component Field Definitions"
+                                            class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-indigo-600 hover:text-indigo-700 bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 transition-all cursor-pointer shadow-2xs"
+                                            title="Manage Fields ({{ $component->fields->count() }})"
                                         >
-                                            <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
                                             </svg>
-                                            <span>Fields ({{ $component->fields->count() }})</span>
                                         </button>
                                         <!-- Edit Component Button -->
                                         <button 
