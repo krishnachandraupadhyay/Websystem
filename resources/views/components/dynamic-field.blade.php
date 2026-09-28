@@ -326,6 +326,9 @@
 
         @case('image')
             <div class="space-y-2">
+                @if($currentFilePath)
+                    <input type="hidden" name="{{ str_replace('[files]', '[existing_files]', $fileInputName) }}" value="{{ $currentFilePath }}">
+                @endif
                 <input 
                     type="file" 
                     accept="image/*" 
@@ -347,6 +350,9 @@
 
         @case('video')
             <div class="space-y-2">
+                @if($currentFilePath)
+                    <input type="hidden" name="{{ str_replace('[files]', '[existing_files]', $fileInputName) }}" value="{{ $currentFilePath }}">
+                @endif
                 <input 
                     type="file" 
                     accept="video/*" 
@@ -368,6 +374,9 @@
 
         @case('file')
             <div class="space-y-2">
+                @if($currentFilePath)
+                    <input type="hidden" name="{{ str_replace('[files]', '[existing_files]', $fileInputName) }}" value="{{ $currentFilePath }}">
+                @endif
                 <input 
                     type="file" 
                     name="{{ $fileInputName }}" 

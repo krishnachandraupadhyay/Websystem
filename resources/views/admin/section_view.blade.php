@@ -695,14 +695,56 @@
 
                                                             <div id="repeater-subcomp-{{ $comp->id }}-{{ $subComp->id }}" data-next-index="{{ count($subInstKeys) }}" class="space-y-3">
                                                                 @foreach($subInstKeys as $sPos => $instIdx)
-                                                                    <div class="repeater-sub-item p-3 bg-slate-50/70 rounded-xl border border-slate-200 relative space-y-2.5">
-                                                                        <div class="flex items-center justify-between pb-1 border-b border-slate-200/60">
-                                                                            <span class="text-[11px] font-bold text-slate-700">#{{ $sPos + 1 }} {{ $subComp->component_name }}</span>
-                                                                            @if($sPos > 0 || count($subInstKeys) > 1)
-                                                                                <button type="button" onclick="this.closest('.repeater-sub-item').remove()" class="text-rose-500 hover:text-rose-700 text-xs font-semibold cursor-pointer">
-                                                                                    🗑 Remove
+                                                                    <div class="repeater-sub-item p-3 bg-slate-50/70 rounded-xl border border-slate-200 relative space-y-2.5 shadow-2xs">
+                                                                        <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/70 repeater-item-header">
+                                                                            <div class="flex items-center gap-2">
+                                                                                <span class="inline-flex items-center justify-center px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 repeater-index-badge">
+                                                                                    #{{ $sPos + 1 }}
+                                                                                </span>
+                                                                                <span class="text-xs font-bold text-slate-700">{{ $subComp->component_name }}</span>
+                                                                            </div>
+                                                                            
+                                                                            <div class="flex items-center gap-1.5">
+                                                                                <div class="flex items-center gap-1 bg-white px-2 py-0.5 rounded-lg border border-slate-200 shadow-2xs">
+                                                                                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Order</span>
+                                                                                    <input 
+                                                                                        type="number" 
+                                                                                        min="1" 
+                                                                                        max="{{ count($subInstKeys) }}"
+                                                                                        value="{{ $sPos + 1 }}" 
+                                                                                        title="Set order position"
+                                                                                        onchange="setRepeaterItemOrder(this, 'subcomp')"
+                                                                                        class="w-12 h-6 text-center text-xs font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none repeater-order-input"
+                                                                                    >
+                                                                                    <button 
+                                                                                        type="button" 
+                                                                                        onclick="moveRepeaterItem(this, 'up', 'subcomp')"
+                                                                                        title="Move Up" 
+                                                                                        {{ $sPos === 0 ? 'disabled' : '' }}
+                                                                                        class="w-6 h-6 rounded flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-25 disabled:pointer-events-none cursor-pointer btn-move-up"
+                                                                                    >
+                                                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                                                                                    </button>
+                                                                                    <button 
+                                                                                        type="button" 
+                                                                                        onclick="moveRepeaterItem(this, 'down', 'subcomp')"
+                                                                                        title="Move Down" 
+                                                                                        {{ $sPos === count($subInstKeys) - 1 ? 'disabled' : '' }}
+                                                                                        class="w-6 h-6 rounded flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-25 disabled:pointer-events-none cursor-pointer btn-move-down"
+                                                                                    >
+                                                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                                                                    </button>
+                                                                                </div>
+
+                                                                                <button 
+                                                                                    type="button" 
+                                                                                    onclick="removeRepeaterItem(this, 'subcomp')" 
+                                                                                    class="px-2 py-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg text-xs font-semibold cursor-pointer transition-colors flex items-center gap-1 btn-remove-item {{ count($subInstKeys) <= 1 ? 'hidden' : '' }}"
+                                                                                >
+                                                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                                                    <span>Remove</span>
                                                                                 </button>
-                                                                            @endif
+                                                                            </div>
                                                                         </div>
                                                                         <div class="space-y-2.5">
                                                                             @foreach($subFields as $field)
@@ -726,12 +768,53 @@
 
                                                             <!-- Template for dynamic add -->
                                                             <template id="template-subcomp-{{ $comp->id }}-{{ $subComp->id }}">
-                                                                <div class="repeater-sub-item p-3 bg-slate-50/70 rounded-xl border border-slate-200 relative space-y-2.5">
-                                                                    <div class="flex items-center justify-between pb-1 border-b border-slate-200/60">
-                                                                        <span class="text-[11px] font-bold text-slate-700">#__DISPLAY_INDEX__ {{ $subComp->component_name }}</span>
-                                                                        <button type="button" onclick="this.closest('.repeater-sub-item').remove()" class="text-rose-500 hover:text-rose-700 text-xs font-semibold cursor-pointer">
-                                                                            🗑 Remove
-                                                                        </button>
+                                                                <div class="repeater-sub-item p-3 bg-slate-50/70 rounded-xl border border-slate-200 relative space-y-2.5 shadow-2xs">
+                                                                    <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/70 repeater-item-header">
+                                                                        <div class="flex items-center gap-2">
+                                                                            <span class="inline-flex items-center justify-center px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 repeater-index-badge">
+                                                                                #__DISPLAY_INDEX__
+                                                                            </span>
+                                                                            <span class="text-xs font-bold text-slate-700">{{ $subComp->component_name }}</span>
+                                                                        </div>
+                                                                        
+                                                                        <div class="flex items-center gap-1.5">
+                                                                            <div class="flex items-center gap-1 bg-white px-2 py-0.5 rounded-lg border border-slate-200 shadow-2xs">
+                                                                                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Order</span>
+                                                                                <input 
+                                                                                    type="number" 
+                                                                                    min="1" 
+                                                                                    value="__DISPLAY_NUM__" 
+                                                                                    title="Set order position"
+                                                                                    onchange="setRepeaterItemOrder(this, 'subcomp')"
+                                                                                    class="w-12 h-6 text-center text-xs font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none repeater-order-input"
+                                                                                >
+                                                                                <button 
+                                                                                    type="button" 
+                                                                                    onclick="moveRepeaterItem(this, 'up', 'subcomp')"
+                                                                                    title="Move Up" 
+                                                                                    class="w-6 h-6 rounded flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-25 disabled:pointer-events-none cursor-pointer btn-move-up"
+                                                                                >
+                                                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                                                                                </button>
+                                                                                <button 
+                                                                                    type="button" 
+                                                                                    onclick="moveRepeaterItem(this, 'down', 'subcomp')"
+                                                                                    title="Move Down" 
+                                                                                    class="w-6 h-6 rounded flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-25 disabled:pointer-events-none cursor-pointer btn-move-down"
+                                                                                >
+                                                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                                                                </button>
+                                                                            </div>
+
+                                                                            <button 
+                                                                                type="button" 
+                                                                                onclick="removeRepeaterItem(this, 'subcomp')" 
+                                                                                class="px-2 py-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg text-xs font-semibold cursor-pointer transition-colors flex items-center gap-1 btn-remove-item"
+                                                                            >
+                                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                                                <span>Remove</span>
+                                                                            </button>
+                                                                        </div>
                                                                     </div>
                                                                     <div class="space-y-2.5">
                                                                         @foreach($subFields as $field)
@@ -887,14 +970,56 @@
 
                                                 <div id="repeater-comp-{{ $comp->id }}" data-next-index="{{ count($compInstKeys) }}" class="space-y-3.5">
                                                     @foreach($compInstKeys as $pos => $instIdx)
-                                                        <div class="repeater-item p-3.5 bg-slate-50/70 rounded-xl border border-slate-200 relative space-y-3">
-                                                            <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/60">
-                                                                <span class="text-xs font-bold text-slate-700">#{{ $pos + 1 }} {{ $comp->component_name }}</span>
-                                                                @if($pos > 0 || count($compInstKeys) > 1)
-                                                                    <button type="button" onclick="this.closest('.repeater-item').remove()" class="text-rose-500 hover:text-rose-700 text-xs font-semibold cursor-pointer">
-                                                                        🗑 Remove
+                                                        <div class="repeater-item p-3.5 bg-slate-50/70 rounded-xl border border-slate-200 relative space-y-3 shadow-2xs">
+                                                            <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/70 repeater-item-header">
+                                                                <div class="flex items-center gap-2">
+                                                                    <span class="inline-flex items-center justify-center px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 repeater-index-badge">
+                                                                        #{{ $pos + 1 }}
+                                                                    </span>
+                                                                    <span class="text-xs font-bold text-slate-700">{{ $comp->component_name }}</span>
+                                                                </div>
+                                                                
+                                                                <div class="flex items-center gap-1.5">
+                                                                    <div class="flex items-center gap-1 bg-white px-2 py-0.5 rounded-lg border border-slate-200 shadow-2xs">
+                                                                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Order</span>
+                                                                        <input 
+                                                                            type="number" 
+                                                                            min="1" 
+                                                                            max="{{ count($compInstKeys) }}"
+                                                                            value="{{ $pos + 1 }}" 
+                                                                            title="Set order position"
+                                                                            onchange="setRepeaterItemOrder(this, 'comp')"
+                                                                            class="w-12 h-6 text-center text-xs font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none repeater-order-input"
+                                                                        >
+                                                                        <button 
+                                                                            type="button" 
+                                                                            onclick="moveRepeaterItem(this, 'up', 'comp')"
+                                                                            title="Move Up" 
+                                                                            {{ $pos === 0 ? 'disabled' : '' }}
+                                                                            class="w-6 h-6 rounded flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-25 disabled:pointer-events-none cursor-pointer btn-move-up"
+                                                                        >
+                                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                                                                        </button>
+                                                                        <button 
+                                                                            type="button" 
+                                                                            onclick="moveRepeaterItem(this, 'down', 'comp')"
+                                                                            title="Move Down" 
+                                                                            {{ $pos === count($compInstKeys) - 1 ? 'disabled' : '' }}
+                                                                            class="w-6 h-6 rounded flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-25 disabled:pointer-events-none cursor-pointer btn-move-down"
+                                                                        >
+                                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                                                        </button>
+                                                                    </div>
+
+                                                                    <button 
+                                                                        type="button" 
+                                                                        onclick="removeRepeaterItem(this, 'comp')" 
+                                                                        class="px-2 py-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg text-xs font-semibold cursor-pointer transition-colors flex items-center gap-1 btn-remove-item {{ count($compInstKeys) <= 1 ? 'hidden' : '' }}"
+                                                                    >
+                                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                                        <span>Remove</span>
                                                                     </button>
-                                                                @endif
+                                                                </div>
                                                             </div>
                                                             <div class="space-y-3">
                                                                 @foreach($compFields as $field)
@@ -918,12 +1043,53 @@
 
                                                 <!-- Template for dynamic add -->
                                                 <template id="template-comp-{{ $comp->id }}">
-                                                    <div class="repeater-item p-3.5 bg-slate-50/70 rounded-xl border border-slate-200 relative space-y-3">
-                                                        <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/60">
-                                                            <span class="text-xs font-bold text-slate-700">#__DISPLAY_INDEX__ {{ $comp->component_name }}</span>
-                                                            <button type="button" onclick="this.closest('.repeater-item').remove()" class="text-rose-500 hover:text-rose-700 text-xs font-semibold cursor-pointer">
-                                                                🗑 Remove
-                                                            </button>
+                                                    <div class="repeater-item p-3.5 bg-slate-50/70 rounded-xl border border-slate-200 relative space-y-3 shadow-2xs">
+                                                        <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/70 repeater-item-header">
+                                                            <div class="flex items-center gap-2">
+                                                                <span class="inline-flex items-center justify-center px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 repeater-index-badge">
+                                                                    #__DISPLAY_INDEX__
+                                                                </span>
+                                                                <span class="text-xs font-bold text-slate-700">{{ $comp->component_name }}</span>
+                                                            </div>
+                                                            
+                                                            <div class="flex items-center gap-1.5">
+                                                                <div class="flex items-center gap-1 bg-white px-2 py-0.5 rounded-lg border border-slate-200 shadow-2xs">
+                                                                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Order</span>
+                                                                    <input 
+                                                                        type="number" 
+                                                                        min="1" 
+                                                                        value="__DISPLAY_NUM__" 
+                                                                        title="Set order position"
+                                                                        onchange="setRepeaterItemOrder(this, 'comp')"
+                                                                        class="w-12 h-6 text-center text-xs font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none repeater-order-input"
+                                                                    >
+                                                                    <button 
+                                                                        type="button" 
+                                                                        onclick="moveRepeaterItem(this, 'up', 'comp')"
+                                                                        title="Move Up" 
+                                                                        class="w-6 h-6 rounded flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-25 disabled:pointer-events-none cursor-pointer btn-move-up"
+                                                                    >
+                                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                                                                    </button>
+                                                                    <button 
+                                                                        type="button" 
+                                                                        onclick="moveRepeaterItem(this, 'down', 'comp')"
+                                                                        title="Move Down" 
+                                                                        class="w-6 h-6 rounded flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-25 disabled:pointer-events-none cursor-pointer btn-move-down"
+                                                                    >
+                                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                                                    </button>
+                                                                </div>
+
+                                                                <button 
+                                                                    type="button" 
+                                                                    onclick="removeRepeaterItem(this, 'comp')" 
+                                                                    class="px-2 py-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg text-xs font-semibold cursor-pointer transition-colors flex items-center gap-1 btn-remove-item"
+                                                                >
+                                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                                    <span>Remove</span>
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                         <div class="space-y-3">
                                                             @foreach($compFields as $field)
@@ -1086,24 +1252,139 @@
 </div>
 @push('scripts')
 <script>
+function moveRepeaterItem(btn, direction, type) {
+    const itemClass = type === 'subcomp' ? '.repeater-sub-item' : '.repeater-item';
+    const item = btn.closest(itemClass);
+    if (!item) return;
+    const container = item.parentElement;
+    
+    if (direction === 'up') {
+        const prev = item.previousElementSibling;
+        if (prev && prev.matches(itemClass)) {
+            container.insertBefore(item, prev);
+        }
+    } else if (direction === 'down') {
+        const next = item.nextElementSibling;
+        if (next && next.matches(itemClass)) {
+            container.insertBefore(next, item);
+        }
+    }
+    
+    refreshRepeaterIndices(container, type);
+}
+
+function setRepeaterItemOrder(input, type) {
+    const itemClass = type === 'subcomp' ? '.repeater-sub-item' : '.repeater-item';
+    const item = input.closest(itemClass);
+    if (!item) return;
+    const container = item.parentElement;
+    const items = Array.from(container.querySelectorAll(itemClass));
+    const total = items.length;
+    const currentIndex = items.indexOf(item);
+    
+    let targetPos = parseInt(input.value);
+    if (isNaN(targetPos) || targetPos < 1) targetPos = 1;
+    if (targetPos > total) targetPos = total;
+    
+    const targetIndex = targetPos - 1;
+    if (targetIndex !== currentIndex) {
+        if (targetIndex >= total - 1) {
+            container.appendChild(item);
+        } else if (targetIndex > currentIndex) {
+            container.insertBefore(item, items[targetIndex].nextSibling);
+        } else {
+            container.insertBefore(item, items[targetIndex]);
+        }
+    }
+    
+    refreshRepeaterIndices(container, type);
+}
+
+function removeRepeaterItem(btn, type) {
+    const itemClass = type === 'subcomp' ? '.repeater-sub-item' : '.repeater-item';
+    const item = btn.closest(itemClass);
+    if (!item) return;
+    const container = item.parentElement;
+    item.remove();
+    refreshRepeaterIndices(container, type);
+}
+
+function refreshRepeaterIndices(container, type) {
+    if (!container) return;
+    const itemClass = type === 'subcomp' ? '.repeater-sub-item' : '.repeater-item';
+    const items = container.querySelectorAll(itemClass);
+    const total = items.length;
+
+    items.forEach((item, index) => {
+        const displayNum = index + 1;
+
+        // 1. Update index badge #1, #2...
+        const badge = item.querySelector('.repeater-index-badge');
+        if (badge) {
+            badge.textContent = '#' + displayNum;
+        }
+
+        // 2. Update order input
+        const orderInput = item.querySelector('.repeater-order-input');
+        if (orderInput) {
+            orderInput.value = displayNum;
+            orderInput.max = total;
+        }
+
+        // 3. Update Move Up / Down button disabled state
+        const upBtn = item.querySelector('.btn-move-up');
+        if (upBtn) {
+            upBtn.disabled = (index === 0);
+        }
+        const downBtn = item.querySelector('.btn-move-down');
+        if (downBtn) {
+            downBtn.disabled = (index === total - 1);
+        }
+
+        // 4. Update Remove button visibility: hide if only 1 item, or show if > 1
+        const removeBtn = item.querySelector('.btn-remove-item');
+        if (removeBtn) {
+            if (total <= 1) {
+                removeBtn.classList.add('hidden');
+            } else {
+                removeBtn.classList.remove('hidden');
+            }
+        }
+
+        // 5. Update input / select / textarea name attributes to match DOM order index
+        const formFields = item.querySelectorAll('input, select, textarea');
+        formFields.forEach(field => {
+            if (field.name && field.name.includes('[instances]')) {
+                field.name = field.name.replace(/\[instances\]\[(?:\d+|__INDEX__)\]/g, `[instances][${index}]`);
+            }
+            if (field.id && field.id.includes('_inst_')) {
+                field.id = field.id.replace(/_inst_(?:\d+|__INDEX__)_/g, `_inst_${index}_`);
+            }
+        });
+    });
+
+    container.dataset.nextIndex = total;
+}
+
 function addRepeaterItem(compId) {
     const container = document.getElementById('repeater-comp-' + compId);
     const template = document.getElementById('template-comp-' + compId);
     if (!container || !template) return;
     
-    let nextIndex = parseInt(container.dataset.nextIndex || '0');
     const existingItems = container.querySelectorAll('.repeater-item');
-    const displayIndex = existingItems.length + 1;
+    const nextIndex = existingItems.length;
+    const displayIndex = nextIndex + 1;
     
     let html = template.innerHTML
         .replace(/__INDEX__/g, nextIndex)
-        .replace(/__DISPLAY_INDEX__/g, displayIndex);
+        .replace(/__DISPLAY_INDEX__/g, '#' + displayIndex)
+        .replace(/__DISPLAY_NUM__/g, displayIndex);
         
-    container.dataset.nextIndex = nextIndex + 1;
-    
     const wrapper = document.createElement('div');
     wrapper.innerHTML = html.trim();
     container.appendChild(wrapper.firstElementChild);
+
+    refreshRepeaterIndices(container, 'comp');
 }
 
 function addSubRepeaterItem(compId, subCompId) {
@@ -1111,20 +1392,26 @@ function addSubRepeaterItem(compId, subCompId) {
     const template = document.getElementById('template-subcomp-' + compId + '-' + subCompId);
     if (!container || !template) return;
     
-    let nextIndex = parseInt(container.dataset.nextIndex || '0');
     const existingItems = container.querySelectorAll('.repeater-sub-item');
-    const displayIndex = existingItems.length + 1;
+    const nextIndex = existingItems.length;
+    const displayIndex = nextIndex + 1;
     
     let html = template.innerHTML
         .replace(/__INDEX__/g, nextIndex)
-        .replace(/__DISPLAY_INDEX__/g, displayIndex);
+        .replace(/__DISPLAY_INDEX__/g, '#' + displayIndex)
+        .replace(/__DISPLAY_NUM__/g, displayIndex);
         
-    container.dataset.nextIndex = nextIndex + 1;
-    
     const wrapper = document.createElement('div');
     wrapper.innerHTML = html.trim();
     container.appendChild(wrapper.firstElementChild);
+
+    refreshRepeaterIndices(container, 'subcomp');
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[id^="repeater-subcomp-"]').forEach(c => refreshRepeaterIndices(c, 'subcomp'));
+    document.querySelectorAll('[id^="repeater-comp-"]').forEach(c => refreshRepeaterIndices(c, 'comp'));
+});
 </script>
 @endpush
 

@@ -480,9 +480,10 @@ class AdminController extends Controller
             if (isset($compData['instances']) && is_array($compData['instances'])) {
                 $instances = $compData['instances'];
                 $processedIndices = [];
+                $seqIdx = 0;
 
                 foreach ($instances as $instIdx => $instData) {
-                    $idx = (int)$instIdx;
+                    $idx = $seqIdx++;
                     $processedIndices[] = $idx;
 
                     if ($secSubComps->isNotEmpty()) {
@@ -494,6 +495,7 @@ class AdminController extends Controller
                                 $isFile = in_array($field->field_type, ['image', 'video', 'file'], true);
                                 if ($isFile) {
                                     $fileKey = "components.{$comp->id}.instances.{$idx}.subcomponents.{$subComp->id}.files.{$field->id}";
+                                    $existingFileKey = "components.{$comp->id}.instances.{$idx}.subcomponents.{$subComp->id}.existing_files.{$field->id}";
                                     if ($request->hasFile($fileKey)) {
                                         $file = $request->file($fileKey);
                                         $ext = $file->getClientOriginalExtension();
@@ -515,6 +517,21 @@ class AdminController extends Controller
                                                 'field_name'    => $field->field_name,
                                                 'file_path'     => $filePath,
                                                 'content_value' => $file->getClientOriginalName(),
+                                            ]
+                                        );
+                                    } elseif ($request->filled($existingFileKey)) {
+                                        SectionComponentData::updateOrCreate(
+                                            [
+                                                'section_id'         => $section->id,
+                                                'component_id'       => $comp->id,
+                                                'sub_component_id'   => $subComp->id,
+                                                'component_field_id' => $field->id,
+                                                'instance_index'     => $idx,
+                                            ],
+                                            [
+                                                'field_name'    => $field->field_name,
+                                                'file_path'     => $request->input($existingFileKey),
+                                                'content_value' => basename($request->input($existingFileKey)),
                                             ]
                                         );
                                     }
@@ -545,6 +562,7 @@ class AdminController extends Controller
                             $isFile = in_array($field->field_type, ['image', 'video', 'file'], true);
                             if ($isFile) {
                                 $fileKey = "components.{$comp->id}.instances.{$idx}.files.{$field->id}";
+                                $existingFileKey = "components.{$comp->id}.instances.{$idx}.existing_files.{$field->id}";
                                 if ($request->hasFile($fileKey)) {
                                     $file = $request->file($fileKey);
                                     $ext = $file->getClientOriginalExtension();
@@ -566,6 +584,21 @@ class AdminController extends Controller
                                             'field_name'    => $field->field_name,
                                             'file_path'     => $filePath,
                                             'content_value' => $file->getClientOriginalName(),
+                                        ]
+                                    );
+                                } elseif ($request->filled($existingFileKey)) {
+                                    SectionComponentData::updateOrCreate(
+                                        [
+                                            'section_id'         => $section->id,
+                                            'component_id'       => $comp->id,
+                                            'sub_component_id'   => null,
+                                            'component_field_id' => $field->id,
+                                            'instance_index'     => $idx,
+                                        ],
+                                        [
+                                            'field_name'    => $field->field_name,
+                                            'file_path'     => $request->input($existingFileKey),
+                                            'content_value' => basename($request->input($existingFileKey)),
                                         ]
                                     );
                                 }
@@ -611,15 +644,17 @@ class AdminController extends Controller
                         // Subcomponent has multiple instances! (e.g. Nav Links / Anchors)
                         $subInstances = $subDataList[$subComp->id]['instances'];
                         $subProcessed = [];
+                        $seqIdx = 0;
 
                         foreach ($subInstances as $sIdx => $sInstData) {
-                            $idx = (int)$sIdx;
+                            $idx = $seqIdx++;
                             $subProcessed[] = $idx;
 
                             foreach ($subFields as $field) {
                                 $isFile = in_array($field->field_type, ['image', 'video', 'file'], true);
                                 if ($isFile) {
                                     $fileKey = "components.{$comp->id}.subcomponents.{$subComp->id}.instances.{$idx}.files.{$field->id}";
+                                    $existingFileKey = "components.{$comp->id}.subcomponents.{$subComp->id}.instances.{$idx}.existing_files.{$field->id}";
                                     if ($request->hasFile($fileKey)) {
                                         $file = $request->file($fileKey);
                                         $ext = $file->getClientOriginalExtension();
@@ -641,6 +676,21 @@ class AdminController extends Controller
                                                 'field_name'    => $field->field_name,
                                                 'file_path'     => $filePath,
                                                 'content_value' => $file->getClientOriginalName(),
+                                            ]
+                                        );
+                                    } elseif ($request->filled($existingFileKey)) {
+                                        SectionComponentData::updateOrCreate(
+                                            [
+                                                'section_id'         => $section->id,
+                                                'component_id'       => $comp->id,
+                                                'sub_component_id'   => $subComp->id,
+                                                'component_field_id' => $field->id,
+                                                'instance_index'     => $idx,
+                                            ],
+                                            [
+                                                'field_name'    => $field->field_name,
+                                                'file_path'     => $request->input($existingFileKey),
+                                                'content_value' => basename($request->input($existingFileKey)),
                                             ]
                                         );
                                     }
