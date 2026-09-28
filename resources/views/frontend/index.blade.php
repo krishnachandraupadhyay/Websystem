@@ -501,411 +501,485 @@
     </section>
 
 
-    <!-- MAIN 3-COLUMN CONTENT GRID -->
-    <main class="max-w-[1440px] mx-auto px-3 sm:px-5 lg:px-6 pb-12">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+    <!-- ==================================================== -->
+    <!-- FULL SCREEN / FULL WIDTH PLACEMENT & ACHIEVEMENTS -->
+    <!-- ==================================================== -->
+    <section id="placement" class="w-full bg-[#f8fafc] border-y border-slate-200/90 py-12 sm:py-16 my-6 shadow-xs">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
             
-            <!-- ============================================== -->
-            <!-- COLUMN 1: MESSAGE FROM LEADERSHIP (lg:col-span-4) -->
-            <!-- ============================================== -->
-            <div class="lg:col-span-4 space-y-5">
+            <!-- Section Header -->
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <div class="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold px-3.5 py-1.5 rounded-full mb-3 shadow-2xs">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <span class="font-hindi">उपलब्धियां एवं करियर सफलता</span>
+                    <span>•</span>
+                    <span class="tracking-wider uppercase">CAREER EXCELLENCE & ACHIEVEMENTS</span>
+                </div>
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight font-heading uppercase">
+                    PLACEMENT & ACHIEVEMENTS
+                </h2>
+                <p class="text-slate-600 text-xs sm:text-sm mt-2 leading-relaxed">
+                    Equipping Gyan Vikas students with top academic distinctions, multinational recruiter selections, and lifelong leadership competencies.
+                </p>
+            </div>
+
+            <!-- Key Placement Highlight Counters -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-2xs text-center hover:border-amber-300 transition-colors">
+                    <span class="text-2xl sm:text-3xl font-black text-amber-500 font-heading block">98%</span>
+                    <span class="text-xs font-semibold text-slate-600 mt-1 block">Campus Placement & Merit Rate</span>
+                </div>
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-2xs text-center hover:border-blue-300 transition-colors">
+                    <span class="text-2xl sm:text-3xl font-black text-blue-600 font-heading block">100+</span>
+                    <span class="text-xs font-semibold text-slate-600 mt-1 block">Corporate & Higher Ed Partners</span>
+                </div>
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-2xs text-center hover:border-emerald-300 transition-colors">
+                    <span class="text-2xl sm:text-3xl font-black text-emerald-600 font-heading block">66+</span>
+                    <span class="text-xs font-semibold text-slate-600 mt-1 block">Premier Tech Placements</span>
+                </div>
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-2xs text-center hover:border-indigo-300 transition-colors">
+                    <span class="text-2xl sm:text-3xl font-black text-indigo-600 font-heading block">+24%</span>
+                    <span class="text-xs font-semibold text-slate-600 mt-1 block">Year-on-Year Growth</span>
+                </div>
+            </div>
+
+            <!-- Placement Cards Grid (4 Columns in Full Width) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
                 
-                <!-- CARD: MESSAGE FROM LEADERSHIP -->
-                <section class="bg-white rounded-xl shadow-xs border border-slate-200/90 p-5 transition-shadow hover:shadow-md">
-                    <h3 class="font-black text-slate-900 text-sm sm:text-base tracking-wider uppercase border-b border-slate-100 pb-2.5 mb-4 font-heading flex items-center justify-between">
+                <!-- Card 1: Featured Alumni Success Story -->
+                <div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div>
+                        <div class="relative rounded-lg overflow-hidden mb-3">
+                            <img 
+                                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80" 
+                                alt="Alumni Success Story" 
+                                class="w-full h-36 object-cover"
+                            />
+                            <span class="absolute top-2 left-2 bg-slate-900/70 backdrop-blur-md text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded">Alumni Spotlight</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm leading-tight font-heading">Alumni Success Stories</h4>
+                        <p class="text-slate-600 text-xs mt-1.5 leading-relaxed">
+                            Alumni from Gyan Vikas holding distinguished leadership roles across top global multinational corporations and scientific institutions.
+                        </p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 mt-3">
+                        <a href="#placement" class="text-blue-600 font-bold text-xs hover:underline inline-flex items-center gap-1">
+                            <span>Read Full Story</span>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card 2: Top Recruiters (Amazon, Microsoft) -->
+                <div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-bold text-slate-900 text-sm font-heading">Top Recruiters</h4>
+                            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">Fortune 500</span>
+                        </div>
+                        
+                        <div class="space-y-2.5">
+                            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-lg border border-slate-200/80">
+                                <span class="font-black text-sm text-slate-900 tracking-tight">amazon</span>
+                                <span class="text-xs font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded">15+ Placed</span>
+                            </div>
+                            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-lg border border-slate-200/80">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-3 h-3 grid grid-cols-2 gap-0.5">
+                                        <span class="bg-red-500 rounded-[1px]"></span>
+                                        <span class="bg-green-500 rounded-[1px]"></span>
+                                        <span class="bg-blue-500 rounded-[1px]"></span>
+                                        <span class="bg-amber-500 rounded-[1px]"></span>
+                                    </span>
+                                    <span class="font-semibold text-xs text-slate-800">Microsoft</span>
+                                </div>
+                                <span class="text-xs font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded">48 Placed</span>
+                            </div>
+                            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-lg border border-slate-200/80">
+                                <span class="font-bold text-xs text-slate-800 tracking-tight">Google / Deloitte</span>
+                                <span class="text-xs font-bold text-purple-700 bg-purple-100/70 px-2 py-0.5 rounded">24+ Placed</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 mt-3 flex items-center justify-between text-xs text-slate-500">
+                        <span>Career Counseling Cell</span>
+                        <span class="text-emerald-600 font-bold">100% Mentorship</span>
+                    </div>
+                </div>
+
+                <!-- Card 3: Top Recruiters (Tecruiters) -->
+                <div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-bold text-slate-900 text-sm font-heading">Corporate Alliances</h4>
+                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 mb-3 bg-red-50/60 p-2 rounded-lg border border-red-100">
+                            <span class="w-7 h-7 rounded-full bg-red-600 text-white font-black text-sm flex items-center justify-center shadow-xs">R</span>
+                            <div>
+                                <span class="font-extrabold text-sm text-slate-900 tracking-tight block">Tecruiters</span>
+                                <span class="text-[10px] text-slate-500">National Placement Partner</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-center">
+                            <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                                <span class="block text-lg font-black text-slate-900 font-heading">66+</span>
+                                <span class="text-[10px] font-semibold text-slate-500">Placements</span>
+                            </div>
+                            <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                                <span class="block text-lg font-black text-slate-900 font-heading">18+</span>
+                                <span class="text-[10px] font-semibold text-slate-500">Global Offers</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 mt-3">
+                        <a href="#placement" class="text-blue-600 font-bold text-xs hover:underline">View Recruitment Partners →</a>
+                    </div>
+                </div>
+
+                <!-- Card 4: Placement Stats Bar Chart -->
+                <div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-bold text-slate-900 text-sm font-heading">Placement Stats</h4>
+                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">↑ +24% YoY</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mb-3">Annual placement growth metrics</p>
+
+                        <!-- Graphical Bar Chart -->
+                        <div class="h-28 flex items-end justify-between gap-2 px-2 py-2 bg-slate-50 rounded-lg border border-slate-200">
+                            <div class="w-full flex flex-col items-center">
+                                <span class="text-[9px] font-bold text-slate-600">32</span>
+                                <div class="w-4 bg-amber-400 rounded-t shadow-2xs" style="height: 40px;"></div>
+                                <span class="text-[9px] text-slate-500 font-medium mt-1">2021</span>
+                            </div>
+                            <div class="w-full flex flex-col items-center">
+                                <span class="text-[9px] font-bold text-slate-600">46</span>
+                                <div class="w-4 bg-emerald-500 rounded-t shadow-2xs" style="height: 55px;"></div>
+                                <span class="text-[9px] text-slate-500 font-medium mt-1">2022</span>
+                            </div>
+                            <div class="w-full flex flex-col items-center">
+                                <span class="text-[9px] font-bold text-slate-600">54</span>
+                                <div class="w-4 bg-sky-500 rounded-t shadow-2xs" style="height: 65px;"></div>
+                                <span class="text-[9px] text-slate-500 font-medium mt-1">2023</span>
+                            </div>
+                            <div class="w-full flex flex-col items-center">
+                                <span class="text-[9px] font-bold text-slate-600">72</span>
+                                <div class="w-4 bg-blue-600 rounded-t shadow-2xs" style="height: 80px;"></div>
+                                <span class="text-[9px] text-slate-500 font-medium mt-1">2024</span>
+                            </div>
+                            <div class="w-full flex flex-col items-center">
+                                <span class="text-[9px] font-bold text-slate-600">95</span>
+                                <div class="w-4 bg-indigo-700 rounded-t shadow-2xs" style="height: 95px;"></div>
+                                <span class="text-[9px] text-slate-500 font-medium mt-1">2025</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 mt-3 text-right">
+                        <span class="text-[11px] text-slate-500 font-medium">Record 95% Top Tier Offers</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Lower Activities & Video Highlights Strip (Full Width) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <!-- Activity 1 -->
+                <div class="relative rounded-xl overflow-hidden group shadow-2xs border border-slate-200">
+                    <img 
+                        src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=500&q=80" 
+                        alt="Robotics Workshop" 
+                        class="w-full h-28 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent flex items-end p-3">
+                        <span class="text-xs font-bold text-white leading-tight">Robotics Workshop</span>
+                    </div>
+                </div>
+
+                <!-- Activity 2 -->
+                <div class="relative rounded-xl overflow-hidden group shadow-2xs border border-slate-200">
+                    <img 
+                        src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=500&q=80" 
+                        alt="Drama Club Performance" 
+                        class="w-full h-28 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent flex items-end p-3">
+                        <span class="text-xs font-bold text-white leading-tight">Drama Club Performance</span>
+                    </div>
+                </div>
+
+                <!-- Activity 3 (Video) -->
+                <div class="relative rounded-xl overflow-hidden group shadow-2xs border border-slate-200">
+                    <img 
+                        src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=500&q=80" 
+                        alt="Drama Video" 
+                        class="w-full h-28 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div class="absolute inset-0 bg-slate-950/40 flex items-center justify-center">
+                        <div class="w-9 h-9 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                            <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 to-transparent p-2 text-center">
+                        <span class="text-[11px] font-bold text-white">Drama Club Performance</span>
+                    </div>
+                </div>
+
+                <!-- Activity 4 (Video) -->
+                <div class="relative rounded-xl overflow-hidden group shadow-2xs border border-slate-200">
+                    <img 
+                        src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=500&q=80" 
+                        alt="Vibrant Club" 
+                        class="w-full h-28 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div class="absolute inset-0 bg-slate-950/40 flex items-center justify-center">
+                        <div class="w-9 h-9 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                            <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 to-transparent p-2 text-center">
+                        <span class="text-[11px] font-bold text-white">Vibrant Club Variety</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ==================================================== -->
+    <!-- 2-COLUMN SECTION: MESSAGE & NOTICE BOARD (col-sm-6 / col-md-6) -->
+    <!-- ==================================================== -->
+    <section class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 items-start">
+            
+            <!-- COLUMN 1: MESSAGE FROM LEADERSHIP (col-sm-6, col-md-6) -->
+            <div class="w-full">
+                <section class="bg-white rounded-xl shadow-xs border border-slate-200/90 p-5 sm:p-6 transition-shadow hover:shadow-md h-full">
+                    <h3 class="font-black text-slate-900 text-sm sm:text-base tracking-wider uppercase border-b border-slate-100 pb-3 mb-5 font-heading flex items-center justify-between">
                         <span>MESSAGE FROM LEADERSHIP</span>
-                        <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
                     </h3>
 
                     <!-- Profile 1: Dr. Sarita Sharma (Principal) - Emerald Theme -->
-                    <div class="bg-gradient-to-br from-[#059669] to-[#047857] text-white rounded-xl p-4 shadow-sm mb-4">
-                        <div class="flex gap-3 items-start">
+                    <div class="bg-gradient-to-br from-[#059669] to-[#047857] text-white rounded-xl p-4 sm:p-5 shadow-sm mb-5">
+                        <div class="flex gap-4 items-start">
                             <img 
                                 src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80" 
                                 alt="Dr. Sarita Sharma - Principal" 
-                                class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border-2 border-white/80 shadow-md shrink-0"
+                                class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover border-2 border-white/80 shadow-md shrink-0"
                             />
                             <div class="min-w-0">
-                                <h4 class="font-bold text-white text-sm sm:text-base leading-tight font-heading">Dr. Sarita Sharma</h4>
-                                <span class="text-emerald-100 text-xs font-semibold block mb-1">Principal</span>
-                                <p class="text-emerald-50 text-[11px] sm:text-xs leading-relaxed line-clamp-3">
-                                    Welcome to Gyan Vikas School. We meet passionate commitment and holistic enrichment. Our institution is dedicated to nurturing curiosity, discipline, and emotional strength in every student.
+                                <h4 class="font-bold text-white text-base sm:text-lg leading-tight font-heading">Dr. Sarita Sharma</h4>
+                                <span class="text-emerald-100 text-xs font-semibold block mb-2">Principal, Gyan Vikas School</span>
+                                <p class="text-emerald-50 text-xs sm:text-[13px] leading-relaxed line-clamp-4">
+                                    Welcome to Gyan Vikas School. We meet passionate commitment and holistic enrichment. Our institution is dedicated to nurturing curiosity, discipline, and emotional strength in every student, preparing them for an interconnected world.
                                 </p>
                             </div>
                         </div>
-                        <div class="mt-2.5 pt-2 border-t border-emerald-400/30 flex justify-end">
-                            <button class="bg-emerald-900/60 hover:bg-emerald-950 text-emerald-100 hover:text-white text-[11px] font-bold px-3 py-1 rounded-md transition-colors">
-                                Read More
+                        <div class="mt-3 pt-2.5 border-t border-emerald-400/30 flex justify-end">
+                            <button class="bg-emerald-900/60 hover:bg-emerald-950 text-emerald-100 hover:text-white text-xs font-bold px-3.5 py-1.5 rounded-md transition-colors">
+                                Read Full Message
                             </button>
                         </div>
                     </div>
 
                     <!-- Profile 2: Mr. Arun Khanna (Director) - Slate/Light Theme -->
-                    <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-4 shadow-2xs">
-                        <div class="flex gap-3 items-start">
+                    <div class="bg-slate-50 border border-slate-200/90 rounded-xl p-4 sm:p-5 shadow-2xs">
+                        <div class="flex gap-4 items-start">
                             <img 
                                 src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" 
                                 alt="Mr. Arun Khanna - Director" 
-                                class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border border-slate-300 shadow-sm shrink-0"
+                                class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover border border-slate-300 shadow-sm shrink-0"
                             />
                             <div class="min-w-0">
-                                <h4 class="font-bold text-slate-900 text-sm sm:text-base leading-tight font-heading">Mr. Arun Khanna</h4>
-                                <span class="text-slate-500 text-xs font-semibold block mb-1">Director</span>
-                                <p class="text-slate-600 text-[11px] sm:text-xs leading-relaxed line-clamp-3">
-                                    Gyan Vikas School stands as a beacon of academic leadership and value-based schooling. We nurture visionaries with global perspectives, cutting-edge technology, and enduring values.
+                                <h4 class="font-bold text-slate-900 text-base sm:text-lg leading-tight font-heading">Mr. Arun Khanna</h4>
+                                <span class="text-slate-500 text-xs font-semibold block mb-2">Director, Gyan Vikas Educational Foundation</span>
+                                <p class="text-slate-600 text-xs sm:text-[13px] leading-relaxed line-clamp-4">
+                                    Gyan Vikas School stands as a beacon of academic leadership and value-based schooling. We nurture visionaries with global perspectives, cutting-edge technology, and enduring ethical integrity that stand the test of time.
                                 </p>
                             </div>
                         </div>
-                        <div class="mt-2.5 pt-2 border-t border-slate-200 flex justify-end">
-                            <button class="text-blue-700 hover:text-blue-900 text-[11px] font-bold hover:underline">
-                                Read More
+                        <div class="mt-3 pt-2.5 border-t border-slate-200 flex justify-end">
+                            <button class="text-blue-700 hover:text-blue-900 text-xs font-bold hover:underline">
+                                Read Full Vision →
                             </button>
                         </div>
                     </div>
                 </section>
-
             </div>
 
-
-            <!-- ============================================== -->
-            <!-- COLUMN 2: PLACEMENT & ACHIEVEMENTS (lg:col-span-4) -->
-            <!-- ============================================== -->
-            <div id="placement" class="lg:col-span-4 space-y-5">
-                
-                <!-- CARD 1: PLACEMENT & ACHIEVEMENTS -->
-                <section class="bg-white rounded-xl shadow-xs border border-slate-200/90 p-5 transition-shadow hover:shadow-md">
-                    <h3 class="font-black text-slate-900 text-sm sm:text-base tracking-wider uppercase border-b border-slate-100 pb-2.5 mb-4 font-heading flex items-center justify-between">
-                        <span>PLACEMENT & ACHIEVEMENTS</span>
-                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                    </h3>
-
-                    <!-- Placement Highlights Sub-Grid -->
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        
-                        <!-- Mini Card 1: Alumni Featured Card -->
-                        <div class="col-span-1 bg-slate-50 rounded-lg border border-slate-200/80 p-2.5 flex flex-col justify-between">
-                            <img 
-                                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80" 
-                                alt="Alumni Success Story" 
-                                class="w-full h-24 object-cover rounded-md mb-2 shadow-2xs"
-                            />
-                            <div>
-                                <h4 class="font-bold text-slate-900 text-xs leading-tight">Alumni Success Stories</h4>
-                                <p class="text-slate-500 text-[10px] mt-1 line-clamp-2">Alumni from Gyan Vikas in leadership roles across top multinational firms.</p>
-                            </div>
-                            <a href="#placement" class="text-blue-600 font-bold text-[10px] mt-2 inline-block hover:underline">Read More</a>
-                        </div>
-
-                        <!-- Mini Card 2: Top Recruiters (Amazon, Microsoft) -->
-                        <div class="col-span-1 bg-slate-50 rounded-lg border border-slate-200/80 p-2.5 flex flex-col justify-between">
-                            <div>
-                                <h4 class="font-bold text-slate-800 text-xs mb-2">Top Recruiters</h4>
-                                
-                                <!-- Brand Badges -->
-                                <div class="space-y-2">
-                                    <div class="flex items-center justify-between bg-white px-2 py-1 rounded border border-slate-200">
-                                        <span class="font-black text-xs text-slate-800 tracking-tight">amazon</span>
-                                        <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">15+ Hired</span>
-                                    </div>
-                                    <div class="flex items-center justify-between bg-white px-2 py-1 rounded border border-slate-200">
-                                        <div class="flex items-center gap-1">
-                                            <span class="w-2.5 h-2.5 grid grid-cols-2 gap-0.5">
-                                                <span class="bg-red-500 rounded-[1px]"></span>
-                                                <span class="bg-green-500 rounded-[1px]"></span>
-                                                <span class="bg-blue-500 rounded-[1px]"></span>
-                                                <span class="bg-amber-500 rounded-[1px]"></span>
-                                            </span>
-                                            <span class="font-semibold text-[11px] text-slate-800">Microsoft</span>
-                                        </div>
-                                        <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">48 Hired</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-2 pt-1.5 border-t border-slate-200/80">
-                                <span class="text-[10px] text-slate-500 font-medium">98% Placement Rate</span>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!-- Row 2: Recruiters & Stats -->
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        
-                        <!-- Tecruiters Card -->
-                        <div class="bg-slate-50 rounded-lg border border-slate-200/80 p-2.5">
-                            <h4 class="font-bold text-slate-800 text-xs mb-1.5">Top Recruiters</h4>
-                            <div class="flex items-center gap-1.5 mb-2">
-                                <span class="w-5 h-5 rounded-full bg-red-600 text-white font-black text-xs flex items-center justify-center">R</span>
-                                <span class="font-extrabold text-xs text-slate-800 tracking-tight">Tecruiters</span>
-                            </div>
-                            <div class="grid grid-cols-2 gap-1 text-center">
-                                <div class="bg-white p-1 rounded border border-slate-200">
-                                    <span class="block text-xs font-black text-slate-900">66+</span>
-                                    <span class="text-[9px] text-slate-500">Placements</span>
-                                </div>
-                                <div class="bg-white p-1 rounded border border-slate-200">
-                                    <span class="block text-xs font-black text-slate-900">18+</span>
-                                    <span class="text-[9px] text-slate-500">Offers</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Placement Stats Bar Chart -->
-                        <div class="bg-slate-50 rounded-lg border border-slate-200/80 p-2.5 flex flex-col justify-between">
-                            <h4 class="font-bold text-slate-800 text-xs mb-1">Placement Stats</h4>
-                            
-                            <!-- Graphical Bar Chart Representation -->
-                            <div class="h-16 flex items-end justify-between gap-1.5 px-1 py-1 bg-white rounded border border-slate-200">
-                                <div class="w-full flex flex-col items-center">
-                                    <div class="w-2.5 bg-amber-400 rounded-t" style="height: 38px;"></div>
-                                    <span class="text-[8px] text-slate-400 mt-0.5">21</span>
-                                </div>
-                                <div class="w-full flex flex-col items-center">
-                                    <div class="w-2.5 bg-emerald-500 rounded-t" style="height: 48px;"></div>
-                                    <span class="text-[8px] text-slate-400 mt-0.5">22</span>
-                                </div>
-                                <div class="w-full flex flex-col items-center">
-                                    <div class="w-2.5 bg-sky-500 rounded-t" style="height: 42px;"></div>
-                                    <span class="text-[8px] text-slate-400 mt-0.5">23</span>
-                                </div>
-                                <div class="w-full flex flex-col items-center">
-                                    <div class="w-2.5 bg-blue-600 rounded-t" style="height: 56px;"></div>
-                                    <span class="text-[8px] text-slate-400 mt-0.5">24</span>
-                                </div>
-                                <div class="w-full flex flex-col items-center">
-                                    <div class="w-2.5 bg-indigo-700 rounded-t" style="height: 60px;"></div>
-                                    <span class="text-[8px] text-slate-400 mt-0.5">25</span>
-                                </div>
-                            </div>
-                            <span class="text-[9px] text-emerald-700 font-semibold text-right mt-1">↑ +24% YoY Growth</span>
-                        </div>
-
-                    </div>
-
-                    <!-- Lower Activity Cards & Highlights (Center Column Lower) -->
-                    <div class="grid grid-cols-2 gap-3">
-                        
-                        <!-- Activity 1: Robotics Workshop -->
-                        <div class="relative rounded-lg overflow-hidden group shadow-2xs border border-slate-200">
-                            <img 
-                                src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=400&q=80" 
-                                alt="Robotics Workshop" 
-                                class="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent flex items-end p-2">
-                                <span class="text-[11px] font-bold text-white leading-tight">Robotics Workshop</span>
-                            </div>
-                        </div>
-
-                        <!-- Activity 2: Drama Club Performance -->
-                        <div class="relative rounded-lg overflow-hidden group shadow-2xs border border-slate-200">
-                            <img 
-                                src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=400&q=80" 
-                                alt="Drama Club Performance" 
-                                class="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent flex items-end p-2">
-                                <span class="text-[11px] font-bold text-white leading-tight">Drama Club Performance</span>
-                            </div>
-                        </div>
-
-                        <!-- Activity 3: Video Play Card 1 -->
-                        <div class="relative rounded-lg overflow-hidden group shadow-2xs border border-slate-200">
-                            <img 
-                                src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=400&q=80" 
-                                alt="Drama Performance Video" 
-                                class="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                            <div class="absolute inset-0 bg-slate-950/40 flex items-center justify-center">
-                                <div class="w-8 h-8 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
-                                    <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                </div>
-                            </div>
-                            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 to-transparent p-1.5 text-center">
-                                <span class="text-[10px] font-bold text-white">Drama Club Performance</span>
-                            </div>
-                        </div>
-
-                        <!-- Activity 4: Video Play Card 2 -->
-                        <div class="relative rounded-lg overflow-hidden group shadow-2xs border border-slate-200">
-                            <img 
-                                src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=400&q=80" 
-                                alt="Vibrant Club Variety" 
-                                class="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                            <div class="absolute inset-0 bg-slate-950/40 flex items-center justify-center">
-                                <div class="w-8 h-8 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
-                                    <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                </div>
-                            </div>
-                            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 to-transparent p-1.5 text-center">
-                                <span class="text-[10px] font-bold text-white">Vibrant Club Variety</span>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!-- Mini Notices Box in Center Column -->
-                    <div class="mt-4 bg-slate-50 border border-slate-200 rounded-lg p-3">
-                        <span class="text-[11px] font-bold uppercase text-slate-700 block mb-2 font-heading">Latest Notices</span>
-                        <div class="space-y-2 text-xs">
-                            <div class="border-l-2 border-blue-500 pl-2">
-                                <p class="text-slate-800 font-semibold text-[11px] leading-tight">Welcome to Gyan Vikas School, Near Rohini, New Delhi</p>
-                                <span class="text-[10px] text-slate-400">13 Jan 2024</span>
-                            </div>
-                            <div class="border-l-2 border-emerald-500 pl-2">
-                                <p class="text-slate-800 font-semibold text-[11px] leading-tight">Parent Teacher Interaction & Career Counseling Sessions</p>
-                                <span class="text-[10px] text-slate-400">15 Jan 2024</span>
-                            </div>
-                        </div>
-                        <a href="#notices" class="text-blue-600 font-bold text-[10px] mt-2 inline-block hover:underline">View All Notices</a>
-                    </div>
-                </section>
-
-            </div>
-
-
-            <!-- ============================================== -->
-            <!-- COLUMN 3: NOTICE BOARD & GALLERY (lg:col-span-4) -->
-            <!-- ============================================== -->
-            <div class="lg:col-span-4 space-y-5">
-                
-                <!-- CARD 1: NOTICE BOARD & EVENTS -->
-                <section id="notices" class="bg-white rounded-xl shadow-xs border border-slate-200/90 p-5 transition-shadow hover:shadow-md">
-                    <h3 class="font-black text-slate-900 text-sm sm:text-base tracking-wider uppercase border-b border-slate-100 pb-2.5 mb-4 font-heading flex items-center justify-between">
+            <!-- COLUMN 2: NOTICE BOARD & EVENTS (col-sm-6, col-md-6) -->
+            <div class="w-full">
+                <section id="notices" class="bg-white rounded-xl shadow-xs border border-slate-200/90 p-5 sm:p-6 transition-shadow hover:shadow-md h-full">
+                    <h3 class="font-black text-slate-900 text-sm sm:text-base tracking-wider uppercase border-b border-slate-100 pb-3 mb-5 font-heading flex items-center justify-between">
                         <span>NOTICE BOARD & EVENTS</span>
-                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
                     </h3>
 
                     <!-- Events 2x2 Grid -->
-                    <div class="grid grid-cols-2 gap-2.5 mb-4">
+                    <div class="grid grid-cols-2 gap-3 mb-5">
                         <div class="relative rounded-lg overflow-hidden group border border-slate-200">
-                            <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=350&q=80" alt="Robotics" class="w-full h-20 object-cover group-hover:scale-105 transition-transform">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 to-transparent flex items-end p-1.5">
-                                <span class="text-[10px] font-bold text-white">Robotics Workshop</span>
+                            <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=400&q=80" alt="Robotics" class="w-full h-24 object-cover group-hover:scale-105 transition-transform">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 to-transparent flex items-end p-2">
+                                <span class="text-xs font-bold text-white">Robotics Workshop</span>
                             </div>
                         </div>
                         <div class="relative rounded-lg overflow-hidden group border border-slate-200">
-                            <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=350&q=80" alt="Drama" class="w-full h-20 object-cover group-hover:scale-105 transition-transform">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 to-transparent flex items-end p-1.5">
-                                <span class="text-[10px] font-bold text-white">Drama Club Performance</span>
+                            <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=400&q=80" alt="Drama" class="w-full h-24 object-cover group-hover:scale-105 transition-transform">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 to-transparent flex items-end p-2">
+                                <span class="text-xs font-bold text-white">Drama Club Performance</span>
                             </div>
                         </div>
                         <div class="relative rounded-lg overflow-hidden group border border-slate-200">
-                            <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=350&q=80" alt="Drama" class="w-full h-20 object-cover group-hover:scale-105 transition-transform">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 to-transparent flex items-end p-1.5">
-                                <span class="text-[10px] font-bold text-white">Drama Club Performance</span>
+                            <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=400&q=80" alt="Drama" class="w-full h-24 object-cover group-hover:scale-105 transition-transform">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 to-transparent flex items-end p-2">
+                                <span class="text-xs font-bold text-white">Academic Symposium</span>
                             </div>
                         </div>
                         <div class="relative rounded-lg overflow-hidden group border border-slate-200">
-                            <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=350&q=80" alt="Drama" class="w-full h-20 object-cover group-hover:scale-105 transition-transform">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 to-transparent flex items-end p-1.5">
-                                <span class="text-[10px] font-bold text-white">Drama Club Performance</span>
+                            <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=400&q=80" alt="Drama" class="w-full h-24 object-cover group-hover:scale-105 transition-transform">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 to-transparent flex items-end p-2">
+                                <span class="text-xs font-bold text-white">Cultural Carnival 2024</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Latest Notices List Box (Matching Screenshot) -->
-                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-3">
-                        <div class="flex items-center justify-between border-b border-slate-200/80 pb-1.5">
-                            <span class="text-xs font-bold text-slate-800 uppercase font-heading">Latest Notices</span>
-                            <span class="text-[10px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">New Updates</span>
+                    <!-- Latest Notices List Box -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3.5">
+                        <div class="flex items-center justify-between border-b border-slate-200/80 pb-2">
+                            <span class="text-xs font-extrabold text-slate-800 uppercase font-heading">Latest Official Circulars</span>
+                            <span class="text-[10px] font-semibold text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200/60">Live Updates</span>
                         </div>
 
                         <!-- Notice 1 -->
-                        <div class="space-y-0.5">
-                            <h5 class="text-xs font-bold text-slate-800 leading-snug hover:text-blue-600 cursor-pointer">
-                                Welcome to Gyan Vikas School, Near Rohini, Delhi, 110085.
+                        <div class="space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">Admissions</span>
+                                <span class="text-[10px] text-slate-400 font-medium">13 Jan 2024</span>
+                            </div>
+                            <h5 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug hover:text-blue-600 cursor-pointer">
+                                Welcome to Gyan Vikas School, Near Rohini, New Delhi — Registration Open for Session 2024-25.
                             </h5>
-                            <span class="text-[10px] text-slate-400 font-medium">13 Jan 2024</span>
                         </div>
 
                         <!-- Notice 2 -->
-                        <div class="space-y-0.5 border-t border-slate-200/60 pt-2">
-                            <h5 class="text-xs font-bold text-slate-800 leading-snug hover:text-blue-600 cursor-pointer">
-                                Parent Teacher Alumni Club Interaction: Annual Performance Discussion & Feedback.
+                        <div class="space-y-1 border-t border-slate-200/60 pt-2.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Academic</span>
+                                <span class="text-[10px] text-slate-400 font-medium">14 Jan 2024</span>
+                            </div>
+                            <h5 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug hover:text-blue-600 cursor-pointer">
+                                Parent Teacher Alumni Club Interaction: Annual Performance Discussion & Career Feedback.
                             </h5>
-                            <span class="text-[10px] text-slate-400 font-medium">14 Jan 2024</span>
                         </div>
 
                         <!-- Notice 3 -->
-                        <div class="space-y-0.5 border-t border-slate-200/60 pt-2">
-                            <h5 class="text-xs font-bold text-slate-800 leading-snug hover:text-blue-600 cursor-pointer">
+                        <div class="space-y-1 border-t border-slate-200/60 pt-2.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">Cultural</span>
+                                <span class="text-[10px] text-slate-400 font-medium">15 Jan 2024</span>
+                            </div>
+                            <h5 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug hover:text-blue-600 cursor-pointer">
                                 Drama Club Performance: The annual theatre showcase is a resounding cultural milestone.
                             </h5>
-                            <span class="text-[10px] text-slate-400 font-medium">15 Jan 2024</span>
                         </div>
 
-                        <div class="pt-1 text-right">
-                            <a href="#notices" class="text-blue-600 font-bold text-xs hover:underline">Read More →</a>
+                        <div class="pt-2 text-right border-t border-slate-200/80">
+                            <a href="#notices" class="text-blue-600 font-bold text-xs hover:underline inline-flex items-center gap-1">
+                                <span>View Notice Archive</span>
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
                         </div>
                     </div>
                 </section>
+            </div>
+
+        </div>
+    </section>
 
 
-                <!-- CARD 2: GALLERY & INNOVATION -->
-                <section id="gallery" class="bg-white rounded-xl shadow-xs border border-slate-200/90 p-5 transition-shadow hover:shadow-md">
-                    <h3 class="font-black text-slate-900 text-sm sm:text-base tracking-wider uppercase border-b border-slate-100 pb-2.5 mb-4 font-heading flex items-center justify-between">
+    <!-- ==================================================== -->
+    <!-- GALLERY & INNOVATION (FULL WIDTH SHOWCASE SECTION) -->
+    <!-- ==================================================== -->
+    <section id="gallery" class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pb-14 pt-4">
+        <div class="bg-white rounded-2xl shadow-xs border border-slate-200/90 p-6 sm:p-8">
+            
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-4 mb-6 gap-2">
+                <div>
+                    <h3 class="font-black text-slate-900 text-lg sm:text-xl tracking-tight uppercase font-heading flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-cyan-500"></span>
                         <span>GALLERY & INNOVATION</span>
-                        <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
                     </h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Capturing moments of learning, creativity, laboratory science & student life</p>
+                </div>
+                <a href="#gallery" class="text-xs font-bold text-blue-600 hover:text-blue-800 hover:underline">
+                    View Complete Campus Gallery →
+                </a>
+            </div>
 
-                    <!-- 6-Photo Collage Grid (3 cols x 2 rows) -->
-                    <div class="grid grid-cols-3 gap-2 mb-3">
-                        <div class="rounded-md overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200">
-                            <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=300&q=80" alt="Students studying" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                        </div>
-                        <div class="rounded-md overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200">
-                            <img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=300&q=80" alt="Student writing" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                        </div>
-                        <div class="rounded-md overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200">
-                            <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=300&q=80" alt="Classroom joy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                        </div>
-                        <div class="rounded-md overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200">
-                            <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=300&q=80" alt="Collaborative learning" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                        </div>
-                        <div class="rounded-md overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200">
-                            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=300&q=80" alt="Library time" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                        </div>
-                        <!-- Video overlay item -->
-                        <div class="relative rounded-md overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200">
-                            <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=300&q=80" alt="Chemistry lab experiment" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                            <div class="absolute inset-0 bg-slate-950/40 flex items-center justify-center">
-                                <div class="w-7 h-7 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-md">
-                                    <svg class="w-3.5 h-3.5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                </div>
-                            </div>
+            <!-- 6-Photo Collage Grid (3 cols x 2 rows or 6 cols) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
+                <div class="rounded-xl overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200 shadow-2xs">
+                    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=400&q=80" alt="Students studying" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <div class="rounded-xl overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200 shadow-2xs">
+                    <img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=400&q=80" alt="Student writing" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <div class="rounded-xl overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200 shadow-2xs">
+                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=400&q=80" alt="Classroom joy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <div class="rounded-xl overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200 shadow-2xs">
+                    <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=400&q=80" alt="Collaborative learning" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <div class="rounded-xl overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200 shadow-2xs">
+                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80" alt="Library time" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <!-- Video overlay item -->
+                <div class="relative rounded-xl overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200 shadow-2xs">
+                    <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=400&q=80" alt="Chemistry lab experiment" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-slate-950/40 flex items-center justify-center">
+                        <div class="w-8 h-8 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                            <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <!-- 2 Wide Banner Cards (Matching Lower Right in Image) -->
-                    <div class="grid grid-cols-2 gap-2.5">
-                        
-                        <!-- Wide Card 1 -->
-                        <div class="relative rounded-lg overflow-hidden group shadow-2xs cursor-pointer border border-slate-200">
-                            <img src="https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=450&q=80" alt="Student Innovation & Labs" class="w-full h-20 object-cover group-hover:scale-105 transition-transform duration-300">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-transparent flex items-end p-2">
-                                <span class="text-[11px] font-bold text-white leading-tight">Student Innovation & Labs</span>
-                            </div>
-                        </div>
-
-                        <!-- Wide Card 2 -->
-                        <div class="relative rounded-lg overflow-hidden group shadow-2xs cursor-pointer border border-slate-200">
-                            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=450&q=80" alt="Vibrant Community" class="w-full h-20 object-cover group-hover:scale-105 transition-transform duration-300">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-transparent flex items-end p-2">
-                                <span class="text-[11px] font-bold text-white leading-tight">Vibrant Community</span>
-                            </div>
-                        </div>
-
+            <!-- 2 Wide Banner Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <!-- Wide Card 1 -->
+                <div class="relative rounded-xl overflow-hidden group shadow-sm cursor-pointer border border-slate-200 min-h-[140px] flex items-end">
+                    <img src="https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=700&q=80" alt="Student Innovation & Labs" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-transparent"></div>
+                    <div class="relative z-10 p-4">
+                        <span class="text-[10px] font-black uppercase text-amber-300 tracking-wider">Research & Technology</span>
+                        <h4 class="text-base sm:text-lg font-bold text-white font-heading">Student Innovation & High-Tech Science Labs</h4>
                     </div>
+                </div>
 
-                </section>
+                <!-- Wide Card 2 -->
+                <div class="relative rounded-xl overflow-hidden group shadow-sm cursor-pointer border border-slate-200 min-h-[140px] flex items-end">
+                    <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=700&q=80" alt="Vibrant Community" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-transparent"></div>
+                    <div class="relative z-10 p-4">
+                        <span class="text-[10px] font-black uppercase text-emerald-300 tracking-wider">Campus Life</span>
+                        <h4 class="text-base sm:text-lg font-bold text-white font-heading">Vibrant Community, Sports & Cultural Spirit</h4>
+                    </div>
+                </div>
 
             </div>
 
         </div>
-    </main>
+    </section>
 
 
     <!-- FOOTER (MATCHING DEEP NAVY BLUE FOOTER) -->
