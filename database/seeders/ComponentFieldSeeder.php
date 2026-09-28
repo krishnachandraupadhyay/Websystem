@@ -297,5 +297,124 @@ class ComponentFieldSeeder extends Seeder
                 }
             }
         }
+
+        // 7. Anchor Component (<a> tag)
+        $anchor = Component::where('component_name', 'Anchor')->orWhere('component_slug', 'anchor')->first();
+        if ($anchor) {
+            $fAnchorText = ComponentField::firstOrCreate(
+                ['component_id' => $anchor->id, 'field_name' => 'anchor_text'],
+                [
+                    'field_label'   => 'Anchor Text',
+                    'field_type'    => 'text',
+                    'placeholder'   => 'e.g. Learn More / Read More',
+                    'default_value' => 'Learn More',
+                    'help_text'     => 'The visible text for the anchor link',
+                    'is_required'   => true,
+                    'is_active'     => true,
+                    'sort_order'    => 1,
+                ]
+            );
+
+            $fAnchorUrl = ComponentField::firstOrCreate(
+                ['component_id' => $anchor->id, 'field_name' => 'anchor_url'],
+                [
+                    'field_label'   => 'Anchor URL (href)',
+                    'field_type'    => 'url',
+                    'placeholder'   => 'https://example.com, /page, or #section',
+                    'default_value' => '#',
+                    'help_text'     => 'Destination link or target URL (href)',
+                    'is_required'   => true,
+                    'is_active'     => true,
+                    'sort_order'    => 2,
+                ]
+            );
+
+            $fAnchorTarget = ComponentField::firstOrCreate(
+                ['component_id' => $anchor->id, 'field_name' => 'target'],
+                [
+                    'field_label'   => 'Target Window',
+                    'field_type'    => 'select',
+                    'placeholder'   => '-- Select Target Window --',
+                    'default_value' => '_self',
+                    'help_text'     => 'Where to open the link',
+                    'is_required'   => false,
+                    'is_active'     => true,
+                    'sort_order'    => 3,
+                    'options'       => [
+                        ['value' => '_self', 'label' => 'Same Tab / Window (_self)'],
+                        ['value' => '_blank', 'label' => 'New Tab (_blank)'],
+                    ],
+                ]
+            );
+
+            $fAnchorTitle = ComponentField::firstOrCreate(
+                ['component_id' => $anchor->id, 'field_name' => 'title'],
+                [
+                    'field_label'   => 'Title / Tooltip',
+                    'field_type'    => 'text',
+                    'placeholder'   => 'e.g. Visit documentation or help section',
+                    'default_value' => null,
+                    'help_text'     => 'Optional hover text for accessibility (title attribute)',
+                    'is_required'   => false,
+                    'is_active'     => true,
+                    'sort_order'    => 4,
+                ]
+            );
+
+            $fAnchorRel = ComponentField::firstOrCreate(
+                ['component_id' => $anchor->id, 'field_name' => 'rel'],
+                [
+                    'field_label'   => 'Relationship (rel)',
+                    'field_type'    => 'select',
+                    'placeholder'   => '-- Select Link Relationship --',
+                    'default_value' => 'none',
+                    'help_text'     => 'Relationship of target URL (e.g. noopener, nofollow)',
+                    'is_required'   => false,
+                    'is_active'     => true,
+                    'sort_order'    => 5,
+                    'options'       => [
+                        ['value' => 'none', 'label' => 'Standard Link (None)'],
+                        ['value' => 'noopener noreferrer', 'label' => 'noopener noreferrer (Secure External Link)'],
+                        ['value' => 'nofollow', 'label' => 'nofollow (Search Engines)'],
+                        ['value' => 'noopener noreferrer nofollow', 'label' => 'nofollow + noopener noreferrer'],
+                    ],
+                ]
+            );
+
+            // Migrate legacy anchor data if any exists
+            $legacyAnchors = SectionComponentData::where('component_id', $anchor->id)
+                ->whereNull('component_field_id')
+                ->get();
+            foreach ($legacyAnchors as $ancData) {
+                if ($ancData->content_value) {
+                    SectionComponentData::firstOrCreate(
+                        [
+                            'section_id'         => $ancData->section_id,
+                            'component_id'       => $anchor->id,
+                            'sub_component_id'   => $ancData->sub_component_id,
+                            'component_field_id' => $fAnchorText->id,
+                        ],
+                        [
+                            'field_name'    => 'anchor_text',
+                            'content_value' => $ancData->content_value,
+                        ]
+                    );
+                }
+                if ($ancData->extra_value) {
+                    SectionComponentData::firstOrCreate(
+                        [
+                            'section_id'         => $ancData->section_id,
+                            'component_id'       => $anchor->id,
+                            'sub_component_id'   => $ancData->sub_component_id,
+                            'component_field_id' => $fAnchorUrl->id,
+                        ],
+                        [
+                            'field_name'    => 'anchor_url',
+                            'content_value' => $ancData->extra_value,
+                        ]
+                    );
+                }
+            }
+        }
     }
 }
