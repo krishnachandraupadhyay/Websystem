@@ -95,6 +95,9 @@
                         @foreach($section->components as $index => $comp)
                             @php
                                 $nameAndSlug = strtolower($comp->component_name . ' ' . $comp->component_slug);
+                                $isCompMultiple = (bool)($comp->pivot->is_multiple ?? $comp->is_multiple ?? false);
+                                $compInstMap = $multiFieldData[$comp->id] ?? [];
+                                $compInstCount = count($compInstMap);
                                 $existing = $contentData[$comp->id] ?? null;
                                 $hasSubComps = $comp->effective_subcomponents->isNotEmpty();
                             @endphp
@@ -639,6 +642,7 @@
                             @foreach($section->components as $index => $comp)
                                 @php
                                     $nameAndSlug = strtolower($comp->component_name . ' ' . $comp->component_slug);
+                                    $isCompMultiple = (bool)($comp->pivot->is_multiple ?? $comp->is_multiple ?? false);
                                     $existing = $contentData[$comp->id] ?? null;
                                 @endphp
 
