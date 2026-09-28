@@ -1,0 +1,225 @@
+@props([
+    'field',
+    'comp' => null,
+    'component' => null,
+    'subComp' => null,
+    'value' => null,
+    'filePath' => null,
+    'disabledCondition' => null,
+])
+
+@php
+    $comp = $comp ?? $component;
+    $isSub = !is_null($subComp);
+    
+    // Naming for normal fields vs file fields
+    if ($isSub && $comp) {
+        $inputName = "components[{$comp->id}][subcomponents][{$subComp->id}][fields][{$field->id}]";
+        $fileInputName = "components[{$comp->id}][subcomponents][{$subComp->id}][files][{$field->id}]";
+        $errorKey = "components.{$comp->id}.subcomponents.{$subComp->id}.fields.{$field->id}";
+        $fileErrorKey = "components.{$comp->id}.subcomponents.{$subComp->id}.files.{$field->id}";
+        $currentVal = old("components.{$comp->id}.subcomponents.{$subComp->id}.fields.{$field->id}", $value ?? $field->default_value);
+    } elseif ($comp) {
+        $inputName = "components[{$comp->id}][fields][{$field->id}]";
+        $fileInputName = "components[{$comp->id}][files][{$field->id}]";
+        $errorKey = "components.{$comp->id}.fields.{$field->id}";
+        $fileErrorKey = "components.{$comp->id}.files.{$field->id}";
+        $currentVal = old("components.{$comp->id}.fields.{$field->id}", $value ?? $field->default_value);
+    } else {
+        $inputName = "fields[{$field->field_name}]";
+        $fileInputName = "files[{$field->field_name}]";
+        $errorKey = "fields.{$field->field_name}";
+        $fileErrorKey = "files.{$field->field_name}";
+        $currentVal = old("fields.{$field->field_name}", $value ?? $field->default_value);
+    }
+
+    $currentFilePath = $filePath;
+    $disabledAttr = $disabledCondition ? ':disabled="' . $disabledCondition . '"' : '';
+    $errorsBag = isset($errors) ? $errors : new \Illuminate\Support\ViewErrorBag();
+    $hasError = $errorsBag->has($errorKey) || $errorsBag->has($fileErrorKey);
+@endphp
+
+<div class="space-y-1.5">
+    <!-- Field Label -->
+    <div class="flex items-center justify-between">
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+            {{ $field->field_label }}
+            @if($field->is_required)
+                <span class="text-rose-500 font-bold">*</span>
+            @endif
+        </label>
+        <span class="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+            {{ $field->field_type }}
+        </span>
+    </div>
+
+    <!-- Dynamic Input rendering by field_type -->
+    @switch($field->field_type)
+        @case('text')
+            <input 
+                type="text" 
+                name="{{ $inputName }}" 
+                value="{{ $currentVal }}" 
+                placeholder="{{ $field->placeholder ?: 'Enter ' . strtolower($field->field_label) . '...' }}"
+                {!! $disabledAttr !!}
+                class="w-full px-3.5 py-2.5 rounded-xl border @if($hasError) border-rose-300 bg-rose-50/20 @else border-slate-300 bg-white @endif text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium"
+            >
+            @break
+
+        @case('textarea')
+            <textarea 
+                name="{{ $inputName }}" 
+                rows="4" 
+                placeholder="{{ $field->placeholder ?: 'Enter ' . strtolower($field->field_label) . '...' }}"
+                {!! $disabledAttr !!}
+                class="w-full px-3.5 py-2.5 rounded-xl border @if($hasError) border-rose-300 bg-rose-50/20 @else border-slate-300 bg-white @endif text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all leading-relaxed"
+            >{{ $currentVal }}</textarea>
+            @break
+
+        @case('url')
+            <input 
+                type="url" 
+                name="{{ $inputName }}" 
+                value="{{ $currentVal }}" 
+                placeholder="{{ $field->placeholder ?: 'https://example.com' }}"
+                {!! $disabledAttr !!}
+                class="w-full px-3.5 py-2.5 rounded-xl border @if($hasError) border-rose-300 bg-rose-50/20 @else border-slate-300 bg-white @endif text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-mono text-xs"
+            >
+            @break
+
+        @case('number')
+            <input 
+                type="number" 
+                step="any"
+                name="{{ $inputName }}" 
+                value="{{ $currentVal }}" 
+                placeholder="{{ $field->placeholder ?: '0' }}"
+                {!! $disabledAttr !!}
+                class="w-full px-3.5 py-2.5 rounded-xl border @if($hasError) border-rose-300 bg-rose-50/20 @else border-slate-300 bg-white @endif text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium"
+            >
+            @break
+
+        @case('select')
+            <select 
+                name="{{ $inputName }}" 
+                {!! $disabledAttr !!}
+                class="w-full px-3.5 py-2.5 rounded-xl border @if($hasError) border-rose-300 bg-rose-50/20 @else border-slate-300 bg-white @endif text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+            >
+                <option value="">{{ $field->placeholder ?: '-- Select ' . $field->field_label . ' --' }}</option>
+                @foreach($field->formatted_options as $opt)
+                    <option value="{{ $opt['value'] }}" {{ (string)$currentVal === (string)$opt['value'] ? 'selected' : '' }}>
+                        {{ $opt['label'] }}
+                    </option>
+                @endforeach
+            </select>
+            @break
+
+        @case('checkbox')
+            <div class="pt-1">
+                <input type="hidden" name="{{ $inputName }}" value="0">
+                <label class="inline-flex items-center gap-2.5 cursor-pointer select-none">
+                    <input 
+                        type="checkbox" 
+                        name="{{ $inputName }}" 
+                        value="1" 
+                        {!! $disabledAttr !!}
+                        {{ ($currentVal === '1' || $currentVal === 1 || $currentVal === true || (empty($currentVal) && $field->default_value == '1')) ? 'checked' : '' }}
+                        class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                    >
+                    <span class="text-xs font-semibold text-slate-700">
+                        {{ $field->placeholder ?: 'Active / Yes' }}
+                    </span>
+                </label>
+            </div>
+            @break
+
+        @case('image')
+            <div class="space-y-2">
+                <input 
+                    type="file" 
+                    accept="image/*" 
+                    name="{{ $fileInputName }}" 
+                    {!! $disabledAttr !!}
+                    class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer rounded-xl border @if($hasError) border-rose-300 bg-rose-50/20 @else border-slate-300 bg-white @endif p-1.5"
+                >
+                @if($currentFilePath && file_exists(public_path($currentFilePath)))
+                    <div class="flex items-center gap-2.5 p-2 bg-slate-50 rounded-xl border border-slate-200">
+                        <img src="{{ asset($currentFilePath) }}" alt="Preview" class="w-10 h-10 object-cover rounded-lg border border-slate-200 shadow-2xs">
+                        <div class="text-xs min-w-0">
+                            <span class="font-bold text-slate-700 block truncate max-w-[220px]">{{ basename($currentFilePath) }}</span>
+                            <span class="text-[10px] text-emerald-600 font-semibold">Current image saved</span>
+                        </div>
+                    </div>
+                @endif
+            </div>
+            @break
+
+        @case('video')
+            <div class="space-y-2">
+                <input 
+                    type="file" 
+                    accept="video/*" 
+                    name="{{ $fileInputName }}" 
+                    {!! $disabledAttr !!}
+                    class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer rounded-xl border @if($hasError) border-rose-300 bg-rose-50/20 @else border-slate-300 bg-white @endif p-1.5"
+                >
+                @if($currentFilePath && file_exists(public_path($currentFilePath)))
+                    <div class="flex items-center gap-2.5 p-2 bg-slate-50 rounded-xl border border-slate-200">
+                        <video src="{{ asset($currentFilePath) }}" class="w-14 h-9 object-cover rounded-lg border border-slate-200 shadow-2xs"></video>
+                        <div class="text-xs min-w-0">
+                            <span class="font-bold text-slate-700 block truncate max-w-[220px]">{{ basename($currentFilePath) }}</span>
+                            <span class="text-[10px] text-purple-600 font-semibold">Current video saved</span>
+                        </div>
+                    </div>
+                @endif
+            </div>
+            @break
+
+        @case('file')
+            <div class="space-y-2">
+                <input 
+                    type="file" 
+                    name="{{ $fileInputName }}" 
+                    {!! $disabledAttr !!}
+                    class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer rounded-xl border @if($hasError) border-rose-300 bg-rose-50/20 @else border-slate-300 bg-white @endif p-1.5"
+                >
+                @if($currentFilePath && file_exists(public_path($currentFilePath)))
+                    <div class="flex items-center gap-2.5 p-2 bg-slate-50 rounded-xl border border-slate-200">
+                        <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <div class="text-xs min-w-0">
+                            <span class="font-bold text-slate-700 block truncate max-w-[220px]">{{ basename($currentFilePath) }}</span>
+                            <a href="{{ asset($currentFilePath) }}" target="_blank" class="text-[10px] text-blue-600 hover:underline font-semibold">Download / View</a>
+                        </div>
+                    </div>
+                @endif
+            </div>
+            @break
+
+        @default
+            <input 
+                type="text" 
+                name="{{ $inputName }}" 
+                value="{{ $currentVal }}" 
+                placeholder="{{ $field->placeholder ?: 'Enter value...' }}"
+                {!! $disabledAttr !!}
+                class="w-full px-3.5 py-2.5 rounded-xl border @if($hasError) border-rose-300 bg-rose-50/20 @else border-slate-300 bg-white @endif text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium"
+            >
+    @endswitch
+
+    <!-- Help Text -->
+    @if($field->help_text)
+        <p class="text-[11px] text-slate-400">{{ $field->help_text }}</p>
+    @endif
+
+    <!-- Validation Error Feedback -->
+    @if($errorsBag->has($errorKey))
+        <p class="text-rose-500 text-xs font-semibold">{{ $errorsBag->first($errorKey) }}</p>
+    @endif
+    @if($errorsBag->has($fileErrorKey))
+        <p class="text-rose-500 text-xs font-semibold">{{ $errorsBag->first($fileErrorKey) }}</p>
+    @endif
+</div>

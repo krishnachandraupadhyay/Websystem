@@ -15,6 +15,8 @@ class SectionComponentData extends Model
         'section_id',
         'component_id',
         'sub_component_id',
+        'component_field_id',
+        'field_name',
         'content_value',
         'extra_value',
         'file_path',
@@ -33,5 +35,10 @@ class SectionComponentData extends Model
     public function subComponent()
     {
         return $this->belongsTo(Component::class, 'sub_component_id');
+    }
+
+    public function field()
+    {
+        return $this->belongsTo(ComponentField::class, 'component_field_id');
     }
 }

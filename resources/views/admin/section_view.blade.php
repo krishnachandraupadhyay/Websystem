@@ -165,6 +165,7 @@
                                     @php
                                         $subNameAndSlug = strtolower($subComp->component_name . ' ' . $subComp->component_slug);
                                         $subExisting = $contentData[$comp->id . '_' . $subComp->id] ?? null;
+                                        $subFields = $subComp->fields->where('is_active', true)->sortBy('sort_order');
                                     @endphp
                                     <tr class="bg-slate-50/40 hover:bg-slate-50 transition-colors border-l-4 border-l-indigo-500">
                                         <td class="px-5 py-3 text-[11px] font-semibold text-slate-400 pl-8">
@@ -184,7 +185,11 @@
                                             </div>
                                         </td>
                                         <td class="px-5 py-3">
-                                            @if(str_contains($subNameAndSlug, 'subheading'))
+                                            @if($subFields->isNotEmpty())
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                    {{ $subFields->count() }} {{ \Illuminate\Support\Str::plural('Field', $subFields->count()) }}
+                                                </span>
+                                            @elseif(str_contains($subNameAndSlug, 'subheading'))
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
                                                     SubHeading
                                                 </span>
@@ -215,7 +220,33 @@
                                             @endif
                                         </td>
                                         <td class="px-5 py-3">
-                                            @if(str_contains($subNameAndSlug, 'heading'))
+                                            @if($subFields->isNotEmpty())
+                                                <div class="space-y-1">
+                                                    @foreach($subFields as $f)
+                                                        @php
+                                                            $fItem = $fieldData[$comp->id . '_' . $subComp->id][$f->id] ?? null;
+                                                        @endphp
+                                                        <div class="flex items-center gap-1.5 text-xs">
+                                                            <span class="text-slate-400 font-semibold text-[11px]">{{ $f->field_label }}:</span>
+                                                            @if(in_array($f->field_type, ['image', 'video', 'file'], true))
+                                                                @if($fItem?->file_path && file_exists(public_path($fItem->file_path)))
+                                                                    <a href="{{ asset($fItem->file_path) }}" target="_blank" class="text-blue-600 hover:underline font-mono text-[11px] truncate max-w-[150px]">
+                                                                        {{ basename($fItem->file_path) }}
+                                                                    </a>
+                                                                @else
+                                                                    <span class="text-slate-400 italic text-[11px]">No file</span>
+                                                                @endif
+                                                            @else
+                                                                @if($fItem?->content_value !== null && $fItem?->content_value !== '')
+                                                                    <span class="text-slate-800 font-medium">{{ $fItem->content_value }}</span>
+                                                                @else
+                                                                    <span class="text-slate-400 italic text-[11px]">Empty</span>
+                                                                @endif
+                                                            @endif
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @elseif(str_contains($subNameAndSlug, 'heading'))
                                                 @if($subExisting?->content_value)
                                                     <p class="text-xs font-bold text-slate-800">{{ $subExisting->content_value }}</p>
                                                 @else
@@ -315,9 +346,17 @@
                                         </div>
                                     </td>
 
+                                    @php
+                                        $compFields = $comp->fields->where('is_active', true)->sortBy('sort_order');
+                                    @endphp
+
                                     <!-- Component Type Badge -->
                                     <td class="px-5 py-4">
-                                        @if(str_contains($nameAndSlug, 'subheading'))
+                                        @if($compFields->isNotEmpty())
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                                {{ $compFields->count() }} {{ \Illuminate\Support\Str::plural('Field', $compFields->count()) }}
+                                            </span>
+                                        @elseif(str_contains($nameAndSlug, 'subheading'))
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
                                                 SubHeading
                                             </span>
@@ -350,8 +389,33 @@
 
                                     <!-- Configured Content / Preview -->
                                     <td class="px-5 py-4">
-                                        {{-- Heading & SubHeading --}}
-                                        @if(str_contains($nameAndSlug, 'heading'))
+                                        @if($compFields->isNotEmpty())
+                                            <div class="space-y-1">
+                                                @foreach($compFields as $f)
+                                                    @php
+                                                        $fItem = $fieldData[$comp->id][$f->id] ?? null;
+                                                    @endphp
+                                                    <div class="flex items-center gap-1.5 text-xs">
+                                                        <span class="text-slate-400 font-semibold text-[11px]">{{ $f->field_label }}:</span>
+                                                        @if(in_array($f->field_type, ['image', 'video', 'file'], true))
+                                                            @if($fItem?->file_path && file_exists(public_path($fItem->file_path)))
+                                                                <a href="{{ asset($fItem->file_path) }}" target="_blank" class="text-blue-600 hover:underline font-mono text-[11px] truncate max-w-[150px]">
+                                                                    {{ basename($fItem->file_path) }}
+                                                                </a>
+                                                            @else
+                                                                <span class="text-slate-400 italic text-[11px]">No file</span>
+                                                            @endif
+                                                        @else
+                                                            @if($fItem?->content_value !== null && $fItem?->content_value !== '')
+                                                                <span class="text-slate-800 font-medium">{{ $fItem->content_value }}</span>
+                                                            @else
+                                                                <span class="text-slate-400 italic text-[11px]">Empty</span>
+                                                            @endif
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @elseif(str_contains($nameAndSlug, 'heading'))
                                             @if($existing?->content_value)
                                                 <p class="text-xs font-bold text-slate-800">{{ $existing->content_value }}</p>
                                             @else
@@ -563,191 +627,219 @@
                                                     @php
                                                         $subNameAndSlug = strtolower($subComp->component_name . ' ' . $subComp->component_slug);
                                                         $subExisting = $contentData[$comp->id . '_' . $subComp->id] ?? null;
+                                                        $subFields = $subComp->fields->where('is_active', true)->sortBy('sort_order');
                                                     @endphp
 
-                                                    {{-- SUBHEADING --}}
-                                                    @if(str_contains($subNameAndSlug, 'subheading'))
-                                                        <div>
-                                                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                                {{ $subComp->component_name }}
-                                                            </label>
-                                                            <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][value]" value="{{ old('components.'.$comp->id.'.subcomponents.'.$subComp->id.'.value', $subExisting?->content_value) }}" placeholder="Enter subheading text..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium bg-white">
-                                                        </div>
-
-                                                    {{-- HEADING --}}
-                                                    @elseif(str_contains($subNameAndSlug, 'heading'))
-                                                        <div>
-                                                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                                {{ $subComp->component_name }}
-                                                            </label>
-                                                            <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][value]" value="{{ old('components.'.$comp->id.'.subcomponents.'.$subComp->id.'.value', $subExisting?->content_value) }}" placeholder="Enter heading title..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-bold bg-white">
-                                                        </div>
-
-                                                    {{-- BUTTON with Live Interactive Binding --}}
-                                                    @elseif(str_contains($subNameAndSlug, 'button'))
-                                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" x-data="{ btnText: '{{ addslashes(old('components.'.$comp->id.'.subcomponents.'.$subComp->id.'.value', $subExisting?->content_value ?? 'Click Here')) }}' }">
-                                                            <div>
-                                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                                    {{ $subComp->component_name }} Label
-                                                                </label>
-                                                                <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" x-model="btnText" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][value]" placeholder="e.g. Get Started / Click Here" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium bg-white">
+                                                    @if($subFields->isNotEmpty())
+                                                        <div class="p-3.5 bg-white rounded-xl border border-indigo-100 shadow-2xs space-y-3">
+                                                            <div class="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                                                                <h5 class="text-xs font-bold text-slate-800 uppercase tracking-wider">{{ $subComp->component_name }}</h5>
+                                                                <span class="text-[10px] font-mono text-slate-400">/{{ $subComp->component_slug }}</span>
                                                             </div>
+                                                            <div class="space-y-3">
+                                                                @foreach($subFields as $field)
+                                                                    @php
+                                                                        $fData = $fieldData[$comp->id . '_' . $subComp->id][$field->id] ?? null;
+                                                                    @endphp
+                                                                    <x-dynamic-field 
+                                                                        :field="$field" 
+                                                                        :comp="$comp" 
+                                                                        :subComp="$subComp" 
+                                                                        :value="$fData?->content_value" 
+                                                                        :filePath="$fData?->file_path" 
+                                                                        :disabledCondition="'activeComponentId && activeComponentId !== ' . $comp->id" 
+                                                                    />
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+                                                    @else
+                                                        {{-- Legacy Fallback for subcomponents without field definitions --}}
+                                                        @if(str_contains($subNameAndSlug, 'subheading'))
                                                             <div>
                                                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                                    {{ $subComp->component_name }} Target Link / URL
+                                                                    {{ $subComp->component_name }}
                                                                 </label>
-                                                                <div class="flex items-center gap-2">
-                                                                    <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][extra]" value="{{ old('components.'.$comp->id.'.subcomponents.'.$subComp->id.'.extra', $subExisting?->extra_value) }}" placeholder="e.g. #contact or https://example.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium bg-white">
-                                                                    <input type="button" :value="btnText || 'Click Here'" value="{{ $subExisting?->content_value ?: 'Click Here' }}" class="shrink-0 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs cursor-pointer shadow-xs transition-colors">
+                                                                <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][value]" value="{{ old('components.'.$comp->id.'.subcomponents.'.$subComp->id.'.value', $subExisting?->content_value) }}" placeholder="Enter subheading text..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium bg-white">
+                                                            </div>
+                                                        @elseif(str_contains($subNameAndSlug, 'heading'))
+                                                            <div>
+                                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                                                    {{ $subComp->component_name }}
+                                                                </label>
+                                                                <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][value]" value="{{ old('components.'.$comp->id.'.subcomponents.'.$subComp->id.'.value', $subExisting?->content_value) }}" placeholder="Enter heading title..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-bold bg-white">
+                                                            </div>
+                                                        @elseif(str_contains($subNameAndSlug, 'button'))
+                                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" x-data="{ btnText: '{{ addslashes(old('components.'.$comp->id.'.subcomponents.'.$subComp->id.'.value', $subExisting?->content_value ?? 'Click Here')) }}' }">
+                                                                <div>
+                                                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                                                        {{ $subComp->component_name }} Label
+                                                                    </label>
+                                                                    <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" x-model="btnText" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][value]" placeholder="e.g. Get Started / Click Here" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium bg-white">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                                                        {{ $subComp->component_name }} Target Link / URL
+                                                                    </label>
+                                                                    <div class="flex items-center gap-2">
+                                                                        <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][extra]" value="{{ old('components.'.$comp->id.'.subcomponents.'.$subComp->id.'.extra', $subExisting?->extra_value) }}" placeholder="e.g. #contact or https://example.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium bg-white">
+                                                                        <input type="button" :value="btnText || 'Click Here'" value="{{ $subExisting?->content_value ?: 'Click Here' }}" class="shrink-0 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs cursor-pointer shadow-xs transition-colors">
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-
-                                                    {{-- PARAGRAPH --}}
-                                                    @elseif(str_contains($subNameAndSlug, 'paragraph') || str_contains($subNameAndSlug, 'textarea') || str_contains($subNameAndSlug, 'desc'))
-                                                        <div>
-                                                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                                {{ $subComp->component_name }} <span class="text-slate-400 text-[11px] font-normal font-mono">(&lt;textarea&gt;)</span>
-                                                            </label>
-                                                            <textarea :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][value]" rows="3" placeholder="Enter paragraph description or content here..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all leading-relaxed bg-white">{{ old('components.'.$comp->id.'.subcomponents.'.$subComp->id.'.value', $subExisting?->content_value) }}</textarea>
-                                                        </div>
-
-                                                    {{-- IMAGE --}}
-                                                    @elseif(str_contains($subNameAndSlug, 'image') || str_contains($subNameAndSlug, 'photo') || str_contains($subNameAndSlug, 'banner'))
-                                                        <div>
-                                                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                                {{ $subComp->component_name }} <span class="text-slate-400 text-[11px] font-normal font-mono">(Image File)</span>
-                                                            </label>
-                                                            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                                                                <input type="file" accept="image/*" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][file]" class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer rounded-xl border border-slate-300 p-1.5 bg-white">
-                                                                @if($subExisting?->file_path && file_exists(public_path($subExisting->file_path)))
-                                                                    <div class="flex items-center gap-2.5 shrink-0 p-1.5 bg-slate-50 rounded-xl border border-slate-200">
-                                                                        <img src="{{ asset($subExisting->file_path) }}" alt="Preview" class="w-8 h-8 object-cover rounded-lg">
-                                                                        <span class="text-xs text-slate-600 font-medium max-w-[140px] truncate">{{ basename($subExisting->file_path) }}</span>
-                                                                    </div>
-                                                                @endif
+                                                        @elseif(str_contains($subNameAndSlug, 'paragraph') || str_contains($subNameAndSlug, 'textarea') || str_contains($subNameAndSlug, 'desc'))
+                                                            <div>
+                                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                                                    {{ $subComp->component_name }} <span class="text-slate-400 text-[11px] font-normal font-mono">(&lt;textarea&gt;)</span>
+                                                                </label>
+                                                                <textarea :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][value]" rows="3" placeholder="Enter paragraph description or content here..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all leading-relaxed bg-white">{{ old('components.'.$comp->id.'.subcomponents.'.$subComp->id.'.value', $subExisting?->content_value) }}</textarea>
                                                             </div>
-                                                        </div>
-
-                                                    {{-- VIDEO --}}
-                                                    @elseif(str_contains($subNameAndSlug, 'video'))
-                                                        <div>
-                                                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                                {{ $subComp->component_name }} <span class="text-slate-400 text-[11px] font-normal font-mono">(Video File)</span>
-                                                            </label>
-                                                            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                                                                <input type="file" accept="video/*" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][file]" class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer rounded-xl border border-slate-300 p-1.5 bg-white">
-                                                                @if($subExisting?->file_path && file_exists(public_path($subExisting->file_path)))
-                                                                    <div class="flex items-center gap-2.5 shrink-0 p-1.5 bg-slate-50 rounded-xl border border-slate-200">
-                                                                        <video src="{{ asset($subExisting->file_path) }}" class="w-12 h-8 object-cover rounded-lg"></video>
-                                                                        <span class="text-xs text-slate-600 font-medium max-w-[140px] truncate">{{ basename($subExisting->file_path) }}</span>
-                                                                    </div>
-                                                                @endif
+                                                        @elseif(str_contains($subNameAndSlug, 'image') || str_contains($subNameAndSlug, 'photo') || str_contains($subNameAndSlug, 'banner'))
+                                                            <div>
+                                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                                                    {{ $subComp->component_name }} <span class="text-slate-400 text-[11px] font-normal font-mono">(Image File)</span>
+                                                                </label>
+                                                                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                                                    <input type="file" accept="image/*" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][file]" class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer rounded-xl border border-slate-300 p-1.5 bg-white">
+                                                                    @if($subExisting?->file_path && file_exists(public_path($subExisting->file_path)))
+                                                                        <div class="flex items-center gap-2.5 shrink-0 p-1.5 bg-slate-50 rounded-xl border border-slate-200">
+                                                                            <img src="{{ asset($subExisting->file_path) }}" alt="Preview" class="w-8 h-8 object-cover rounded-lg">
+                                                                            <span class="text-xs text-slate-600 font-medium max-w-[140px] truncate">{{ basename($subExisting->file_path) }}</span>
+                                                                        </div>
+                                                                    @endif
+                                                                </div>
                                                             </div>
-                                                        </div>
-
-                                                    {{-- DEFAULT FALLBACK --}}
-                                                    @else
-                                                        <div>
-                                                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                                {{ $subComp->component_name }}
-                                                            </label>
-                                                            <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][value]" value="{{ old('components.'.$comp->id.'.subcomponents.'.$subComp->id.'.value', $subExisting?->content_value) }}" placeholder="Enter value for {{ $subComp->component_name }}..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium bg-white">
-                                                        </div>
+                                                        @elseif(str_contains($subNameAndSlug, 'video'))
+                                                            <div>
+                                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                                                    {{ $subComp->component_name }} <span class="text-slate-400 text-[11px] font-normal font-mono">(Video File)</span>
+                                                                </label>
+                                                                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                                                    <input type="file" accept="video/*" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][file]" class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer rounded-xl border border-slate-300 p-1.5 bg-white">
+                                                                    @if($subExisting?->file_path && file_exists(public_path($subExisting->file_path)))
+                                                                        <div class="flex items-center gap-2.5 shrink-0 p-1.5 bg-slate-50 rounded-xl border border-slate-200">
+                                                                            <video src="{{ asset($subExisting->file_path) }}" class="w-12 h-8 object-cover rounded-lg"></video>
+                                                                            <span class="text-xs text-slate-600 font-medium max-w-[140px] truncate">{{ basename($subExisting->file_path) }}</span>
+                                                                        </div>
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                        @else
+                                                            <div>
+                                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                                                    {{ $subComp->component_name }}
+                                                                </label>
+                                                                <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][value]" value="{{ old('components.'.$comp->id.'.subcomponents.'.$subComp->id.'.value', $subExisting?->content_value) }}" placeholder="Enter value for {{ $subComp->component_name }}..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium bg-white">
+                                                            </div>
+                                                        @endif
                                                     @endif
                                                 @endforeach
                                             </div>
                                         </div>
                                     @else
-                                        {{-- 1. SUBHEADING --}}
-                                        @if(str_contains($nameAndSlug, 'subheading'))
-                                            <div>
-                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                    {{ $comp->component_name }}
-                                                </label>
-                                                <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][value]" value="{{ old('components.'.$comp->id.'.value', $existing?->content_value) }}" placeholder="Enter subheading text..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium">
-                                            </div>
-
-                                        {{-- 2. HEADING --}}
-                                        @elseif(str_contains($nameAndSlug, 'heading'))
-                                            <div>
-                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                    {{ $comp->component_name }}
-                                                </label>
-                                                <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][value]" value="{{ old('components.'.$comp->id.'.value', $existing?->content_value) }}" placeholder="Enter heading title..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-bold">
-                                            </div>
-
-                                        {{-- 3. BUTTON with Live Interactive Binding --}}
-                                        @elseif(str_contains($nameAndSlug, 'button'))
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" x-data="{ btnText: '{{ addslashes(old('components.'.$comp->id.'.value', $existing?->content_value ?? 'Click Here')) }}' }">
-                                                <div>
-                                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                        {{ $comp->component_name }} Label
-                                                    </label>
-                                                    <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" x-model="btnText" name="components[{{ $comp->id }}][value]" placeholder="e.g. Get Started / Click Here" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium">
+                                        @php
+                                            $compFields = $comp->fields->where('is_active', true)->sortBy('sort_order');
+                                        @endphp
+                                        @if($compFields->isNotEmpty())
+                                            <div class="p-4 rounded-xl border border-slate-200/90 bg-white space-y-3.5">
+                                                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">{{ $comp->component_name }}</h4>
+                                                    <span class="text-[10px] font-mono text-slate-400">/{{ $comp->component_slug }}</span>
                                                 </div>
+                                                <div class="space-y-3.5">
+                                                    @foreach($compFields as $field)
+                                                        @php
+                                                            $fData = $fieldData[$comp->id][$field->id] ?? null;
+                                                        @endphp
+                                                        <x-dynamic-field 
+                                                            :field="$field" 
+                                                            :comp="$comp" 
+                                                            :subComp="null" 
+                                                            :value="$fData?->content_value" 
+                                                            :filePath="$fData?->file_path" 
+                                                            :disabledCondition="'activeComponentId && activeComponentId !== ' . $comp->id" 
+                                                        />
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @else
+                                            {{-- Legacy Fallback for top-level component without field definitions --}}
+                                            @if(str_contains($nameAndSlug, 'subheading'))
                                                 <div>
                                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                        {{ $comp->component_name }} Target Link / URL
+                                                        {{ $comp->component_name }}
                                                     </label>
-                                                    <div class="flex items-center gap-2">
-                                                        <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][extra]" value="{{ old('components.'.$comp->id.'.extra', $existing?->extra_value) }}" placeholder="e.g. #contact or https://example.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium">
-                                                        <input type="button" :value="btnText || 'Click Here'" value="{{ $existing?->content_value ?: 'Click Here' }}" class="shrink-0 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs cursor-pointer shadow-xs transition-colors">
+                                                    <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][value]" value="{{ old('components.'.$comp->id.'.value', $existing?->content_value) }}" placeholder="Enter subheading text..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium">
+                                                </div>
+                                            @elseif(str_contains($nameAndSlug, 'heading'))
+                                                <div>
+                                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                                        {{ $comp->component_name }}
+                                                    </label>
+                                                    <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][value]" value="{{ old('components.'.$comp->id.'.value', $existing?->content_value) }}" placeholder="Enter heading title..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-bold">
+                                                </div>
+                                            @elseif(str_contains($nameAndSlug, 'button'))
+                                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" x-data="{ btnText: '{{ addslashes(old('components.'.$comp->id.'.value', $existing?->content_value ?? 'Click Here')) }}' }">
+                                                    <div>
+                                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                                            {{ $comp->component_name }} Label
+                                                        </label>
+                                                        <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" x-model="btnText" name="components[{{ $comp->id }}][value]" placeholder="e.g. Get Started / Click Here" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                                            {{ $comp->component_name }} Target Link / URL
+                                                        </label>
+                                                        <div class="flex items-center gap-2">
+                                                            <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][extra]" value="{{ old('components.'.$comp->id.'.extra', $existing?->extra_value) }}" placeholder="e.g. #contact or https://example.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium">
+                                                            <input type="button" :value="btnText || 'Click Here'" value="{{ $existing?->content_value ?: 'Click Here' }}" class="shrink-0 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs cursor-pointer shadow-xs transition-colors">
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-
-                                        {{-- 4. PARAGRAPH --}}
-                                        @elseif(str_contains($nameAndSlug, 'paragraph') || str_contains($nameAndSlug, 'textarea') || str_contains($nameAndSlug, 'desc'))
-                                            <div>
-                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                    {{ $comp->component_name }} <span class="text-slate-400 text-[11px] font-normal font-mono">(&lt;textarea&gt;)</span>
-                                                </label>
-                                                <textarea :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][value]" rows="3" placeholder="Enter paragraph description or content here..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all leading-relaxed">{{ old('components.'.$comp->id.'.value', $existing?->content_value) }}</textarea>
-                                            </div>
-
-                                        {{-- 5. IMAGE --}}
-                                        @elseif(str_contains($nameAndSlug, 'image') || str_contains($nameAndSlug, 'photo') || str_contains($nameAndSlug, 'banner'))
-                                            <div>
-                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                    {{ $comp->component_name }}
-                                                </label>
-                                                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                                                    <input type="file" accept="image/*" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][file]" class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer rounded-xl border border-slate-300 p-1.5 bg-white">
-                                                    @if($existing?->file_path && file_exists(public_path($existing->file_path)))
-                                                        <div class="flex items-center gap-2.5 shrink-0 p-1.5 bg-slate-50 rounded-xl border border-slate-200">
-                                                            <img src="{{ asset($existing->file_path) }}" alt="Preview" class="w-8 h-8 object-cover rounded-lg">
-                                                            <span class="text-xs text-slate-600 font-medium max-w-[140px] truncate">{{ basename($existing->file_path) }}</span>
-                                                        </div>
-                                                    @endif
+                                            @elseif(str_contains($nameAndSlug, 'paragraph') || str_contains($nameAndSlug, 'textarea') || str_contains($nameAndSlug, 'desc'))
+                                                <div>
+                                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                                        {{ $comp->component_name }} <span class="text-slate-400 text-[11px] font-normal font-mono">(&lt;textarea&gt;)</span>
+                                                    </label>
+                                                    <textarea :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][value]" rows="3" placeholder="Enter paragraph description or content here..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all leading-relaxed">{{ old('components.'.$comp->id.'.value', $existing?->content_value) }}</textarea>
                                                 </div>
-                                            </div>
-
-                                        {{-- 6. VIDEO --}}
-                                        @elseif(str_contains($nameAndSlug, 'video'))
-                                            <div>
-                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                    {{ $comp->component_name }}
-                                                </label>
-                                                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                                                    <input type="file" accept="video/*" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][file]" class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer rounded-xl border border-slate-300 p-1.5 bg-white">
-                                                    @if($existing?->file_path && file_exists(public_path($existing->file_path)))
-                                                        <div class="flex items-center gap-2.5 shrink-0 p-1.5 bg-slate-50 rounded-xl border border-slate-200">
-                                                            <video src="{{ asset($existing->file_path) }}" class="w-12 h-8 object-cover rounded-lg"></video>
-                                                            <span class="text-xs text-slate-600 font-medium max-w-[140px] truncate">{{ basename($existing->file_path) }}</span>
-                                                        </div>
-                                                    @endif
+                                            @elseif(str_contains($nameAndSlug, 'image') || str_contains($nameAndSlug, 'photo') || str_contains($nameAndSlug, 'banner'))
+                                                <div>
+                                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                                        {{ $comp->component_name }}
+                                                    </label>
+                                                    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                                        <input type="file" accept="image/*" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][file]" class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer rounded-xl border border-slate-300 p-1.5 bg-white">
+                                                        @if($existing?->file_path && file_exists(public_path($existing->file_path)))
+                                                            <div class="flex items-center gap-2.5 shrink-0 p-1.5 bg-slate-50 rounded-xl border border-slate-200">
+                                                                <img src="{{ asset($existing->file_path) }}" alt="Preview" class="w-8 h-8 object-cover rounded-lg">
+                                                                <span class="text-xs text-slate-600 font-medium max-w-[140px] truncate">{{ basename($existing->file_path) }}</span>
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
-                                            </div>
-
-                                        {{-- 7. DEFAULT FALLBACK --}}
-                                        @else
-                                            <div>
-                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                    {{ $comp->component_name }}
-                                                </label>
-                                                <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][value]" value="{{ old('components.'.$comp->id.'.value', $existing?->content_value) }}" placeholder="Enter value for {{ $comp->component_name }}..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium">
-                                            </div>
+                                            @elseif(str_contains($nameAndSlug, 'video'))
+                                                <div>
+                                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                                        {{ $comp->component_name }}
+                                                    </label>
+                                                    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                                        <input type="file" accept="video/*" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][file]" class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer rounded-xl border border-slate-300 p-1.5 bg-white">
+                                                        @if($existing?->file_path && file_exists(public_path($existing->file_path)))
+                                                            <div class="flex items-center gap-2.5 shrink-0 p-1.5 bg-slate-50 rounded-xl border border-slate-200">
+                                                                <video src="{{ asset($existing->file_path) }}" class="w-12 h-8 object-cover rounded-lg"></video>
+                                                                <span class="text-xs text-slate-600 font-medium max-w-[140px] truncate">{{ basename($existing->file_path) }}</span>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <div>
+                                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                                        {{ $comp->component_name }}
+                                                    </label>
+                                                    <input type="text" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][value]" value="{{ old('components.'.$comp->id.'.value', $existing?->content_value) }}" placeholder="Enter value for {{ $comp->component_name }}..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium">
+                                                </div>
+                                            @endif
                                         @endif
                                     @endif
                                 </div>

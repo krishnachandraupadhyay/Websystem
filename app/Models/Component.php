@@ -40,4 +40,16 @@ class Component extends Model
                     ->withPivot('status')
                     ->withTimestamps();
     }
+
+    public function fields()
+    {
+        return $this->hasMany(ComponentField::class)->orderBy('sort_order', 'asc');
+    }
+
+    public function activeFields()
+    {
+        return $this->hasMany(ComponentField::class)
+                    ->where('is_active', true)
+                    ->orderBy('sort_order', 'asc');
+    }
 }

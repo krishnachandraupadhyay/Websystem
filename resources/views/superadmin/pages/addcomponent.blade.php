@@ -86,6 +86,188 @@
         this.viewIsSubcomponentEnabled = Boolean(comp.is_subcomponent);
         this.viewSubcomponents = subs || [];
         this.openViewModal = true;
+    },
+    // Dynamic Fields Management State & Methods
+    openFieldsModal: false,
+    fieldsComponentId: null,
+    fieldsComponentName: '',
+    fieldsComponentTitle: '',
+    fieldsList: [],
+    isLoadingFields: false,
+    isFieldFormOpen: false,
+    isEditingField: false,
+    fieldErrorMsg: '',
+    isSavingField: false,
+    fieldForm: {
+        id: null,
+        field_label: '',
+        field_name: '',
+        field_type: 'text',
+        placeholder: '',
+        default_value: '',
+        help_text: '',
+        is_required: false,
+        is_active: true,
+        sort_order: 1,
+        options: [{ value: '', label: '' }]
+    },
+    slugify(text) {
+        return (text || '').toString().toLowerCase().trim()
+            .replace(/\s+/g, '_')
+            .replace(/[^\w\-]+/g, '')
+            .replace(/\-\-+/g, '_')
+            .replace(/^-+/, '')
+            .replace(/-+$/, '');
+    },
+    onFieldLabelChange() {
+        if (!this.isEditingField) {
+            this.fieldForm.field_name = this.slugify(this.fieldForm.field_label);
+        }
+    },
+    addOptionRow() {
+        this.fieldForm.options.push({ value: '', label: '' });
+    },
+    removeOptionRow(index) {
+        if (this.fieldForm.options.length > 1) {
+            this.fieldForm.options.splice(index, 1);
+        } else {
+            this.fieldForm.options = [{ value: '', label: '' }];
+        }
+    },
+    openManageFields(comp) {
+        this.fieldsComponentId = comp.id;
+        this.fieldsComponentName = comp.component_name || '';
+        this.fieldsComponentTitle = comp.component_title || comp.component_name || '';
+        this.isFieldFormOpen = false;
+        this.fieldErrorMsg = '';
+        this.openFieldsModal = true;
+        this.loadFields();
+    },
+    async loadFields() {
+        this.isLoadingFields = true;
+        try {
+            let res = await fetch(`/components/${this.fieldsComponentId}/fields`);
+            let data = await res.json();
+            this.fieldsList = data.fields || [];
+        } catch (e) {
+            console.error('Error loading component fields:', e);
+        } finally {
+            this.isLoadingFields = false;
+        }
+    },
+    openNewFieldForm() {
+        this.isEditingField = false;
+        this.fieldErrorMsg = '';
+        this.fieldForm = {
+            id: null,
+            field_label: '',
+            field_name: '',
+            field_type: 'text',
+            placeholder: '',
+            default_value: '',
+            help_text: '',
+            is_required: false,
+            is_active: true,
+            sort_order: (this.fieldsList.length + 1),
+            options: [{ value: '', label: '' }]
+        };
+        this.isFieldFormOpen = true;
+    },
+    editField(f) {
+        this.isEditingField = true;
+        this.fieldErrorMsg = '';
+        let opts = [];
+        if (f.options && Array.isArray(f.options) && f.options.length > 0) {
+            opts = JSON.parse(JSON.stringify(f.options));
+        } else {
+            opts = [{ value: '', label: '' }];
+        }
+        this.fieldForm = {
+            id: f.id,
+            field_label: f.field_label || '',
+            field_name: f.field_name || '',
+            field_type: f.field_type || 'text',
+            placeholder: f.placeholder || '',
+            default_value: f.default_value || '',
+            help_text: f.help_text || '',
+            is_required: Boolean(f.is_required),
+            is_active: Boolean(f.is_active),
+            sort_order: f.sort_order || 1,
+            options: opts
+        };
+        this.isFieldFormOpen = true;
+    },
+    async saveField() {
+        this.fieldErrorMsg = '';
+        if (!this.fieldForm.field_label || !this.fieldForm.field_name || !this.fieldForm.field_type) {
+            this.fieldErrorMsg = 'Please enter Field Label, Field Name, and select a Field Type.';
+            return;
+        }
+        this.isSavingField = true;
+        let url = this.isEditingField 
+            ? `/components/${this.fieldsComponentId}/fields/${this.fieldForm.id}`
+            : `/components/${this.fieldsComponentId}/fields`;
+        let method = this.isEditingField ? 'PUT' : 'POST';
+
+        try {
+            let res = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(this.fieldForm)
+            });
+            let data = await res.json();
+            if (!res.ok) {
+                this.fieldErrorMsg = data.message || 'Validation error saving field.';
+                return;
+            }
+            this.isFieldFormOpen = false;
+            await this.loadFields();
+        } catch (e) {
+            this.fieldErrorMsg = 'Failed to save field: ' + e.message;
+        } finally {
+            this.isSavingField = false;
+        }
+    },
+    async deleteField(fieldId) {
+        if (!confirm('Are you sure you want to delete this field definition? Existing section data for this field will also be removed.')) {
+            return;
+        }
+        try {
+            let res = await fetch(`/components/${this.fieldsComponentId}/fields/${fieldId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            });
+            if (res.ok) {
+                await this.loadFields();
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    },
+    async updateFieldSortOrder(fieldId, newOrder) {
+        try {
+            await fetch(`/components/${this.fieldsComponentId}/fields/order`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    orders: [{ id: fieldId, sort_order: parseInt(newOrder) || 1 }]
+                })
+            });
+            await this.loadFields();
+        } catch (e) {
+            console.error(e);
+        }
     }
 }">
 
@@ -289,6 +471,18 @@
                                                 </svg>
                                             </button>
                                         @endif
+                                        <!-- Manage Fields Button -->
+                                        <button 
+                                            type="button" 
+                                            @click='openManageFields(@json($component))'
+                                            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold text-indigo-700 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 hover:border-indigo-300 transition-all cursor-pointer shadow-2xs"
+                                            title="Manage Component Field Definitions"
+                                        >
+                                            <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                                            </svg>
+                                            <span>Fields ({{ $component->fields->count() }})</span>
+                                        </button>
                                         <!-- Edit Component Button -->
                                         <button 
                                             @click='openEdit(@json($component))' 
@@ -808,6 +1002,428 @@
                     <button 
                         type="button" 
                         @click="openViewModal = false"
+                        class="px-5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-300 hover:bg-slate-100 transition-all cursor-pointer shadow-2xs"
+                    >
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Component Fields Management Modal -->
+    <div 
+        x-show="openFieldsModal" 
+        x-cloak
+        style="display: none;"
+        class="fixed inset-0 z-50 overflow-y-auto"
+        role="dialog" 
+        aria-modal="true"
+        @keydown.escape.window="openFieldsModal = false"
+    >
+        <!-- Modal Backdrop -->
+        <div 
+            x-show="openFieldsModal"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+            @click="openFieldsModal = false"
+        ></div>
+
+        <!-- Modal Dialog Placement -->
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-6">
+            <div 
+                x-show="openFieldsModal"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                @click.away="openFieldsModal = false"
+                class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-4xl border border-slate-200/90"
+            >
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4.5 bg-slate-50/70">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center font-bold shadow-2xs">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-base font-bold text-slate-900">
+                                    Field Definitions
+                                </h3>
+                                <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-100/80 text-indigo-700 font-mono" x-text="fieldsList.length + ' fields'"></span>
+                            </div>
+                            <p class="text-xs text-slate-500 font-medium">
+                                Component: <span class="font-bold text-slate-800" x-text="fieldsComponentName"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button 
+                            type="button" 
+                            x-show="!isFieldFormOpen"
+                            @click="openNewFieldForm()"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-all shadow-2xs cursor-pointer"
+                        >
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            <span>Add Field</span>
+                        </button>
+                        <button 
+                            type="button" 
+                            @click="openFieldsModal = false" 
+                            class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 max-h-[75vh] overflow-y-auto space-y-6">
+                    <!-- Error Message Banner -->
+                    <div x-show="fieldErrorMsg" x-cloak class="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center justify-between">
+                        <span x-text="fieldErrorMsg"></span>
+                        <button @click="fieldErrorMsg = ''" type="button" class="text-rose-500 hover:text-rose-700 font-bold ml-2 cursor-pointer">&times;</button>
+                    </div>
+
+                    <!-- Collapsible Add/Edit Form -->
+                    <div x-show="isFieldFormOpen" x-cloak class="p-5 rounded-2xl bg-indigo-50/40 border border-indigo-100 space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-indigo-100/80">
+                            <h4 class="text-xs font-bold text-indigo-950 uppercase tracking-wider flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                                <span x-text="isEditingField ? 'Edit Field Definition' : 'Add New Field Definition'"></span>
+                            </h4>
+                            <button 
+                                type="button" 
+                                @click="isFieldFormOpen = false" 
+                                class="text-xs font-semibold text-slate-500 hover:text-slate-800 cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Field Label -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">
+                                    Field Label <span class="text-rose-500">*</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    x-model="fieldForm.field_label"
+                                    @input="onFieldLabelChange()"
+                                    placeholder="e.g. Button Text, Background Image"
+                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                    required
+                                >
+                            </div>
+
+                            <!-- Field Name (Machine Key) -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
+                                    <span>Field Name (Database Key) <span class="text-rose-500">*</span></span>
+                                    <span class="text-[10px] text-slate-400 font-mono">snake_case</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    x-model="fieldForm.field_name"
+                                    placeholder="e.g. button_text"
+                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                    required
+                                >
+                            </div>
+
+                            <!-- Field Type -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">
+                                    Field Type <span class="text-rose-500">*</span>
+                                </label>
+                                <select 
+                                    x-model="fieldForm.field_type"
+                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                >
+                                    <option value="text">Text (Single-line input)</option>
+                                    <option value="textarea">Textarea (Multi-line text)</option>
+                                    <option value="url">URL (Link input)</option>
+                                    <option value="image">Image (File upload)</option>
+                                    <option value="file">File (Generic attachment)</option>
+                                    <option value="video">Video (Video file upload)</option>
+                                    <option value="select">Select (Dropdown options)</option>
+                                    <option value="checkbox">Checkbox (Toggle / Boolean)</option>
+                                    <option value="number">Number (Numeric input)</option>
+                                </select>
+                            </div>
+
+                            <!-- Sort Order -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">
+                                    Sort Order
+                                </label>
+                                <input 
+                                    type="number" 
+                                    x-model.number="fieldForm.sort_order"
+                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                >
+                            </div>
+
+                            <!-- Placeholder -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">
+                                    Placeholder (Optional)
+                                </label>
+                                <input 
+                                    type="text" 
+                                    x-model="fieldForm.placeholder"
+                                    placeholder="e.g. Enter button text..."
+                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                >
+                            </div>
+
+                            <!-- Default Value -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">
+                                    Default Value (Optional)
+                                </label>
+                                <input 
+                                    type="text" 
+                                    x-model="fieldForm.default_value"
+                                    placeholder="Default value if blank"
+                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                >
+                            </div>
+
+                            <!-- Help Text -->
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-bold text-slate-700 mb-1">
+                                    Help Text / Instructions (Optional)
+                                </label>
+                                <input 
+                                    type="text" 
+                                    x-model="fieldForm.help_text"
+                                    placeholder="Helper note displayed under the field in the admin form"
+                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                >
+                            </div>
+
+                            <!-- Required & Active Toggles -->
+                            <div class="sm:col-span-2 flex items-center gap-6 pt-1">
+                                <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                                    <input type="checkbox" x-model="fieldForm.is_required" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300">
+                                    <span class="text-xs font-bold text-slate-700">Required Field</span>
+                                </label>
+                                <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                                    <input type="checkbox" x-model="fieldForm.is_active" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300">
+                                    <span class="text-xs font-bold text-slate-700">Active (Visible in Admin Form)</span>
+                                </label>
+                            </div>
+
+                            <!-- Select Options Builder (Only shown when field_type === 'select') -->
+                            <div x-show="fieldForm.field_type === 'select'" x-cloak class="sm:col-span-2 p-3.5 rounded-xl bg-white border border-indigo-100 space-y-2.5">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-indigo-950 uppercase tracking-wider">Dropdown Options</span>
+                                    <button 
+                                        type="button" 
+                                        @click="addOptionRow()"
+                                        class="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 hover:text-indigo-800 cursor-pointer"
+                                    >
+                                        + Add Option
+                                    </button>
+                                </div>
+                                <div class="space-y-2">
+                                    <template x-for="(opt, oIdx) in fieldForm.options" :key="oIdx">
+                                        <div class="flex items-center gap-2">
+                                            <input 
+                                                type="text" 
+                                                x-model="opt.value" 
+                                                placeholder="Value (e.g. same)" 
+                                                class="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-mono text-slate-800"
+                                            >
+                                            <input 
+                                                type="text" 
+                                                x-model="opt.label" 
+                                                placeholder="Display Label (e.g. Same Tab)" 
+                                                class="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-800"
+                                            >
+                                            <button 
+                                                type="button" 
+                                                @click="removeOptionRow(oIdx)"
+                                                class="w-7 h-7 rounded-lg text-rose-500 hover:bg-rose-50 flex items-center justify-center cursor-pointer"
+                                                title="Remove Option"
+                                            >
+                                                &times;
+                                            </button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-2 pt-2 border-t border-indigo-100/60">
+                            <button 
+                                type="button" 
+                                @click="isFieldFormOpen = false"
+                                class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-white transition-colors cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                type="button" 
+                                @click="saveField()"
+                                :disabled="isSavingField"
+                                class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-2xs cursor-pointer flex items-center gap-1.5"
+                            >
+                                <span x-show="!isSavingField" x-text="isEditingField ? 'Update Field' : 'Save Field'">Save Field</span>
+                                <span x-show="isSavingField">Saving...</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Fields List Table -->
+                    <div>
+                        <div x-show="isLoadingFields" class="py-8 text-center text-xs text-slate-400">
+                            Loading component fields...
+                        </div>
+
+                        <div x-show="!isLoadingFields && fieldsList.length === 0 && !isFieldFormOpen" class="py-10 text-center rounded-2xl border-2 border-dashed border-slate-200">
+                            <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center mx-auto mb-2.5">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                            </div>
+                            <h5 class="text-sm font-bold text-slate-800">No Fields Defined</h5>
+                            <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-4">
+                                Configure the fields this component needs so admins can fill them in when adding the component to a section.
+                            </p>
+                            <button 
+                                type="button" 
+                                @click="openNewFieldForm()"
+                                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-all shadow-2xs cursor-pointer"
+                            >
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                <span>Define First Field</span>
+                            </button>
+                        </div>
+
+                        <div x-show="!isLoadingFields && fieldsList.length > 0" class="overflow-x-auto rounded-xl border border-slate-200">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-[10px] font-bold tracking-wider">
+                                    <tr>
+                                        <th class="px-4 py-3 w-16">Order</th>
+                                        <th class="px-4 py-3">Label</th>
+                                        <th class="px-4 py-3">Field Key</th>
+                                        <th class="px-4 py-3">Type</th>
+                                        <th class="px-4 py-3">Required</th>
+                                        <th class="px-4 py-3">Status</th>
+                                        <th class="px-4 py-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <template x-for="(f, fIdx) in fieldsList" :key="f.id">
+                                        <tr class="hover:bg-slate-50/60 transition-colors">
+                                            <td class="px-4 py-3">
+                                                <input 
+                                                    type="number" 
+                                                    :value="f.sort_order" 
+                                                    @change="updateFieldSortOrder(f.id, $event.target.value)"
+                                                    class="w-14 px-2 py-1 rounded-lg border border-slate-200 text-center font-bold text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
+                                                    title="Change order & press enter"
+                                                >
+                                            </td>
+                                            <td class="px-4 py-3 font-bold text-slate-900">
+                                                <span x-text="f.field_label"></span>
+                                                <p x-show="f.help_text" class="text-[10px] font-normal text-slate-400 mt-0.5" x-text="f.help_text"></p>
+                                            </td>
+                                            <td class="px-4 py-3 font-mono text-[11px] text-slate-600">
+                                                <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200" x-text="f.field_name"></span>
+                                            </td>
+                                            <td class="px-4 py-3">
+                                                <span 
+                                                    class="px-2 py-0.5 rounded-full font-bold uppercase text-[10px]"
+                                                    :class="{
+                                                        'bg-blue-50 text-blue-700 border border-blue-200': ['text', 'textarea', 'number'].includes(f.field_type),
+                                                        'bg-emerald-50 text-emerald-700 border border-emerald-200': ['image', 'file', 'video'].includes(f.field_type),
+                                                        'bg-amber-50 text-amber-700 border border-amber-200': f.field_type === 'select',
+                                                        'bg-purple-50 text-purple-700 border border-purple-200': f.field_type === 'checkbox',
+                                                        'bg-cyan-50 text-cyan-700 border border-cyan-200': f.field_type === 'url'
+                                                    }"
+                                                    x-text="f.field_type"
+                                                ></span>
+                                            </td>
+                                            <td class="px-4 py-3">
+                                                <span 
+                                                    class="inline-flex items-center gap-1 font-bold text-[11px]"
+                                                    :class="f.is_required ? 'text-rose-600' : 'text-slate-400'"
+                                                >
+                                                    <span x-text="f.is_required ? 'Required *' : 'Optional'"></span>
+                                                </span>
+                                            </td>
+                                            <td class="px-4 py-3">
+                                                <span 
+                                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"
+                                                    :class="f.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500'"
+                                                >
+                                                    <span class="w-1.5 h-1.5 rounded-full" :class="f.is_active ? 'bg-emerald-500' : 'bg-slate-400'"></span>
+                                                    <span x-text="f.is_active ? 'Active' : 'Inactive'"></span>
+                                                </span>
+                                            </td>
+                                            <td class="px-4 py-3 text-right">
+                                                <div class="inline-flex items-center gap-1">
+                                                    <button 
+                                                        type="button" 
+                                                        @click="editField(f)"
+                                                        class="w-7 h-7 rounded-lg text-blue-600 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 flex items-center justify-center transition-colors cursor-pointer"
+                                                        title="Edit Field"
+                                                    >
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button 
+                                                        type="button" 
+                                                        @click="deleteField(f.id)"
+                                                        class="w-7 h-7 rounded-lg text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 flex items-center justify-center transition-colors cursor-pointer"
+                                                        title="Delete Field"
+                                                    >
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                    <span class="text-xs text-slate-500">
+                        Changes are saved immediately and reflect dynamically in Admin forms.
+                    </span>
+                    <button 
+                        type="button" 
+                        @click="openFieldsModal = false"
                         class="px-5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-300 hover:bg-slate-100 transition-all cursor-pointer shadow-2xs"
                     >
                         Close

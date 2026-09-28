@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ComponentFieldController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -75,6 +76,13 @@ Route::middleware(['auth', 'role:Super Admin'])->group(function () {
     Route::post('/components/{component}/subcomponents', [ComponentController::class, 'assignSubcomponents'])->name('components.assignSubcomponents');
     Route::patch('/components/{component}/toggle-status', [ComponentController::class, 'toggleStatus'])->name('components.toggleStatus');
     Route::delete('/components/{component}', [ComponentController::class, 'destroy'])->name('components.destroy');
+
+    // Component Dynamic Fields
+    Route::get('/components/{component}/fields', [ComponentFieldController::class, 'index'])->name('components.fields.index');
+    Route::post('/components/{component}/fields', [ComponentFieldController::class, 'store'])->name('components.fields.store');
+    Route::put('/components/{component}/fields/{field}', [ComponentFieldController::class, 'update'])->name('components.fields.update');
+    Route::delete('/components/{component}/fields/{field}', [ComponentFieldController::class, 'destroy'])->name('components.fields.destroy');
+    Route::match(['post', 'patch'], '/components/{component}/fields/order', [ComponentFieldController::class, 'updateOrder'])->name('components.fields.order');
 
     // Admin & Assign Section
     Route::get('/Superadmin.manageadmin', [AdminController::class, 'index'])->name('Superadmin.manageadmin');

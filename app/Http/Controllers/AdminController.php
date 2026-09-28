@@ -172,14 +172,16 @@ class AdminController extends Controller
             }
         }
 
-        // Load active components configured for this section with their subcomponents
+        // Load active components configured for this section with their subcomponents and fields
         $section->load(['components' => function ($q) {
-            $q->wherePivot('status', 1)->with('subcomponents');
+            $q->wherePivot('status', 1)->with(['fields', 'subcomponents.fields']);
         }]);
 
         // Attach effective subcomponents for each component
         foreach ($section->components as $comp) {
-            $secSubComps = SectionComponentSubcomponent::with('subComponent')
+            $secSubComps = SectionComponentSubcomponent::with(['subComponent' => function($q) {
+                    $q->with('fields');
+                }])
                 ->where('section_id', $section->id)
                 ->where('component_id', $comp->id)
                 ->where('status', true)
@@ -198,18 +200,20 @@ class AdminController extends Controller
             }
         }
 
-        // Load existing content data from database, keyed by "comp_id" for top-level and "comp_id_sub_id" for subcomponents
+        // Load existing content data from database, separating field-based data and legacy data
         $allData = SectionComponentData::where('section_id', $section->id)->get();
         $contentData = [];
+        $fieldData = [];
         foreach ($allData as $item) {
-            if ($item->sub_component_id) {
-                $contentData[$item->component_id . '_' . $item->sub_component_id] = $item;
+            $key = $item->sub_component_id ? ($item->component_id . '_' . $item->sub_component_id) : (string)$item->component_id;
+            if ($item->component_field_id) {
+                $fieldData[$key][$item->component_field_id] = $item;
             } else {
-                $contentData[$item->component_id] = $item;
+                $contentData[$key] = $item;
             }
         }
 
-        return view('admin.section_view', compact('section', 'contentData'));
+        return view('admin.section_view', compact('section', 'contentData', 'fieldData'));
     }
 
     /**
@@ -233,18 +237,200 @@ class AdminController extends Controller
 
         $submittedComponents = $request->input('components', []);
         $activeComponentId = $request->input('active_component_id');
+        if (!$activeComponentId && count($submittedComponents) === 1) {
+            $activeComponentId = array_key_first($submittedComponents);
+        }
 
         // Load active components for this section
-        $activeComponents = $section->components()->wherePivot('status', 1)->get();
+        $activeComponents = $section->components()->wherePivot('status', 1)->with('fields')->get();
+
+        // ----------------------------------------------------
+        // PHASE 1: DYNAMIC VALIDATION GENERATION & EXECUTION
+        // ----------------------------------------------------
+        $rules = [];
+        $messages = [];
 
         foreach ($activeComponents as $comp) {
-            // If active_component_id is passed, only edit that specific component!
             if ($activeComponentId && (int)$activeComponentId !== (int)$comp->id) {
                 continue;
             }
 
-            // Check if this component has subcomponents (per-section or fallback global)
-            $secSubComps = SectionComponentSubcomponent::with('subComponent')
+            // Check if this component has subcomponents
+            $secSubComps = SectionComponentSubcomponent::with(['subComponent' => function($q) {
+                    $q->with('fields');
+                }])
+                ->where('section_id', $section->id)
+                ->where('component_id', $comp->id)
+                ->where('status', true)
+                ->orderBy('order')
+                ->get()
+                ->pluck('subComponent')
+                ->filter()
+                ->values();
+
+            if ($secSubComps->isEmpty() && $comp->is_subcomponent && $comp->subcomponents->isNotEmpty()) {
+                $secSubComps = $comp->subcomponents;
+            }
+
+            if ($secSubComps->isNotEmpty()) {
+                // Container with Subcomponents
+                foreach ($secSubComps as $subComp) {
+                    $subFields = $subComp->fields()->where('is_active', true)->orderBy('sort_order', 'asc')->get();
+
+                    foreach ($subFields as $field) {
+                        $isFile = in_array($field->field_type, ['image', 'video', 'file'], true);
+                        $key = $isFile
+                            ? "components.{$comp->id}.subcomponents.{$subComp->id}.files.{$field->id}"
+                            : "components.{$comp->id}.subcomponents.{$subComp->id}.fields.{$field->id}";
+
+                        $existingData = SectionComponentData::where('section_id', $section->id)
+                            ->where('component_id', $comp->id)
+                            ->where('sub_component_id', $subComp->id)
+                            ->where('component_field_id', $field->id)
+                            ->first();
+
+                        $fieldRules = [];
+
+                        if ($isFile) {
+                            if ($field->is_required && (!$existingData || !$existingData->file_path)) {
+                                $fieldRules[] = 'required';
+                            } else {
+                                $fieldRules[] = 'nullable';
+                            }
+
+                            if ($field->field_type === 'image') {
+                                $fieldRules[] = 'image';
+                                $fieldRules[] = 'max:10240'; // 10MB
+                            } elseif ($field->field_type === 'video') {
+                                $fieldRules[] = 'mimes:mp4,mov,avi,webm,wmv';
+                                $fieldRules[] = 'max:51200'; // 50MB
+                            } elseif ($field->field_type === 'file') {
+                                $fieldRules[] = 'file';
+                                $fieldRules[] = 'max:20480'; // 20MB
+                            }
+                        } else {
+                            if ($field->is_required) {
+                                $fieldRules[] = 'required';
+                            } else {
+                                $fieldRules[] = 'nullable';
+                            }
+
+                            if ($field->field_type === 'url') {
+                                $fieldRules[] = 'url';
+                            } elseif ($field->field_type === 'number') {
+                                $fieldRules[] = 'numeric';
+                            }
+                        }
+
+                        if (!empty($field->validation_rules)) {
+                            $customParts = explode('|', $field->validation_rules);
+                            foreach ($customParts as $cp) {
+                                $cp = trim($cp);
+                                if (!empty($cp) && !in_array($cp, $fieldRules, true)) {
+                                    $fieldRules[] = $cp;
+                                }
+                            }
+                        }
+
+                        $rules[$key] = $fieldRules;
+                        $messages["{$key}.required"] = "The {$field->field_label} field is required.";
+                        $messages["{$key}.url"]      = "The {$field->field_label} must be a valid URL.";
+                        $messages["{$key}.numeric"]  = "The {$field->field_label} must be a number.";
+                        $messages["{$key}.image"]    = "The {$field->field_label} must be an image.";
+                        $messages["{$key}.mimes"]    = "The {$field->field_label} must be a valid file type.";
+                    }
+                }
+            } else {
+                // Top-Level Component
+                $compFields = $comp->fields()->where('is_active', true)->orderBy('sort_order', 'asc')->get();
+
+                foreach ($compFields as $field) {
+                    $isFile = in_array($field->field_type, ['image', 'video', 'file'], true);
+                    if ($isFile) {
+                        $key = $request->hasFile("components.{$comp->id}.files.{$field->field_name}")
+                            ? "components.{$comp->id}.files.{$field->field_name}"
+                            : "components.{$comp->id}.files.{$field->id}";
+                    } else {
+                        $key = $request->has("components.{$comp->id}.fields.{$field->field_name}")
+                            ? "components.{$comp->id}.fields.{$field->field_name}"
+                            : "components.{$comp->id}.fields.{$field->id}";
+                    }
+
+                    $existingData = SectionComponentData::where('section_id', $section->id)
+                        ->where('component_id', $comp->id)
+                        ->whereNull('sub_component_id')
+                        ->where('component_field_id', $field->id)
+                        ->first();
+
+                    $fieldRules = [];
+
+                    if ($isFile) {
+                        if ($field->is_required && (!$existingData || !$existingData->file_path)) {
+                            $fieldRules[] = 'required';
+                        } else {
+                            $fieldRules[] = 'nullable';
+                        }
+
+                        if ($field->field_type === 'image') {
+                            $fieldRules[] = 'image';
+                            $fieldRules[] = 'max:10240'; // 10MB
+                        } elseif ($field->field_type === 'video') {
+                            $fieldRules[] = 'mimes:mp4,mov,avi,webm,wmv';
+                            $fieldRules[] = 'max:51200'; // 50MB
+                        } elseif ($field->field_type === 'file') {
+                            $fieldRules[] = 'file';
+                            $fieldRules[] = 'max:20480'; // 20MB
+                        }
+                    } else {
+                        if ($field->is_required) {
+                            $fieldRules[] = 'required';
+                        } else {
+                            $fieldRules[] = 'nullable';
+                        }
+
+                        if ($field->field_type === 'url') {
+                            $fieldRules[] = 'url';
+                        } elseif ($field->field_type === 'number') {
+                            $fieldRules[] = 'numeric';
+                        }
+                    }
+
+                    if (!empty($field->validation_rules)) {
+                        $customParts = explode('|', $field->validation_rules);
+                        foreach ($customParts as $cp) {
+                            $cp = trim($cp);
+                            if (!empty($cp) && !in_array($cp, $fieldRules, true)) {
+                                $fieldRules[] = $cp;
+                            }
+                        }
+                    }
+
+                    $rules[$key] = $fieldRules;
+                    $messages["{$key}.required"] = "The {$field->field_label} field is required.";
+                    $messages["{$key}.url"]      = "The {$field->field_label} must be a valid URL.";
+                    $messages["{$key}.numeric"]  = "The {$field->field_label} must be a number.";
+                    $messages["{$key}.image"]    = "The {$field->field_label} must be an image.";
+                    $messages["{$key}.mimes"]    = "The {$field->field_label} must be a valid file type.";
+                }
+            }
+        }
+
+        if (!empty($rules)) {
+            $request->validate($rules, $messages);
+        }
+
+        // ----------------------------------------------------
+        // PHASE 2: DYNAMIC DATA STORAGE
+        // ----------------------------------------------------
+        foreach ($activeComponents as $comp) {
+            if ($activeComponentId && (int)$activeComponentId !== (int)$comp->id) {
+                continue;
+            }
+
+            // Check if this component has subcomponents
+            $secSubComps = SectionComponentSubcomponent::with(['subComponent' => function($q) {
+                    $q->with('fields');
+                }])
                 ->where('section_id', $section->id)
                 ->where('component_id', $comp->id)
                 ->where('status', true)
@@ -260,27 +446,201 @@ class AdminController extends Controller
 
             $compData = $submittedComponents[$comp->id] ?? [];
 
-            // 1. If component has subcomponents, process each subcomponent independently
             if ($secSubComps->isNotEmpty()) {
+                // Container with Subcomponents
                 $subDataList = $compData['subcomponents'] ?? [];
 
                 foreach ($secSubComps as $subComp) {
-                    $subInput = $subDataList[$subComp->id] ?? [];
-                    $subContentValue = isset($subInput['value']) ? $subInput['value'] : null;
-                    $subExtraValue = isset($subInput['extra']) ? $subInput['extra'] : null;
+                    $subFields = $subComp->fields()->where('is_active', true)->orderBy('sort_order', 'asc')->get();
+
+                    if ($subFields->isNotEmpty()) {
+                        // Dynamic fields processing for this subcomponent
+                        foreach ($subFields as $field) {
+                            $isFile = in_array($field->field_type, ['image', 'video', 'file'], true);
+
+                            if ($isFile) {
+                                if ($request->hasFile("components.{$comp->id}.subcomponents.{$subComp->id}.files.{$field->id}")) {
+                                    $file = $request->file("components.{$comp->id}.subcomponents.{$subComp->id}.files.{$field->id}");
+                                    $extension = $file->getClientOriginalExtension();
+                                    $filename = 'sec_' . $section->id . '_comp_' . $comp->id . '_sub_' . $subComp->id . '_f_' . $field->id . '_' . time() . '.' . $extension;
+
+                                    $destinationPath = public_path('uploads/sections');
+                                    if (!file_exists($destinationPath)) {
+                                        mkdir($destinationPath, 0755, true);
+                                    }
+
+                                    $file->move($destinationPath, $filename);
+                                    $filePath = 'uploads/sections/' . $filename;
+
+                                    SectionComponentData::updateOrCreate(
+                                        [
+                                            'section_id'         => $section->id,
+                                            'component_id'       => $comp->id,
+                                            'sub_component_id'   => $subComp->id,
+                                            'component_field_id' => $field->id,
+                                        ],
+                                        [
+                                            'field_name'    => $field->field_name,
+                                            'file_path'     => $filePath,
+                                            'content_value' => $file->getClientOriginalName(),
+                                        ]
+                                    );
+                                }
+                            } else {
+                                if (isset($subDataList[$subComp->id]['fields']) && array_key_exists($field->id, $subDataList[$subComp->id]['fields'])) {
+                                    $val = $subDataList[$subComp->id]['fields'][$field->id];
+
+                                    SectionComponentData::updateOrCreate(
+                                        [
+                                            'section_id'         => $section->id,
+                                            'component_id'       => $comp->id,
+                                            'sub_component_id'   => $subComp->id,
+                                            'component_field_id' => $field->id,
+                                        ],
+                                        [
+                                            'field_name'    => $field->field_name,
+                                            'content_value' => $val,
+                                        ]
+                                    );
+                                }
+                            }
+                        }
+                    } else {
+                        // Fallback: Legacy subcomponent handling
+                        $subInput = $subDataList[$subComp->id] ?? [];
+                        $subContentValue = isset($subInput['value']) ? $subInput['value'] : null;
+                        $subExtraValue = isset($subInput['extra']) ? $subInput['extra'] : null;
+
+                        $existing = SectionComponentData::where('section_id', $section->id)
+                                                        ->where('component_id', $comp->id)
+                                                        ->where('sub_component_id', $subComp->id)
+                                                        ->whereNull('component_field_id')
+                                                        ->first();
+
+                        $filePath = $existing?->file_path;
+
+                        if ($request->hasFile("components.{$comp->id}.subcomponents.{$subComp->id}.file")) {
+                            $file = $request->file("components.{$comp->id}.subcomponents.{$subComp->id}.file");
+                            $extension = $file->getClientOriginalExtension();
+                            $filename = 'sec_' . $section->id . '_comp_' . $comp->id . '_sub_' . $subComp->id . '_' . time() . '.' . $extension;
+
+                            $destinationPath = public_path('uploads/sections');
+                            if (!file_exists($destinationPath)) {
+                                mkdir($destinationPath, 0755, true);
+                            }
+
+                            $file->move($destinationPath, $filename);
+                            $filePath = 'uploads/sections/' . $filename;
+                        }
+
+                        if (array_key_exists($subComp->id, $subDataList) || $request->hasFile("components.{$comp->id}.subcomponents.{$subComp->id}.file")) {
+                            SectionComponentData::updateOrCreate(
+                                [
+                                    'section_id'         => $section->id,
+                                    'component_id'       => $comp->id,
+                                    'sub_component_id'   => $subComp->id,
+                                    'component_field_id' => null,
+                                ],
+                                [
+                                    'content_value' => $subContentValue,
+                                    'extra_value'   => $subExtraValue,
+                                    'file_path'     => $filePath,
+                                ]
+                            );
+                        }
+                    }
+                }
+            } else {
+                // Top-Level Component (no subcomponents)
+                $compFields = $comp->fields()->where('is_active', true)->orderBy('sort_order', 'asc')->get();
+
+                if ($compFields->isNotEmpty()) {
+                    // Dynamic fields processing
+                    foreach ($compFields as $field) {
+                        $isFile = in_array($field->field_type, ['image', 'video', 'file'], true);
+
+                        if ($isFile) {
+                            $fileKey = $request->hasFile("components.{$comp->id}.files.{$field->field_name}")
+                                ? "components.{$comp->id}.files.{$field->field_name}"
+                                : "components.{$comp->id}.files.{$field->id}";
+
+                            if ($request->hasFile($fileKey)) {
+                                $file = $request->file($fileKey);
+                                $extension = $file->getClientOriginalExtension();
+                                $filename = 'sec_' . $section->id . '_comp_' . $comp->id . '_f_' . $field->id . '_' . time() . '.' . $extension;
+
+                                $destinationPath = public_path('uploads/sections');
+                                if (!file_exists($destinationPath)) {
+                                    mkdir($destinationPath, 0755, true);
+                                }
+
+                                $file->move($destinationPath, $filename);
+                                $filePath = 'uploads/sections/' . $filename;
+
+                                SectionComponentData::updateOrCreate(
+                                    [
+                                        'section_id'         => $section->id,
+                                        'component_id'       => $comp->id,
+                                        'sub_component_id'   => null,
+                                        'component_field_id' => $field->id,
+                                    ],
+                                    [
+                                        'field_name'    => $field->field_name,
+                                        'file_path'     => $filePath,
+                                        'content_value' => $file->getClientOriginalName(),
+                                    ]
+                                );
+                            }
+                        } else {
+                            $hasVal = false;
+                            $val = null;
+                            if (isset($compData['fields'])) {
+                                if (array_key_exists($field->id, $compData['fields'])) {
+                                    $hasVal = true;
+                                    $val = $compData['fields'][$field->id];
+                                } elseif (array_key_exists($field->field_name, $compData['fields'])) {
+                                    $hasVal = true;
+                                    $val = $compData['fields'][$field->field_name];
+                                }
+                            }
+
+                            if ($hasVal) {
+                                SectionComponentData::updateOrCreate(
+                                    [
+                                        'section_id'         => $section->id,
+                                        'component_id'       => $comp->id,
+                                        'sub_component_id'   => null,
+                                        'component_field_id' => $field->id,
+                                    ],
+                                    [
+                                        'field_name'    => $field->field_name,
+                                        'content_value' => $val,
+                                    ]
+                                );
+                            }
+                        }
+                    }
+                } else {
+                    // Fallback: Legacy top-level component handling
+                    if (!array_key_exists($comp->id, $submittedComponents) && !$request->hasFile("components.{$comp->id}.file")) {
+                        continue;
+                    }
+
+                    $contentValue = isset($compData['value']) ? $compData['value'] : null;
+                    $extraValue = isset($compData['extra']) ? $compData['extra'] : null;
 
                     $existing = SectionComponentData::where('section_id', $section->id)
                                                     ->where('component_id', $comp->id)
-                                                    ->where('sub_component_id', $subComp->id)
+                                                    ->whereNull('sub_component_id')
+                                                    ->whereNull('component_field_id')
                                                     ->first();
 
                     $filePath = $existing?->file_path;
 
-                    // Handle file upload for subcomponent (image or video)
-                    if ($request->hasFile("components.{$comp->id}.subcomponents.{$subComp->id}.file")) {
-                        $file = $request->file("components.{$comp->id}.subcomponents.{$subComp->id}.file");
+                    if ($request->hasFile("components.{$comp->id}.file")) {
+                        $file = $request->file("components.{$comp->id}.file");
                         $extension = $file->getClientOriginalExtension();
-                        $filename = 'sec_' . $section->id . '_comp_' . $comp->id . '_sub_' . $subComp->id . '_' . time() . '.' . $extension;
+                        $filename = 'sec_' . $section->id . '_comp_' . $comp->id . '_' . time() . '.' . $extension;
 
                         $destinationPath = public_path('uploads/sections');
                         if (!file_exists($destinationPath)) {
@@ -291,65 +651,20 @@ class AdminController extends Controller
                         $filePath = 'uploads/sections/' . $filename;
                     }
 
-                    // Save or update subcomponent data if submitted or file uploaded
-                    if (array_key_exists($subComp->id, $subDataList) || $request->hasFile("components.{$comp->id}.subcomponents.{$subComp->id}.file")) {
-                        SectionComponentData::updateOrCreate(
-                            [
-                                'section_id'       => $section->id,
-                                'component_id'     => $comp->id,
-                                'sub_component_id' => $subComp->id,
-                            ],
-                            [
-                                'content_value'    => $subContentValue,
-                                'extra_value'      => $subExtraValue,
-                                'file_path'        => $filePath,
-                            ]
-                        );
-                    }
+                    SectionComponentData::updateOrCreate(
+                        [
+                            'section_id'         => $section->id,
+                            'component_id'       => $comp->id,
+                            'sub_component_id'   => null,
+                            'component_field_id' => null,
+                        ],
+                        [
+                            'content_value' => $contentValue,
+                            'extra_value'   => $extraValue,
+                            'file_path'     => $filePath,
+                        ]
+                    );
                 }
-            } else {
-                // 2. Standard top-level component (no subcomponents)
-                if (!array_key_exists($comp->id, $submittedComponents) && !$request->hasFile("components.{$comp->id}.file")) {
-                    continue;
-                }
-
-                $contentValue = isset($compData['value']) ? $compData['value'] : null;
-                $extraValue = isset($compData['extra']) ? $compData['extra'] : null;
-
-                $existing = SectionComponentData::where('section_id', $section->id)
-                                                ->where('component_id', $comp->id)
-                                                ->whereNull('sub_component_id')
-                                                ->first();
-
-                $filePath = $existing?->file_path;
-
-                // Handle file upload (image or video)
-                if ($request->hasFile("components.{$comp->id}.file")) {
-                    $file = $request->file("components.{$comp->id}.file");
-                    $extension = $file->getClientOriginalExtension();
-                    $filename = 'sec_' . $section->id . '_comp_' . $comp->id . '_' . time() . '.' . $extension;
-
-                    $destinationPath = public_path('uploads/sections');
-                    if (!file_exists($destinationPath)) {
-                        mkdir($destinationPath, 0755, true);
-                    }
-
-                    $file->move($destinationPath, $filename);
-                    $filePath = 'uploads/sections/' . $filename;
-                }
-
-                SectionComponentData::updateOrCreate(
-                    [
-                        'section_id'       => $section->id,
-                        'component_id'     => $comp->id,
-                        'sub_component_id' => null,
-                    ],
-                    [
-                        'content_value' => $contentValue,
-                        'extra_value'   => $extraValue,
-                        'file_path'     => $filePath,
-                    ]
-                );
             }
         }
 

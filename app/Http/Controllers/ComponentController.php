@@ -12,7 +12,7 @@ class ComponentController extends Controller
      */
     public function index()
     {
-        $components = Component::with('subcomponents')->latest()->get();
+        $components = Component::with(['subcomponents', 'fields'])->latest()->get();
         $componentSubcomponentsMap = [];
         foreach ($components as $comp) {
             $componentSubcomponentsMap[$comp->id] = $comp->subcomponents->pluck('pivot.status', 'id')->toArray();
