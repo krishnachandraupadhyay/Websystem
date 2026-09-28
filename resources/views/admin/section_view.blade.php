@@ -186,14 +186,31 @@
                                                     $fVal = is_array($instFields) ? ($instFields[$sf->id] ?? null) : null;
                                                     $valStr = $fVal?->content_value ?? '';
                                                     $fNameLower = strtolower($sf->field_name);
+                                                    $fLabelLower = strtolower($sf->field_label);
 
                                                     if (!$instLabel && in_array($fNameLower, ['anchor_text', 'text', 'label', 'title', 'heading', 'name', 'button_text'], true) && !empty($valStr)) {
                                                         $instLabel = $valStr;
                                                     }
-                                                    if (!$instUrl && in_array($fNameLower, ['anchor_url', 'url', 'link', 'href'], true) && !empty($valStr)) {
+                                                    if (!$instUrl && (in_array($fNameLower, ['anchor_url', 'url', 'link', 'href'], true) || str_contains($fNameLower, 'url') || str_contains($fNameLower, 'link')) && !empty($valStr)) {
                                                         $instUrl = $valStr;
                                                     }
-                                                    if (!empty($valStr) || $fVal?->file_path) {
+
+                                                    // Exclude metadata/technical fields (target, rel, title/tooltip, url duplicates) from table preview
+                                                    $isMetaOrDuplicate = in_array($fNameLower, ['anchor_text', 'anchor_url', 'target', 'title', 'rel', 'window', 'tooltip'], true)
+                                                        || str_contains($fNameLower, 'target')
+                                                        || str_contains($fNameLower, 'rel')
+                                                        || str_contains($fNameLower, 'tooltip')
+                                                        || str_contains($fNameLower, 'window')
+                                                        || str_contains($fNameLower, 'url')
+                                                        || str_contains($fNameLower, 'href')
+                                                        || str_contains($fNameLower, 'text')
+                                                        || str_contains($fLabelLower, 'target')
+                                                        || str_contains($fLabelLower, 'relationship')
+                                                        || str_contains($fLabelLower, 'tooltip')
+                                                        || str_contains($fLabelLower, 'anchor url')
+                                                        || str_contains($fLabelLower, 'anchor text');
+
+                                                    if (!$isMetaOrDuplicate && (!empty($valStr) || $fVal?->file_path)) {
                                                         $otherFields[] = [
                                                             'label' => $sf->field_label,
                                                             'val' => $valStr,
@@ -249,16 +266,17 @@
                                                             </span>
                                                         @endif
                                                         @foreach($otherFields as $of)
-                                                            @if(!in_array(strtolower($of['label']), ['text', 'anchor text', 'url', 'anchor url']))
-                                                                @if($of['file'])
-                                                                    <img src="{{ asset($of['file']) }}" class="w-7 h-7 object-cover rounded border border-slate-200 shadow-2xs" title="{{ $of['label'] }}">
-                                                                @elseif(!empty($of['val']))
-                                                                    <span class="text-[11px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-medium">
-                                                                        <span class="text-slate-400 font-semibold">{{ $of['label'] }}:</span> {{ $of['val'] }}
-                                                                    </span>
-                                                                @endif
+                                                            @if($of['file'])
+                                                                <img src="{{ asset($of['file']) }}" class="w-7 h-7 object-cover rounded border border-slate-200 shadow-2xs" title="{{ $of['label'] }}">
+                                                            @elseif(!empty($of['val']))
+                                                                <span class="text-[11px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-medium">
+                                                                    <span class="text-slate-400 font-semibold">{{ $of['label'] }}:</span> {{ $of['val'] }}
+                                                                </span>
                                                             @endif
                                                         @endforeach
+                                                        @if(!$instUrl && empty($otherFields))
+                                                            <span class="text-xs text-slate-400 italic">-</span>
+                                                        @endif
                                                     </div>
                                                 </td>
 
@@ -547,14 +565,28 @@
                                                 $fVal = is_array($instFields) ? ($instFields[$cf->id] ?? null) : null;
                                                 $valStr = $fVal?->content_value ?? '';
                                                 $fNameLower = strtolower($cf->field_name);
+                                                $fLabelLower = strtolower($cf->field_label);
 
-                                                if (!$cLabel && in_array($fNameLower, ['title', 'heading', 'name', 'text', 'label'], true) && !empty($valStr)) {
+                                                if (!$cLabel && in_array($fNameLower, ['title', 'heading', 'name', 'text', 'label', 'button_text', 'anchor_text'], true) && !empty($valStr)) {
                                                     $cLabel = $valStr;
                                                 }
-                                                if (!$cUrl && in_array($fNameLower, ['url', 'link', 'href'], true) && !empty($valStr)) {
+                                                if (!$cUrl && (in_array($fNameLower, ['url', 'link', 'href', 'anchor_url'], true) || str_contains($fNameLower, 'url') || str_contains($fNameLower, 'link')) && !empty($valStr)) {
                                                     $cUrl = $valStr;
                                                 }
-                                                if (!empty($valStr) || $fVal?->file_path) {
+
+                                                $isMetaOrDuplicate = in_array($fNameLower, ['target', 'rel', 'tooltip', 'window', 'title'], true)
+                                                    || str_contains($fNameLower, 'target')
+                                                    || str_contains($fNameLower, 'rel')
+                                                    || str_contains($fNameLower, 'tooltip')
+                                                    || str_contains($fNameLower, 'window')
+                                                    || str_contains($fNameLower, 'url')
+                                                    || str_contains($fNameLower, 'href')
+                                                    || str_contains($fLabelLower, 'target')
+                                                    || str_contains($fLabelLower, 'relationship')
+                                                    || str_contains($fLabelLower, 'tooltip')
+                                                    || str_contains($fLabelLower, 'url');
+
+                                                if (!$isMetaOrDuplicate && (!empty($valStr) || $fVal?->file_path)) {
                                                     $cOtherFields[] = [
                                                         'label' => $cf->field_label,
                                                         'val' => $valStr,
@@ -605,16 +637,17 @@
                                                         </span>
                                                     @endif
                                                     @foreach($cOtherFields as $of)
-                                                        @if(!in_array(strtolower($of['label']), ['title', 'name', 'heading', 'url', 'link']))
-                                                            @if($of['file'])
-                                                                <img src="{{ asset($of['file']) }}" class="w-8 h-8 object-cover rounded-lg border border-slate-200 shadow-2xs" title="{{ $of['label'] }}">
-                                                            @elseif(!empty($of['val']))
-                                                                <span class="text-[11px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-medium">
-                                                                    <span class="text-slate-400 font-semibold">{{ $of['label'] }}:</span> {{ $of['val'] }}
-                                                                </span>
-                                                            @endif
+                                                        @if($of['file'])
+                                                            <img src="{{ asset($of['file']) }}" class="w-8 h-8 object-cover rounded-lg border border-slate-200 shadow-2xs" title="{{ $of['label'] }}">
+                                                        @elseif(!empty($of['val']))
+                                                            <span class="text-[11px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-medium">
+                                                                <span class="text-slate-400 font-semibold">{{ $of['label'] }}:</span> {{ $of['val'] }}
+                                                            </span>
                                                         @endif
                                                     @endforeach
+                                                    @if(!$cUrl && empty($cOtherFields))
+                                                        <span class="text-xs text-slate-400 italic">-</span>
+                                                    @endif
                                                 </div>
                                             </td>
                                             <td class="px-4 py-4 text-center">
