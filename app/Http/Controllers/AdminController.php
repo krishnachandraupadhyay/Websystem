@@ -291,11 +291,12 @@ class AdminController extends Controller
                 foreach ($secSubComps as $subComp) {
                     $subFields = $subComp->fields()->where('is_active', true)->orderBy('sort_order', 'asc')->get();
 
+                    $isSubMultiple = (bool)($subComp->pivot->is_multiple ?? $subComp->is_multiple ?? false);
                     foreach ($subFields as $field) {
                         $isFile = in_array($field->field_type, ['image', 'video', 'file'], true);
                         $key = $isFile
-                            ? "components.{$comp->id}.subcomponents.{$subComp->id}.files.{$field->id}"
-                            : "components.{$comp->id}.subcomponents.{$subComp->id}.fields.{$field->id}";
+                            ? ($isSubMultiple ? "components.{$comp->id}.subcomponents.{$subComp->id}.instances.*.files.{$field->id}" : "components.{$comp->id}.subcomponents.{$subComp->id}.files.{$field->id}")
+                            : ($isSubMultiple ? "components.{$comp->id}.subcomponents.{$subComp->id}.instances.*.fields.{$field->id}" : "components.{$comp->id}.subcomponents.{$subComp->id}.fields.{$field->id}");
 
                         $existingData = SectionComponentData::where('section_id', $section->id)
                             ->where('component_id', $comp->id)
@@ -330,7 +331,8 @@ class AdminController extends Controller
                             }
 
                             if ($field->field_type === 'url') {
-                                $fieldRules[] = 'url';
+                                $fieldRules[] = 'string';
+                                $fieldRules[] = 'max:2048';
                             } elseif ($field->field_type === 'number') {
                                 $fieldRules[] = 'numeric';
                             }
@@ -348,7 +350,7 @@ class AdminController extends Controller
 
                         $rules[$key] = $fieldRules;
                         $messages["{$key}.required"] = "The {$field->field_label} field is required.";
-                        $messages["{$key}.url"]      = "The {$field->field_label} must be a valid URL.";
+                        $messages["{$key}.string"]   = "The {$field->field_label} must be valid text.";
                         $messages["{$key}.numeric"]  = "The {$field->field_label} must be a number.";
                         $messages["{$key}.image"]    = "The {$field->field_label} must be an image.";
                         $messages["{$key}.mimes"]    = "The {$field->field_label} must be a valid file type.";
@@ -357,17 +359,24 @@ class AdminController extends Controller
             } else {
                 // Top-Level Component
                 $compFields = $comp->fields()->where('is_active', true)->orderBy('sort_order', 'asc')->get();
+                $isCompMultiple = (bool)($comp->pivot->is_multiple ?? $comp->is_multiple ?? false);
 
                 foreach ($compFields as $field) {
                     $isFile = in_array($field->field_type, ['image', 'video', 'file'], true);
-                    if ($isFile) {
-                        $key = $request->hasFile("components.{$comp->id}.files.{$field->field_name}")
-                            ? "components.{$comp->id}.files.{$field->field_name}"
-                            : "components.{$comp->id}.files.{$field->id}";
+                    if ($isCompMultiple) {
+                        $key = $isFile
+                            ? "components.{$comp->id}.instances.*.files.{$field->id}"
+                            : "components.{$comp->id}.instances.*.fields.{$field->id}";
                     } else {
-                        $key = $request->has("components.{$comp->id}.fields.{$field->field_name}")
-                            ? "components.{$comp->id}.fields.{$field->field_name}"
-                            : "components.{$comp->id}.fields.{$field->id}";
+                        if ($isFile) {
+                            $key = $request->hasFile("components.{$comp->id}.files.{$field->field_name}")
+                                ? "components.{$comp->id}.files.{$field->field_name}"
+                                : "components.{$comp->id}.files.{$field->id}";
+                        } else {
+                            $key = $request->has("components.{$comp->id}.fields.{$field->field_name}")
+                                ? "components.{$comp->id}.fields.{$field->field_name}"
+                                : "components.{$comp->id}.fields.{$field->id}";
+                        }
                     }
 
                     $existingData = SectionComponentData::where('section_id', $section->id)
@@ -403,7 +412,8 @@ class AdminController extends Controller
                         }
 
                         if ($field->field_type === 'url') {
-                            $fieldRules[] = 'url';
+                            $fieldRules[] = 'string';
+                            $fieldRules[] = 'max:2048';
                         } elseif (in_array($field->field_type, ['number', 'range'], true)) {
                             $fieldRules[] = 'numeric';
                         } elseif ($field->field_type === 'email') {
@@ -425,7 +435,7 @@ class AdminController extends Controller
 
                     $rules[$key] = $fieldRules;
                     $messages["{$key}.required"] = "The {$field->field_label} field is required.";
-                    $messages["{$key}.url"]      = "The {$field->field_label} must be a valid URL.";
+                    $messages["{$key}.string"]   = "The {$field->field_label} must be valid text.";
                     $messages["{$key}.numeric"]  = "The {$field->field_label} must be a number.";
                     $messages["{$key}.email"]    = "The {$field->field_label} must be a valid email address.";
                     $messages["{$key}.date"]     = "The {$field->field_label} must be a valid date.";
