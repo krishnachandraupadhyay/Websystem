@@ -144,7 +144,13 @@
                             <div 
                                 x-show="openMenu" 
                                 @click.away="openMenu = false"
-                                class="absolute bottom-full left-0 mb-2 w-48 rounded-xl bg-[#0f172a] border border-slate-700 shadow-xl py-1 text-xs z-50 divide-y divide-slate-800"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute bottom-full right-0 mb-2 w-48 rounded-xl bg-[#0f172a] border border-slate-700 shadow-xl py-1 text-xs z-50 divide-y divide-slate-800"
                                 style="display: none;"
                             >
                                 <div class="px-3 py-2 text-slate-300">
