@@ -907,75 +907,207 @@
 
 
     <!-- ==================================================== -->
-    <!-- GALLERY & INNOVATION (FULL WIDTH SHOWCASE SECTION) -->
+    <!-- FULL SCREEN / FULL WIDTH GALLERY & INNOVATION -->
     <!-- ==================================================== -->
-    <section id="gallery" class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pb-14 pt-4">
-        <div class="bg-white rounded-2xl shadow-xs border border-slate-200/90 p-6 sm:p-8">
+    <section 
+        id="gallery" 
+        class="w-full bg-white border-y border-slate-200/90 py-12 sm:py-16 my-6 shadow-xs"
+        x-data="{
+            activeFilter: 'all',
+            items: [
+                {
+                    title: 'Collaborative Group Study',
+                    category: 'classrooms',
+                    image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80',
+                    tag: 'Academics',
+                    isVideo: false
+                },
+                {
+                    title: 'Student Journal & Creative Writing',
+                    category: 'classrooms',
+                    image: 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=600&q=80',
+                    tag: 'Curriculum',
+                    isVideo: false
+                },
+                {
+                    title: 'Joyful Primary Classrooms',
+                    category: 'classrooms',
+                    image: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=600&q=80',
+                    tag: 'Campus Joy',
+                    isVideo: false
+                },
+                {
+                    title: 'Advanced Robotics Workshop',
+                    category: 'robotics',
+                    image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=600&q=80',
+                    tag: 'STEM & Robotics',
+                    isVideo: false
+                },
+                {
+                    title: 'Central Digital Knowledge Library',
+                    category: 'classrooms',
+                    image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80',
+                    tag: 'Resource Center',
+                    isVideo: false
+                },
+                {
+                    title: 'Chemistry & Molecular Research Lab',
+                    category: 'robotics',
+                    image: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=600&q=80',
+                    tag: 'Science Lab',
+                    isVideo: true
+                },
+                {
+                    title: 'Annual Drama & Cultural Gala',
+                    category: 'cultural',
+                    image: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80',
+                    tag: 'Performing Arts',
+                    isVideo: false
+                },
+                {
+                    title: 'Athletics & Track Championship',
+                    category: 'sports',
+                    image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=600&q=80',
+                    tag: 'Sports League',
+                    isVideo: true
+                }
+            ],
+            filteredItems() {
+                if (this.activeFilter === 'all') return this.items;
+                return this.items.filter(item => item.category === this.activeFilter);
+            }
+        }"
+    >
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
             
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-4 mb-6 gap-2">
-                <div>
-                    <h3 class="font-black text-slate-900 text-lg sm:text-xl tracking-tight uppercase font-heading flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-cyan-500"></span>
-                        <span>GALLERY & INNOVATION</span>
-                    </h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Capturing moments of learning, creativity, laboratory science & student life</p>
+            <!-- Section Header -->
+            <div class="text-center max-w-3xl mx-auto mb-8">
+                <div class="inline-flex items-center gap-2 bg-cyan-50 border border-cyan-200 text-cyan-900 text-xs font-bold px-3.5 py-1.5 rounded-full mb-3 shadow-2xs">
+                    <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
+                    <span class="font-hindi">परिसर, नवाचार एवं स्मृतियां</span>
+                    <span>•</span>
+                    <span class="tracking-wider uppercase">CAMPUS LIFE & INNOVATION</span>
                 </div>
-                <a href="#gallery" class="text-xs font-bold text-blue-600 hover:text-blue-800 hover:underline">
-                    View Complete Campus Gallery →
-                </a>
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight font-heading uppercase">
+                    GALLERY & INNOVATION
+                </h2>
+                <p class="text-slate-600 text-xs sm:text-sm mt-2 leading-relaxed">
+                    Capturing everyday moments of curiosity, discovery, athletics, and cultural milestones across the Gyan Vikas campus.
+                </p>
             </div>
 
-            <!-- 6-Photo Collage Grid (3 cols x 2 rows or 6 cols) -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
-                <div class="rounded-xl overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200 shadow-2xs">
-                    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=400&q=80" alt="Students studying" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <div class="rounded-xl overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200 shadow-2xs">
-                    <img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=400&q=80" alt="Student writing" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <div class="rounded-xl overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200 shadow-2xs">
-                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=400&q=80" alt="Classroom joy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <div class="rounded-xl overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200 shadow-2xs">
-                    <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=400&q=80" alt="Collaborative learning" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <div class="rounded-xl overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200 shadow-2xs">
-                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80" alt="Library time" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <!-- Video overlay item -->
-                <div class="relative rounded-xl overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200 shadow-2xs">
-                    <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=400&q=80" alt="Chemistry lab experiment" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-slate-950/40 flex items-center justify-center">
-                        <div class="w-8 h-8 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
-                            <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <!-- Filter Buttons Bar -->
+            <div class="flex flex-wrap items-center justify-center gap-2 mb-8">
+                <button 
+                    @click="activeFilter = 'all'" 
+                    :class="activeFilter === 'all' ? 'bg-[#0070e0] text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
+                    class="px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer"
+                >
+                    All Photos (सभी)
+                </button>
+                <button 
+                    @click="activeFilter = 'classrooms'" 
+                    :class="activeFilter === 'classrooms' ? 'bg-[#0070e0] text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
+                    class="px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer"
+                >
+                    Smart Classrooms (कक्षाएं)
+                </button>
+                <button 
+                    @click="activeFilter = 'robotics'" 
+                    :class="activeFilter === 'robotics' ? 'bg-[#0070e0] text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
+                    class="px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer"
+                >
+                    Robotics & Science Labs (प्रयोगशालाएं)
+                </button>
+                <button 
+                    @click="activeFilter = 'cultural'" 
+                    :class="activeFilter === 'cultural' ? 'bg-[#0070e0] text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
+                    class="px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer"
+                >
+                    Cultural & Drama (सांस्कृतिक)
+                </button>
+                <button 
+                    @click="activeFilter = 'sports'" 
+                    :class="activeFilter === 'sports' ? 'bg-[#0070e0] text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
+                    class="px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer"
+                >
+                    Sports & Athletics (खेलकूद)
+                </button>
+            </div>
+
+            <!-- Dynamic Photos Grid (8 items across 4 columns) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <template x-for="(item, idx) in filteredItems()" :key="idx">
+                    <div class="relative rounded-xl overflow-hidden aspect-4/3 group cursor-pointer border border-slate-200 shadow-2xs hover:shadow-md transition-all">
+                        <img 
+                            :src="item.image" 
+                            :alt="item.title" 
+                            class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                        />
+                        
+                        <!-- Video Play Icon Overlay -->
+                        <template x-if="item.isVideo">
+                            <div class="absolute inset-0 bg-slate-950/35 flex items-center justify-center">
+                                <div class="w-10 h-10 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                                    <svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Bottom Gradient Caption -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent flex flex-col justify-end p-3.5 opacity-90 group-hover:opacity-100 transition-opacity">
+                            <span class="text-[10px] font-bold text-amber-300 uppercase tracking-wider" x-text="item.tag"></span>
+                            <h4 class="text-xs sm:text-sm font-bold text-white leading-tight font-heading mt-0.5" x-text="item.title"></h4>
                         </div>
                     </div>
-                </div>
+                </template>
             </div>
 
-            <!-- 2 Wide Banner Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- 2 Grand Panoramic Wide Banner Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
                 
-                <!-- Wide Card 1 -->
-                <div class="relative rounded-xl overflow-hidden group shadow-sm cursor-pointer border border-slate-200 min-h-[140px] flex items-end">
-                    <img src="https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=700&q=80" alt="Student Innovation & Labs" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-transparent"></div>
-                    <div class="relative z-10 p-4">
-                        <span class="text-[10px] font-black uppercase text-amber-300 tracking-wider">Research & Technology</span>
-                        <h4 class="text-base sm:text-lg font-bold text-white font-heading">Student Innovation & High-Tech Science Labs</h4>
+                <!-- Panoramic Card 1: Innovation Labs -->
+                <div class="relative rounded-2xl overflow-hidden group shadow-md cursor-pointer border border-slate-200 min-h-[180px] sm:min-h-[200px] flex items-end">
+                    <img 
+                        src="https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=900&q=80" 
+                        alt="Student Innovation & Labs" 
+                        class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/55 to-slate-950/20"></div>
+                    <div class="relative z-10 p-5 sm:p-6 w-full">
+                        <span class="text-xs font-black uppercase text-amber-400 tracking-wider">Research & Technology Center</span>
+                        <h4 class="text-lg sm:text-xl font-extrabold text-white font-heading mt-1">Student Innovation & High-Tech Science Labs</h4>
+                        <p class="text-xs text-slate-200 mt-1 max-w-lg leading-relaxed line-clamp-2">
+                            Equipped with 3D printers, robotic automation arms, AI workstations, and university-grade chemical analysis equipment.
+                        </p>
                     </div>
                 </div>
 
-                <!-- Wide Card 2 -->
-                <div class="relative rounded-xl overflow-hidden group shadow-sm cursor-pointer border border-slate-200 min-h-[140px] flex items-end">
-                    <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=700&q=80" alt="Vibrant Community" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-transparent"></div>
-                    <div class="relative z-10 p-4">
-                        <span class="text-[10px] font-black uppercase text-emerald-300 tracking-wider">Campus Life</span>
-                        <h4 class="text-base sm:text-lg font-bold text-white font-heading">Vibrant Community, Sports & Cultural Spirit</h4>
+                <!-- Panoramic Card 2: Vibrant Community -->
+                <div class="relative rounded-2xl overflow-hidden group shadow-md cursor-pointer border border-slate-200 min-h-[180px] sm:min-h-[200px] flex items-end">
+                    <img 
+                        src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=80" 
+                        alt="Vibrant Community" 
+                        class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/55 to-slate-950/20"></div>
+                    <div class="relative z-10 p-5 sm:p-6 w-full">
+                        <span class="text-xs font-black uppercase text-emerald-400 tracking-wider">Campus Life & Athletics</span>
+                        <h4 class="text-lg sm:text-xl font-extrabold text-white font-heading mt-1">Vibrant Community, Sports & Cultural Spirit</h4>
+                        <p class="text-xs text-slate-200 mt-1 max-w-lg leading-relaxed line-clamp-2">
+                            Fostering lifelong friendships, championship sportsmanship, dramatic theatre arts, and humanitarian student clubs.
+                        </p>
                     </div>
                 </div>
 
+            </div>
+
+            <!-- Footer Action Button -->
+            <div class="text-center">
+                <a href="#gallery" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-7 py-3.5 rounded-full shadow-md hover:shadow-lg transition-all">
+                    <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span>View Complete Campus Photo Gallery (300+ Photos)</span>
+                </a>
             </div>
 
         </div>
