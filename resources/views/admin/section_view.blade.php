@@ -3,7 +3,7 @@
 @section('title', $section->section_name . ' - Section Content')
 
 @section('content')
-<div class="max-w-7xl mx-auto space-y-6" x-data="{ openModal: false, activeComponentId: null, activeComponentName: '' }">
+<div class="max-w-7xl mx-auto space-y-6" x-data="{ openModal: false, activeComponentId: null, activeComponentName: '', activeSubCompId: null, activeInstanceIndex: null, activeInstanceLabel: '' }">
 
     <!-- Top Breadcrumb & Navigation -->
     <div class="flex items-center justify-between">
@@ -67,7 +67,7 @@
                 <p class="text-xs text-slate-400">Assigned components & live content saved directly in the database.</p>
             </div>
             <button 
-                @click="openModal = true; activeComponentId = null; activeComponentName = ''" 
+                @click="openModal = true; activeComponentId = null; activeComponentName = ''; activeSubCompId = null; activeInstanceIndex = null; activeInstanceLabel = ''" 
                 type="button" 
                 class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/20 cursor-pointer self-start sm:self-auto"
             >
@@ -87,6 +87,7 @@
                             <th class="px-5 py-3.5">Component</th>
                             <th class="px-5 py-3.5">Type</th>
                             <th class="px-5 py-3.5">Configured Content / Preview</th>
+                            <th class="px-4 py-3.5 text-center">Order</th>
                             <th class="px-5 py-3.5 text-center">Status</th>
                             <th class="px-5 py-3.5 text-right">Action</th>
                         </tr>
@@ -139,6 +140,9 @@
                                             <span class="font-bold text-indigo-600">{{ $comp->effective_subcomponents->count() }}</span>
                                         </span>
                                     </td>
+                                    <td class="px-4 py-4 text-center text-slate-300 font-semibold text-xs">
+                                        -
+                                    </td>
                                     <td class="px-5 py-4 text-center">
                                         <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -147,7 +151,7 @@
                                     </td>
                                     <td class="px-5 py-4 text-right">
                                         <button 
-                                            @click="openModal = true; activeComponentId = {{ $comp->id }}; activeComponentName = '{{ addslashes($comp->component_name) }}'" 
+                                            @click="openModal = true; activeComponentId = {{ $comp->id }}; activeComponentName = '{{ addslashes($comp->component_name) }}'; activeSubCompId = null; activeInstanceIndex = null; activeInstanceLabel = ''" 
                                             type="button" 
                                             class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-blue-600 hover:text-blue-700 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer shadow-2xs"
                                             title="Edit {{ $comp->component_name }}"
@@ -169,53 +173,559 @@
                                         $subInstMap = $multiFieldData[$comp->id . '_' . $subComp->id] ?? [];
                                         $subInstCount = count($subInstMap);
                                     @endphp
-                                    <tr class="bg-slate-50/40 hover:bg-slate-50 transition-colors border-l-4 border-l-indigo-500">
-                                        <td class="px-5 py-3 text-[11px] font-semibold text-slate-400 pl-8">
-                                            {{ $index + 1 }}.{{ $subIndex + 1 }}
+
+                                    @if($isSubMultiple && $subInstCount > 0)
+                                        {{-- 2.1 Individual Repeater Rows (e.g. 4.1 Home, 4.2 About Us, 4.3 Message...) --}}
+                                        @foreach($subInstMap as $sPos => $instFields)
+                                            @php
+                                                $instLabel = null;
+                                                $instUrl = null;
+                                                $otherFields = [];
+
+                                                foreach($subFields as $sf) {
+                                                    $fVal = is_array($instFields) ? ($instFields[$sf->id] ?? null) : null;
+                                                    $valStr = $fVal?->content_value ?? '';
+                                                    $fNameLower = strtolower($sf->field_name);
+
+                                                    if (!$instLabel && in_array($fNameLower, ['anchor_text', 'text', 'label', 'title', 'heading', 'name', 'button_text'], true) && !empty($valStr)) {
+                                                        $instLabel = $valStr;
+                                                    }
+                                                    if (!$instUrl && in_array($fNameLower, ['anchor_url', 'url', 'link', 'href'], true) && !empty($valStr)) {
+                                                        $instUrl = $valStr;
+                                                    }
+                                                    if (!empty($valStr) || $fVal?->file_path) {
+                                                        $otherFields[] = [
+                                                            'label' => $sf->field_label,
+                                                            'val' => $valStr,
+                                                            'file' => $fVal?->file_path
+                                                        ];
+                                                    }
+                                                }
+
+                                                if (!$instLabel) {
+                                                    $firstVal = is_array($instFields) ? (reset($instFields)?->content_value ?? null) : null;
+                                                    $instLabel = $firstVal ?: ($subComp->component_name . ' #' . ($sPos + 1));
+                                                }
+                                            @endphp
+                                            <tr 
+                                                class="repeater-table-row bg-slate-50/40 hover:bg-indigo-50/40 transition-colors border-l-4 border-l-indigo-500"
+                                                data-group-key="comp-{{ $comp->id }}-sub-{{ $subComp->id }}"
+                                                data-parent-prefix="{{ $index + 1 }}."
+                                            >
+                                                {{-- 1. Sequence number: 4.1, 4.2, 4.3... --}}
+                                                <td class="px-5 py-3.5 text-[11px] font-bold text-indigo-700 pl-8 table-seq-num">
+                                                    {{ $index + 1 }}.{{ $sPos + 1 }}
+                                                </td>
+
+                                                {{-- 2. Component Name & Title --}}
+                                                <td class="px-5 py-3.5 pl-8">
+                                                    <div class="flex items-center gap-2.5">
+                                                        <span class="text-indigo-400 font-mono text-xs font-bold">↳</span>
+                                                        <div>
+                                                            <h5 class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+                                                                <span class="item-title text-slate-900">{{ $instLabel }}</span>
+                                                            </h5>
+                                                            <p class="text-[10px] text-slate-400 font-mono">
+                                                                {{ $subComp->component_name }} • /{{ $subComp->component_slug }}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                                {{-- 3. Type --}}
+                                                <td class="px-5 py-3.5">
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                        {{ $subComp->component_name }} Item
+                                                    </span>
+                                                </td>
+
+                                                {{-- 4. Preview / Configured Content --}}
+                                                <td class="px-5 py-3.5">
+                                                    <div class="flex flex-wrap items-center gap-2">
+                                                        @if($instUrl)
+                                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-xs font-mono font-medium">
+                                                                <svg class="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                                                                <span>{{ $instUrl }}</span>
+                                                            </span>
+                                                        @endif
+                                                        @foreach($otherFields as $of)
+                                                            @if(!in_array(strtolower($of['label']), ['text', 'anchor text', 'url', 'anchor url']))
+                                                                @if($of['file'])
+                                                                    <img src="{{ asset($of['file']) }}" class="w-7 h-7 object-cover rounded border border-slate-200 shadow-2xs" title="{{ $of['label'] }}">
+                                                                @elseif(!empty($of['val']))
+                                                                    <span class="text-[11px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-medium">
+                                                                        <span class="text-slate-400 font-semibold">{{ $of['label'] }}:</span> {{ $of['val'] }}
+                                                                    </span>
+                                                                @endif
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
+                                                </td>
+
+                                                {{-- 5. In-Table Order Controls --}}
+                                                <td class="px-4 py-3.5 text-center">
+                                                    <div class="inline-flex items-center justify-center gap-1.5 bg-slate-100/90 p-1 rounded-xl border border-slate-200/90 shadow-2xs">
+                                                        <input 
+                                                            type="number" 
+                                                            min="1" 
+                                                            max="{{ $subInstCount }}" 
+                                                            value="{{ $sPos + 1 }}" 
+                                                            data-comp-id="{{ $comp->id }}" 
+                                                            data-subcomp-id="{{ $subComp->id }}" 
+                                                            data-inst-idx="{{ $sPos }}" 
+                                                            data-pos="{{ $sPos }}" 
+                                                            class="table-order-input w-10 h-6 text-center text-xs font-bold text-slate-800 bg-white border border-slate-300 rounded-lg focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                                                            onchange="handleTableOrderChange(this)"
+                                                            title="Change order position"
+                                                        >
+                                                        <div class="flex flex-col gap-0.5">
+                                                            <button 
+                                                                type="button" 
+                                                                onclick="moveTableRow(this, 'up')" 
+                                                                {{ $sPos === 0 ? 'disabled' : '' }} 
+                                                                class="table-btn-up w-5 h-3 rounded flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-white disabled:opacity-20 disabled:pointer-events-none cursor-pointer transition-colors"
+                                                                title="Move Up"
+                                                            >
+                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                                                            </button>
+                                                            <button 
+                                                                type="button" 
+                                                                onclick="moveTableRow(this, 'down')" 
+                                                                {{ $sPos === $subInstCount - 1 ? 'disabled' : '' }} 
+                                                                class="table-btn-down w-5 h-3 rounded flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-white disabled:opacity-20 disabled:pointer-events-none cursor-pointer transition-colors"
+                                                                title="Move Down"
+                                                            >
+                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                                {{-- 6. Status --}}
+                                                <td class="px-5 py-3.5 text-center">
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                        <span class="w-1 h-1 rounded-full bg-emerald-500"></span>
+                                                        Active
+                                                    </span>
+                                                </td>
+
+                                                {{-- 7. Action: Focus modal on this specific instance --}}
+                                                <td class="px-5 py-3.5 text-right">
+                                                    <button 
+                                                        @click="openModal = true; activeComponentId = {{ $comp->id }}; activeComponentName = '{{ addslashes($comp->component_name) }}'; activeSubCompId = {{ $subComp->id }}; activeInstanceIndex = {{ $sPos }}; activeInstanceLabel = '{{ addslashes($instLabel) }}'" 
+                                                        type="button" 
+                                                        class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-blue-600 hover:text-blue-700 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer shadow-2xs"
+                                                        title="Edit {{ $instLabel }}"
+                                                    >
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                        </svg>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @elseif($isSubMultiple)
+                                        {{-- 2.2 Empty Repeater Subcomponent Row --}}
+                                        <tr class="bg-slate-50/40 hover:bg-slate-50 transition-colors border-l-4 border-l-indigo-500">
+                                            <td class="px-5 py-3 text-[11px] font-semibold text-slate-400 pl-8">
+                                                {{ $index + 1 }}.{{ $subIndex + 1 }}
+                                            </td>
+                                            <td class="px-5 py-3 pl-8">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-indigo-400 font-mono text-xs">↳</span>
+                                                    <div>
+                                                        <h5 class="font-bold text-slate-800 text-xs">{{ $subComp->component_name }}</h5>
+                                                        <p class="text-[10px] text-slate-400 font-mono">/{{ $subComp->component_slug }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-5 py-3">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                                    Repeater (0)
+                                                </span>
+                                            </td>
+                                            <td class="px-5 py-3">
+                                                <span class="text-xs text-slate-400 italic">No items added yet</span>
+                                            </td>
+                                            <td class="px-4 py-3 text-center text-slate-300 font-semibold text-xs">-</td>
+                                            <td class="px-5 py-3 text-center">
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                    <span class="w-1 h-1 rounded-full bg-emerald-500"></span>
+                                                    Active
+                                                </span>
+                                            </td>
+                                            <td class="px-5 py-3 text-right">
+                                                <button 
+                                                    @click="openModal = true; activeComponentId = {{ $comp->id }}; activeComponentName = '{{ addslashes($comp->component_name) }}'; activeSubCompId = {{ $subComp->id }}; activeInstanceIndex = null; activeInstanceLabel = ''" 
+                                                    type="button" 
+                                                    class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-blue-600 hover:text-blue-700 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer shadow-2xs"
+                                                    title="Add {{ $subComp->component_name }}"
+                                                >
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @else
+                                        {{-- 2.3 Single / Non-repeater Subcomponent Row --}}
+                                        <tr class="bg-slate-50/40 hover:bg-slate-50 transition-colors border-l-4 border-l-indigo-500">
+                                            <td class="px-5 py-3 text-[11px] font-semibold text-slate-400 pl-8">
+                                                {{ $index + 1 }}.{{ $subIndex + 1 }}
+                                            </td>
+                                            <td class="px-5 py-3 pl-8">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-indigo-400 font-mono text-xs">↳</span>
+                                                    <div>
+                                                        <h5 class="font-bold text-slate-800 text-xs">
+                                                            {{ $subComp->component_name }}
+                                                        </h5>
+                                                        <p class="text-[10px] text-slate-400 font-mono">
+                                                            /{{ $subComp->component_slug }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-5 py-3">
+                                                @if($subFields->isNotEmpty())
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                        {{ $subFields->count() }} {{ \Illuminate\Support\Str::plural('Field', $subFields->count()) }}
+                                                    </span>
+                                                @elseif(str_contains($subNameAndSlug, 'subheading'))
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                                                        SubHeading
+                                                    </span>
+                                                @elseif(str_contains($subNameAndSlug, 'heading'))
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                                        Heading
+                                                    </span>
+                                                @elseif(str_contains($subNameAndSlug, 'button'))
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                        Button
+                                                    </span>
+                                                @elseif(str_contains($subNameAndSlug, 'paragraph') || str_contains($subNameAndSlug, 'textarea') || str_contains($subNameAndSlug, 'desc'))
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                                        Paragraph
+                                                    </span>
+                                                @elseif(str_contains($subNameAndSlug, 'image') || str_contains($subNameAndSlug, 'photo') || str_contains($subNameAndSlug, 'banner'))
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                                                        Image
+                                                    </span>
+                                                @elseif(str_contains($subNameAndSlug, 'video'))
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                                        Video
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-600">
+                                                        Standard
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td class="px-5 py-3">
+                                                @if($subFields->isNotEmpty())
+                                                    <div class="space-y-1">
+                                                        @foreach($subFields as $f)
+                                                            @php
+                                                                $fItem = $fieldData[$comp->id . '_' . $subComp->id][$f->id] ?? null;
+                                                            @endphp
+                                                            <div class="flex items-center gap-1.5 text-xs">
+                                                                <span class="text-slate-400 font-semibold text-[11px]">{{ $f->field_label }}:</span>
+                                                                @if(in_array($f->field_type, ['image', 'video', 'file'], true))
+                                                                    @if($fItem?->file_path && file_exists(public_path($fItem->file_path)))
+                                                                        <a href="{{ asset($fItem->file_path) }}" target="_blank" class="text-blue-600 hover:underline font-mono text-[11px] truncate max-w-[150px]">
+                                                                            {{ basename($fItem->file_path) }}
+                                                                        </a>
+                                                                    @else
+                                                                        <span class="text-slate-400 italic text-[11px]">No file</span>
+                                                                    @endif
+                                                                @else
+                                                                    @if($fItem?->content_value !== null && $fItem?->content_value !== '')
+                                                                        <span class="text-slate-800 font-medium">{{ $fItem->content_value }}</span>
+                                                                    @else
+                                                                        <span class="text-slate-400 italic text-[11px]">Empty</span>
+                                                                    @endif
+                                                                @endif
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                @elseif(str_contains($subNameAndSlug, 'heading'))
+                                                    @if($subExisting?->content_value)
+                                                        <p class="text-xs font-bold text-slate-800">{{ $subExisting->content_value }}</p>
+                                                    @else
+                                                        <span class="text-xs text-slate-400 italic">No text entered</span>
+                                                    @endif
+                                                @elseif(str_contains($subNameAndSlug, 'button'))
+                                                    @if($subExisting?->content_value || $subExisting?->extra_value)
+                                                        <div class="flex items-center gap-2">
+                                                            <span class="px-2.5 py-0.5 rounded-lg bg-blue-600 text-white font-bold text-xs shadow-2xs">
+                                                                {{ $subExisting->content_value ?: 'Button' }}
+                                                            </span>
+                                                            @if($subExisting->extra_value)
+                                                                <span class="text-[11px] font-mono text-slate-400 truncate max-w-[160px]">
+                                                                    {{ $subExisting->extra_value }}
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                    @else
+                                                        <span class="text-xs text-slate-400 italic">No button configured</span>
+                                                    @endif
+                                                @elseif(str_contains($subNameAndSlug, 'paragraph') || str_contains($subNameAndSlug, 'textarea') || str_contains($subNameAndSlug, 'desc'))
+                                                    @if($subExisting?->content_value)
+                                                        <div class="text-xs text-slate-700 leading-relaxed whitespace-pre-line break-words max-w-xl">
+                                                            {{ $subExisting->content_value }}
+                                                        </div>
+                                                    @else
+                                                        <span class="text-xs text-slate-400 italic">No paragraph entered</span>
+                                                    @endif
+                                                @elseif(str_contains($subNameAndSlug, 'image') || str_contains($subNameAndSlug, 'photo') || str_contains($subNameAndSlug, 'banner'))
+                                                    @if($subExisting?->file_path && file_exists(public_path($subExisting->file_path)))
+                                                        <div class="flex items-center gap-2">
+                                                            <img src="{{ asset($subExisting->file_path) }}" alt="Preview" class="w-8 h-8 object-cover rounded-lg border border-slate-200 shadow-2xs">
+                                                            <span class="text-xs text-slate-700 font-medium truncate max-w-[130px]">{{ basename($subExisting->file_path) }}</span>
+                                                        </div>
+                                                    @else
+                                                        <span class="text-xs text-slate-400 italic">No image uploaded</span>
+                                                    @endif
+                                                @elseif(str_contains($subNameAndSlug, 'video'))
+                                                    @if($subExisting?->file_path && file_exists(public_path($subExisting->file_path)))
+                                                        <div class="flex items-center gap-2">
+                                                            <video src="{{ asset($subExisting->file_path) }}" class="w-12 h-8 object-cover rounded-lg border border-slate-200 shadow-2xs"></video>
+                                                            <span class="text-xs text-slate-700 font-medium truncate max-w-[130px]">{{ basename($subExisting->file_path) }}</span>
+                                                        </div>
+                                                    @else
+                                                        <span class="text-xs text-slate-400 italic">No video uploaded</span>
+                                                    @endif
+                                                @else
+                                                    @if($subExisting?->content_value)
+                                                        <span class="text-xs text-slate-800">{{ $subExisting->content_value }}</span>
+                                                    @else
+                                                        <span class="text-xs text-slate-400 italic">No value</span>
+                                                    @endif
+                                                @endif
+                                            </td>
+                                            <td class="px-4 py-3 text-center text-slate-300 font-semibold text-xs">
+                                                -
+                                            </td>
+                                            <td class="px-5 py-3 text-center">
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                    <span class="w-1 h-1 rounded-full bg-emerald-500"></span>
+                                                    Active
+                                                </span>
+                                            </td>
+                                            <td class="px-5 py-3 text-right">
+                                                <button 
+                                                    @click="openModal = true; activeComponentId = {{ $comp->id }}; activeComponentName = '{{ addslashes($comp->component_name) }}'; activeSubCompId = {{ $subComp->id }}; activeInstanceIndex = null; activeInstanceLabel = ''" 
+                                                    type="button" 
+                                                    class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-blue-600 hover:text-blue-700 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer shadow-2xs"
+                                                    title="Edit {{ $subComp->component_name }}"
+                                                >
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endif
+                                @endforeach
+                            @else
+                                @php
+                                    $nameAndSlug = strtolower($comp->component_name . ' ' . $comp->component_slug);
+                                    $isCompMultiple = (bool)($comp->pivot->is_multiple ?? $comp->is_multiple);
+                                    $compFields = $comp->fields->where('is_active', true)->sortBy('sort_order');
+                                    $compInstMap = $multiFieldData[$comp->id] ?? [];
+                                    $compInstCount = count($compInstMap);
+                                    $existing = $contentData[$comp->id] ?? null;
+                                @endphp
+
+                                @if($isCompMultiple && $compInstCount > 0)
+                                    {{-- 3.1 Top-Level Repeater Individual Rows --}}
+                                    @foreach($compInstMap as $cPos => $instFields)
+                                        @php
+                                            $cLabel = null;
+                                            $cUrl = null;
+                                            $cOtherFields = [];
+
+                                            foreach($compFields as $cf) {
+                                                $fVal = is_array($instFields) ? ($instFields[$cf->id] ?? null) : null;
+                                                $valStr = $fVal?->content_value ?? '';
+                                                $fNameLower = strtolower($cf->field_name);
+
+                                                if (!$cLabel && in_array($fNameLower, ['title', 'heading', 'name', 'text', 'label'], true) && !empty($valStr)) {
+                                                    $cLabel = $valStr;
+                                                }
+                                                if (!$cUrl && in_array($fNameLower, ['url', 'link', 'href'], true) && !empty($valStr)) {
+                                                    $cUrl = $valStr;
+                                                }
+                                                if (!empty($valStr) || $fVal?->file_path) {
+                                                    $cOtherFields[] = [
+                                                        'label' => $cf->field_label,
+                                                        'val' => $valStr,
+                                                        'file' => $fVal?->file_path
+                                                    ];
+                                                }
+                                            }
+
+                                            if (!$cLabel) {
+                                                $firstVal = is_array($instFields) ? (reset($instFields)?->content_value ?? null) : null;
+                                                $cLabel = $firstVal ?: ($comp->component_name . ' #' . ($cPos + 1));
+                                            }
+                                        @endphp
+                                        <tr 
+                                            class="repeater-table-row hover:bg-blue-50/40 transition-colors"
+                                            data-group-key="comp-{{ $comp->id }}"
+                                            data-parent-prefix="{{ $index + 1 }}."
+                                        >
+                                            <td class="px-5 py-4 text-xs font-bold text-blue-700 table-seq-num">
+                                                {{ $index + 1 }}.{{ $cPos + 1 }}
+                                            </td>
+                                            <td class="px-5 py-4">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0">
+                                                        {{ strtoupper(substr($comp->component_name, 0, 1)) }}
+                                                    </div>
+                                                    <div>
+                                                        <h4 class="font-bold text-slate-900 text-xs item-title">
+                                                            {{ $cLabel }}
+                                                        </h4>
+                                                        <p class="text-[10px] text-slate-400 font-mono">
+                                                            {{ $comp->component_name }} • /{{ $comp->component_slug }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-5 py-4">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                                    {{ $comp->component_name }} Item
+                                                </span>
+                                            </td>
+                                            <td class="px-5 py-4">
+                                                <div class="flex flex-wrap items-center gap-2">
+                                                    @if($cUrl)
+                                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-xs font-mono font-medium">
+                                                            <svg class="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                                                            <span>{{ $cUrl }}</span>
+                                                        </span>
+                                                    @endif
+                                                    @foreach($cOtherFields as $of)
+                                                        @if(!in_array(strtolower($of['label']), ['title', 'name', 'heading', 'url', 'link']))
+                                                            @if($of['file'])
+                                                                <img src="{{ asset($of['file']) }}" class="w-8 h-8 object-cover rounded-lg border border-slate-200 shadow-2xs" title="{{ $of['label'] }}">
+                                                            @elseif(!empty($of['val']))
+                                                                <span class="text-[11px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-medium">
+                                                                    <span class="text-slate-400 font-semibold">{{ $of['label'] }}:</span> {{ $of['val'] }}
+                                                                </span>
+                                                            @endif
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-4 text-center">
+                                                <div class="inline-flex items-center justify-center gap-1.5 bg-slate-100/90 p-1 rounded-xl border border-slate-200/90 shadow-2xs">
+                                                    <input 
+                                                        type="number" 
+                                                        min="1" 
+                                                        max="{{ $compInstCount }}" 
+                                                        value="{{ $cPos + 1 }}" 
+                                                        data-comp-id="{{ $comp->id }}" 
+                                                        data-subcomp-id="" 
+                                                        data-inst-idx="{{ $cPos }}" 
+                                                        data-pos="{{ $cPos }}" 
+                                                        class="table-order-input w-10 h-6 text-center text-xs font-bold text-slate-800 bg-white border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                                        onchange="handleTableOrderChange(this)"
+                                                        title="Change order position"
+                                                    >
+                                                    <div class="flex flex-col gap-0.5">
+                                                        <button 
+                                                            type="button" 
+                                                            onclick="moveTableRow(this, 'up')" 
+                                                            {{ $cPos === 0 ? 'disabled' : '' }} 
+                                                            class="table-btn-up w-5 h-3 rounded flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-white disabled:opacity-20 disabled:pointer-events-none cursor-pointer transition-colors"
+                                                            title="Move Up"
+                                                        >
+                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                                                        </button>
+                                                        <button 
+                                                            type="button" 
+                                                            onclick="moveTableRow(this, 'down')" 
+                                                            {{ $cPos === $compInstCount - 1 ? 'disabled' : '' }} 
+                                                            class="table-btn-down w-5 h-3 rounded flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-white disabled:opacity-20 disabled:pointer-events-none cursor-pointer transition-colors"
+                                                            title="Move Down"
+                                                        >
+                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-5 py-4 text-center">
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                    Active
+                                                </span>
+                                            </td>
+                                            <td class="px-5 py-4 text-right">
+                                                <button 
+                                                    @click="openModal = true; activeComponentId = {{ $comp->id }}; activeComponentName = '{{ addslashes($comp->component_name) }}'; activeSubCompId = null; activeInstanceIndex = {{ $cPos }}; activeInstanceLabel = '{{ addslashes($cLabel) }}'" 
+                                                    type="button" 
+                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-blue-600 hover:text-blue-700 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer shadow-2xs"
+                                                    title="Edit {{ $cLabel }}"
+                                                >
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @else
+                                    {{-- 3.2 Standard Component Row (no subcomponents or single) --}}
+                                    <tr class="hover:bg-slate-50/60 transition-colors">
+                                        <!-- Index -->
+                                        <td class="px-5 py-4 text-xs font-semibold text-slate-400">
+                                            {{ $index + 1 }}
                                         </td>
-                                        <td class="px-5 py-3 pl-8">
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-indigo-400 font-mono text-xs">↳</span>
+
+                                        <!-- Component Name & Slug -->
+                                        <td class="px-5 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0">
+                                                    {{ strtoupper(substr($comp->component_name, 0, 1)) }}
+                                                </div>
                                                 <div>
-                                                    <h5 class="font-bold text-slate-800 text-xs">
-                                                        {{ $subComp->component_name }}
-                                                    </h5>
+                                                    <h4 class="font-bold text-slate-900 text-xs">
+                                                        {{ $comp->component_name }}
+                                                    </h4>
                                                     <p class="text-[10px] text-slate-400 font-mono">
-                                                        /{{ $subComp->component_slug }}
+                                                        /{{ $comp->component_slug }}
                                                     </p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-5 py-3">
-                                            @if($isSubMultiple)
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
-                                                    Repeater ({{ $subInstCount }})
+
+                                        <!-- Component Type Badge -->
+                                        <td class="px-5 py-4">
+                                            @if($compFields->isNotEmpty())
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                                    {{ $compFields->count() }} {{ \Illuminate\Support\Str::plural('Field', $compFields->count()) }}
                                                 </span>
-                                            @elseif($subFields->isNotEmpty())
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                                    {{ $subFields->count() }} {{ \Illuminate\Support\Str::plural('Field', $subFields->count()) }}
-                                                </span>
-                                            @elseif(str_contains($subNameAndSlug, 'subheading'))
+                                            @elseif(str_contains($nameAndSlug, 'subheading'))
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
                                                     SubHeading
                                                 </span>
-                                            @elseif(str_contains($subNameAndSlug, 'heading'))
+                                            @elseif(str_contains($nameAndSlug, 'heading'))
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
                                                     Heading
                                                 </span>
-                                            @elseif(str_contains($subNameAndSlug, 'button'))
+                                            @elseif(str_contains($nameAndSlug, 'button'))
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
                                                     Button
                                                 </span>
-                                            @elseif(str_contains($subNameAndSlug, 'paragraph') || str_contains($subNameAndSlug, 'textarea') || str_contains($subNameAndSlug, 'desc'))
+                                            @elseif(str_contains($nameAndSlug, 'paragraph') || str_contains($nameAndSlug, 'textarea') || str_contains($nameAndSlug, 'desc'))
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
                                                     Paragraph
                                                 </span>
-                                            @elseif(str_contains($subNameAndSlug, 'image') || str_contains($subNameAndSlug, 'photo') || str_contains($subNameAndSlug, 'banner'))
+                                            @elseif(str_contains($nameAndSlug, 'image'))
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
                                                     Image
                                                 </span>
-                                            @elseif(str_contains($subNameAndSlug, 'video'))
+                                            @elseif(str_contains($nameAndSlug, 'video'))
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
                                                     Video
                                                 </span>
@@ -225,27 +735,14 @@
                                                 </span>
                                             @endif
                                         </td>
-                                        <td class="px-5 py-3">
-                                            @if($isSubMultiple && $subInstCount > 0)
+
+                                        <!-- Configured Content / Preview -->
+                                        <td class="px-5 py-4">
+                                            @if($compFields->isNotEmpty())
                                                 <div class="space-y-1">
-                                                    <div class="flex flex-wrap items-center gap-1.5">
-                                                        @foreach($subInstMap as $sIdx => $fList)
-                                                            @php
-                                                                $firstField = is_array($fList) ? ($fList[array_key_first($fList)] ?? null) : $fList;
-                                                            @endphp
-                                                            @if($firstField?->content_value)
-                                                                <span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-semibold">
-                                                                    {{ $firstField->content_value }}
-                                                                </span>
-                                                            @endif
-                                                        @endforeach
-                                                    </div>
-                                                </div>
-                                            @elseif($subFields->isNotEmpty())
-                                                <div class="space-y-1">
-                                                    @foreach($subFields as $f)
+                                                    @foreach($compFields as $f)
                                                         @php
-                                                            $fItem = $fieldData[$comp->id . '_' . $subComp->id][$f->id] ?? null;
+                                                            $fItem = $fieldData[$comp->id][$f->id] ?? null;
                                                         @endphp
                                                         <div class="flex items-center gap-1.5 text-xs">
                                                             <span class="text-slate-400 font-semibold text-[11px]">{{ $f->field_label }}:</span>
@@ -267,284 +764,100 @@
                                                         </div>
                                                     @endforeach
                                                 </div>
-                                            @elseif(str_contains($subNameAndSlug, 'heading'))
-                                                @if($subExisting?->content_value)
-                                                    <p class="text-xs font-bold text-slate-800">{{ $subExisting->content_value }}</p>
+                                            @elseif(str_contains($nameAndSlug, 'heading'))
+                                                @if($existing?->content_value)
+                                                    <p class="text-xs font-bold text-slate-800">{{ $existing->content_value }}</p>
                                                 @else
                                                     <span class="text-xs text-slate-400 italic">No text entered</span>
                                                 @endif
-                                            @elseif(str_contains($subNameAndSlug, 'button'))
-                                                @if($subExisting?->content_value || $subExisting?->extra_value)
+
+                                            {{-- Button --}}
+                                            @elseif(str_contains($nameAndSlug, 'button'))
+                                                @if($existing?->content_value || $existing?->extra_value)
                                                     <div class="flex items-center gap-2">
-                                                        <span class="px-2.5 py-0.5 rounded-lg bg-blue-600 text-white font-bold text-xs shadow-2xs">
-                                                            {{ $subExisting->content_value ?: 'Button' }}
+                                                        <span class="px-3 py-1 rounded-lg bg-blue-600 text-white font-bold text-xs shadow-2xs">
+                                                            {{ $existing->content_value ?: 'Button' }}
                                                         </span>
-                                                        @if($subExisting->extra_value)
-                                                            <span class="text-[11px] font-mono text-slate-400 truncate max-w-[160px]">
-                                                                {{ $subExisting->extra_value }}
+                                                        @if($existing->extra_value)
+                                                            <span class="text-[11px] font-mono text-slate-400 truncate max-w-[180px]">
+                                                                {{ $existing->extra_value }}
                                                             </span>
                                                         @endif
                                                     </div>
                                                 @else
                                                     <span class="text-xs text-slate-400 italic">No button configured</span>
                                                 @endif
-                                            @elseif(str_contains($subNameAndSlug, 'paragraph') || str_contains($subNameAndSlug, 'textarea') || str_contains($subNameAndSlug, 'desc'))
-                                                @if($subExisting?->content_value)
-                                                    <div class="text-xs text-slate-700 leading-relaxed whitespace-pre-line break-words max-w-xl">
-                                                        {{ $subExisting->content_value }}
+
+                                            {{-- Paragraph --}}
+                                            @elseif(str_contains($nameAndSlug, 'paragraph') || str_contains($nameAndSlug, 'textarea') || str_contains($nameAndSlug, 'desc'))
+                                                @if($existing?->content_value)
+                                                    <div class="text-xs text-slate-700 leading-relaxed whitespace-pre-line break-words max-w-2xl">
+                                                        {{ $existing->content_value }}
                                                     </div>
                                                 @else
                                                     <span class="text-xs text-slate-400 italic">No paragraph entered</span>
                                                 @endif
-                                            @elseif(str_contains($subNameAndSlug, 'image') || str_contains($subNameAndSlug, 'photo') || str_contains($subNameAndSlug, 'banner'))
-                                                @if($subExisting?->file_path && file_exists(public_path($subExisting->file_path)))
-                                                    <div class="flex items-center gap-2">
-                                                        <img src="{{ asset($subExisting->file_path) }}" alt="Preview" class="w-8 h-8 object-cover rounded-lg border border-slate-200 shadow-2xs">
-                                                        <span class="text-xs text-slate-700 font-medium truncate max-w-[130px]">{{ basename($subExisting->file_path) }}</span>
+
+                                            {{-- Image --}}
+                                            @elseif(str_contains($nameAndSlug, 'image'))
+                                                @if($existing?->file_path && file_exists(public_path($existing->file_path)))
+                                                    <div class="flex items-center gap-2.5">
+                                                        <img src="{{ asset($existing->file_path) }}" alt="Preview" class="w-10 h-10 object-cover rounded-lg border border-slate-200 shadow-2xs">
+                                                        <span class="text-xs text-slate-700 font-medium truncate max-w-[140px]">{{ basename($existing->file_path) }}</span>
                                                     </div>
                                                 @else
                                                     <span class="text-xs text-slate-400 italic">No image uploaded</span>
                                                 @endif
-                                            @elseif(str_contains($subNameAndSlug, 'video'))
-                                                @if($subExisting?->file_path && file_exists(public_path($subExisting->file_path)))
-                                                    <div class="flex items-center gap-2">
-                                                        <video src="{{ asset($subExisting->file_path) }}" class="w-12 h-8 object-cover rounded-lg border border-slate-200 shadow-2xs"></video>
-                                                        <span class="text-xs text-slate-700 font-medium truncate max-w-[130px]">{{ basename($subExisting->file_path) }}</span>
+
+                                            {{-- Video --}}
+                                            @elseif(str_contains($nameAndSlug, 'video'))
+                                                @if($existing?->file_path && file_exists(public_path($existing->file_path)))
+                                                    <div class="flex items-center gap-2.5">
+                                                        <video src="{{ asset($existing->file_path) }}" class="w-14 h-9 object-cover rounded-lg border border-slate-200 shadow-2xs"></video>
+                                                        <span class="text-xs text-slate-700 font-medium truncate max-w-[140px]">{{ basename($existing->file_path) }}</span>
                                                     </div>
                                                 @else
                                                     <span class="text-xs text-slate-400 italic">No video uploaded</span>
                                                 @endif
+
+                                            {{-- Fallback --}}
                                             @else
-                                                @if($subExisting?->content_value)
-                                                    <span class="text-xs text-slate-800">{{ $subExisting->content_value }}</span>
+                                                @if($existing?->content_value)
+                                                    <span class="text-xs text-slate-800">{{ $existing->content_value }}</span>
                                                 @else
                                                     <span class="text-xs text-slate-400 italic">No value</span>
                                                 @endif
                                             @endif
                                         </td>
-                                        <td class="px-5 py-3 text-center">
-                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                <span class="w-1 h-1 rounded-full bg-emerald-500"></span>
+
+                                        <!-- Order -->
+                                        <td class="px-4 py-4 text-center text-slate-300 font-semibold text-xs">
+                                            -
+                                        </td>
+
+                                        <!-- Status -->
+                                        <td class="px-5 py-4 text-center">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                                 Active
                                             </span>
                                         </td>
-                                        <td class="px-5 py-3 text-right">
+
+                                        <!-- Action -->
+                                        <td class="px-5 py-4 text-right">
                                             <button 
-                                                @click="openModal = true; activeComponentId = {{ $comp->id }}; activeComponentName = '{{ addslashes($comp->component_name) }}'" 
+                                                @click="openModal = true; activeComponentId = {{ $comp->id }}; activeComponentName = '{{ addslashes($comp->component_name) }}'; activeSubCompId = null; activeInstanceIndex = null; activeInstanceLabel = ''" 
                                                 type="button" 
-                                                class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-blue-600 hover:text-blue-700 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer shadow-2xs"
-                                                title="Edit {{ $subComp->component_name }}"
+                                                class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-blue-600 hover:text-blue-700 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer shadow-2xs"
+                                                title="Edit {{ $comp->component_name }}"
                                             >
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                                 </svg>
                                             </button>
                                         </td>
                                     </tr>
-                                @endforeach
-                            @else
-                                {{-- 3. Standard Component Row (no subcomponents) --}}
-                                <tr class="hover:bg-slate-50/60 transition-colors">
-                                    <!-- Index -->
-                                    <td class="px-5 py-4 text-xs font-semibold text-slate-400">
-                                        {{ $index + 1 }}
-                                    </td>
-
-                                    <!-- Component Name & Slug -->
-                                    <td class="px-5 py-4">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0">
-                                                {{ strtoupper(substr($comp->component_name, 0, 1)) }}
-                                            </div>
-                                            <div>
-                                                <h4 class="font-bold text-slate-900 text-xs">
-                                                    {{ $comp->component_name }}
-                                                </h4>
-                                                <p class="text-[10px] text-slate-400 font-mono">
-                                                    /{{ $comp->component_slug }}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </td>
-
-                                    @php
-                                        $nameAndSlug = strtolower($comp->component_name . ' ' . $comp->component_slug);
-                                        $isCompMultiple = (bool)($comp->pivot->is_multiple ?? $comp->is_multiple);
-                                        $compFields = $comp->fields->where('is_active', true)->sortBy('sort_order');
-                                        $compInstMap = $multiFieldData[$comp->id] ?? [];
-                                        $compInstCount = count($compInstMap);
-                                    @endphp
-
-                                    <!-- Component Type Badge -->
-                                    <td class="px-5 py-4">
-                                        @if($compFields->isNotEmpty())
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                                                {{ $compFields->count() }} {{ \Illuminate\Support\Str::plural('Field', $compFields->count()) }}
-                                            </span>
-                                        @elseif(str_contains($nameAndSlug, 'subheading'))
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
-                                                SubHeading
-                                            </span>
-                                        @elseif(str_contains($nameAndSlug, 'heading'))
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                                                Heading
-                                            </span>
-                                        @elseif(str_contains($nameAndSlug, 'button'))
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                                Button
-                                            </span>
-                                        @elseif(str_contains($nameAndSlug, 'paragraph') || str_contains($nameAndSlug, 'textarea') || str_contains($nameAndSlug, 'desc'))
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                                Paragraph
-                                            </span>
-                                        @elseif(str_contains($nameAndSlug, 'image'))
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
-                                                Image
-                                            </span>
-                                        @elseif(str_contains($nameAndSlug, 'video'))
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
-                                                Video
-                                            </span>
-                                        @else
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-600">
-                                                Standard
-                                            </span>
-                                        @endif
-                                    </td>
-
-                                    <!-- Configured Content / Preview -->
-                                    <td class="px-5 py-4">
-                                        @if($isCompMultiple && $compInstCount > 0)
-                                            <div class="space-y-1.5">
-                                                <div class="flex flex-wrap items-center gap-2">
-                                                    @foreach($compInstMap as $instIdx => $fList)
-                                                        @php
-                                                            $primaryItem = is_array($fList) ? ($fList[array_key_first($fList)] ?? null) : $fList;
-                                                        @endphp
-                                                        @if($primaryItem?->file_path && file_exists(public_path($primaryItem->file_path)))
-                                                            <img src="{{ asset($primaryItem->file_path) }}" class="w-10 h-10 object-cover rounded-lg border border-slate-200 shadow-2xs" title="Item #{{ $instIdx + 1 }}">
-                                                        @elseif($primaryItem?->content_value)
-                                                            <span class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold">
-                                                                {{ $primaryItem->content_value }}
-                                                            </span>
-                                                        @endif
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                        @elseif($compFields->isNotEmpty())
-                                            <div class="space-y-1">
-                                                @foreach($compFields as $f)
-                                                    @php
-                                                        $fItem = $fieldData[$comp->id][$f->id] ?? null;
-                                                    @endphp
-                                                    <div class="flex items-center gap-1.5 text-xs">
-                                                        <span class="text-slate-400 font-semibold text-[11px]">{{ $f->field_label }}:</span>
-                                                        @if(in_array($f->field_type, ['image', 'video', 'file'], true))
-                                                            @if($fItem?->file_path && file_exists(public_path($fItem->file_path)))
-                                                                <a href="{{ asset($fItem->file_path) }}" target="_blank" class="text-blue-600 hover:underline font-mono text-[11px] truncate max-w-[150px]">
-                                                                    {{ basename($fItem->file_path) }}
-                                                                </a>
-                                                            @else
-                                                                <span class="text-slate-400 italic text-[11px]">No file</span>
-                                                            @endif
-                                                        @else
-                                                            @if($fItem?->content_value !== null && $fItem?->content_value !== '')
-                                                                <span class="text-slate-800 font-medium">{{ $fItem->content_value }}</span>
-                                                            @else
-                                                                <span class="text-slate-400 italic text-[11px]">Empty</span>
-                                                            @endif
-                                                        @endif
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        @elseif(str_contains($nameAndSlug, 'heading'))
-                                            @if($existing?->content_value)
-                                                <p class="text-xs font-bold text-slate-800">{{ $existing->content_value }}</p>
-                                            @else
-                                                <span class="text-xs text-slate-400 italic">No text entered</span>
-                                            @endif
-
-                                        {{-- Button --}}
-                                        @elseif(str_contains($nameAndSlug, 'button'))
-                                            @if($existing?->content_value || $existing?->extra_value)
-                                                <div class="flex items-center gap-2">
-                                                    <span class="px-3 py-1 rounded-lg bg-blue-600 text-white font-bold text-xs shadow-2xs">
-                                                        {{ $existing->content_value ?: 'Button' }}
-                                                    </span>
-                                                    @if($existing->extra_value)
-                                                        <span class="text-[11px] font-mono text-slate-400 truncate max-w-[180px]">
-                                                            {{ $existing->extra_value }}
-                                                        </span>
-                                                    @endif
-                                                </div>
-                                            @else
-                                                <span class="text-xs text-slate-400 italic">No button configured</span>
-                                            @endif
-
-                                        {{-- Paragraph --}}
-                                        @elseif(str_contains($nameAndSlug, 'paragraph') || str_contains($nameAndSlug, 'textarea') || str_contains($nameAndSlug, 'desc'))
-                                            @if($existing?->content_value)
-                                                <div class="text-xs text-slate-700 leading-relaxed whitespace-pre-line break-words max-w-2xl">
-                                                    {{ $existing->content_value }}
-                                                </div>
-                                            @else
-                                                <span class="text-xs text-slate-400 italic">No paragraph entered</span>
-                                            @endif
-
-                                        {{-- Image --}}
-                                        @elseif(str_contains($nameAndSlug, 'image'))
-                                            @if($existing?->file_path && file_exists(public_path($existing->file_path)))
-                                                <div class="flex items-center gap-2.5">
-                                                    <img src="{{ asset($existing->file_path) }}" alt="Preview" class="w-10 h-10 object-cover rounded-lg border border-slate-200 shadow-2xs">
-                                                    <span class="text-xs text-slate-700 font-medium truncate max-w-[140px]">{{ basename($existing->file_path) }}</span>
-                                                </div>
-                                            @else
-                                                <span class="text-xs text-slate-400 italic">No image uploaded</span>
-                                            @endif
-
-                                        {{-- Video --}}
-                                        @elseif(str_contains($nameAndSlug, 'video'))
-                                            @if($existing?->file_path && file_exists(public_path($existing->file_path)))
-                                                <div class="flex items-center gap-2.5">
-                                                    <video src="{{ asset($existing->file_path) }}" class="w-14 h-9 object-cover rounded-lg border border-slate-200 shadow-2xs"></video>
-                                                    <span class="text-xs text-slate-700 font-medium truncate max-w-[140px]">{{ basename($existing->file_path) }}</span>
-                                                </div>
-                                            @else
-                                                <span class="text-xs text-slate-400 italic">No video uploaded</span>
-                                            @endif
-
-                                        {{-- Fallback --}}
-                                        @else
-                                            @if($existing?->content_value)
-                                                <span class="text-xs text-slate-800">{{ $existing->content_value }}</span>
-                                            @else
-                                                <span class="text-xs text-slate-400 italic">No value</span>
-                                            @endif
-                                        @endif
-                                    </td>
-
-                                    <!-- Status -->
-                                    <td class="px-5 py-4 text-center">
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                            Active
-                                        </span>
-                                    </td>
-
-                                    <!-- Action -->
-                                    <td class="px-5 py-4 text-right">
-                                        <button 
-                                            @click="openModal = true; activeComponentId = {{ $comp->id }}; activeComponentName = '{{ addslashes($comp->component_name) }}'" 
-                                            type="button" 
-                                            class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-blue-600 hover:text-blue-700 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer shadow-2xs"
-                                            title="Edit Content"
-                                        >
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                            </svg>
-                                        </button>
-                                    </td>
-                                </tr>
+                                @endif
                             @endif
                         @endforeach
                     </tbody>
@@ -611,17 +924,19 @@
                         </div>
                         <div>
                             <h3 class="text-base font-bold text-slate-900" id="modal-title">
-                                <span x-show="activeComponentId">Edit Component: <span class="text-blue-600 font-extrabold" x-text="activeComponentName"></span></span>
-                                <span x-show="!activeComponentId">Edit Content: <span class="text-blue-600 font-extrabold">{{ $section->section_name }}</span></span>
+                                <span x-show="activeInstanceLabel">Edit <span class="text-blue-600 font-extrabold" x-text="activeComponentName"></span>: <span class="text-indigo-600 font-extrabold" x-text="activeInstanceLabel"></span></span>
+                                <span x-show="!activeInstanceLabel && activeComponentId">Edit Component: <span class="text-blue-600 font-extrabold" x-text="activeComponentName"></span></span>
+                                <span x-show="!activeInstanceLabel && !activeComponentId">Edit Content: <span class="text-blue-600 font-extrabold">{{ $section->section_name }}</span></span>
                             </h3>
                             <p class="text-xs text-slate-400 mt-0.5">
-                                <span x-show="activeComponentId">Editing only this component. Saved directly to the database.</span>
-                                <span x-show="!activeComponentId">Fill in the fields below. Data will be saved directly into the database.</span>
+                                <span x-show="activeInstanceLabel">Editing only <span class="font-bold text-slate-600" x-text="activeInstanceLabel"></span>. Other items will be preserved safely.</span>
+                                <span x-show="!activeInstanceLabel && activeComponentId">Editing only this component. Saved directly to the database.</span>
+                                <span x-show="!activeInstanceLabel && !activeComponentId">Fill in the fields below. Data will be saved directly into the database.</span>
                             </p>
                         </div>
                     </div>
                     <button 
-                        @click="openModal = false" 
+                        @click="openModal = false; activeComponentId = null; activeComponentName = ''; activeSubCompId = null; activeInstanceIndex = null; activeInstanceLabel = ''" 
                         type="button" 
                         class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
                         aria-label="Close"
@@ -695,7 +1010,11 @@
 
                                                             <div id="repeater-subcomp-{{ $comp->id }}-{{ $subComp->id }}" data-next-index="{{ count($subInstKeys) }}" class="space-y-3">
                                                                 @foreach($subInstKeys as $sPos => $instIdx)
-                                                                    <div class="repeater-sub-item p-3 bg-slate-50/70 rounded-xl border border-slate-200 relative space-y-2.5 shadow-2xs">
+                                                                    <div 
+                                                                        class="repeater-sub-item p-3 bg-slate-50/70 rounded-xl border border-slate-200 relative space-y-2.5 shadow-2xs"
+                                                                        data-pos="{{ $sPos }}"
+                                                                        x-show="activeInstanceIndex === null || activeInstanceIndex === {{ $sPos }}"
+                                                                    >
                                                                         <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/70 repeater-item-header">
                                                                             <div class="flex items-center gap-2">
                                                                                 <span class="inline-flex items-center justify-center px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 repeater-index-badge">
@@ -704,7 +1023,7 @@
                                                                                 <span class="text-xs font-bold text-slate-700">{{ $subComp->component_name }}</span>
                                                                             </div>
                                                                             
-                                                                            <div class="flex items-center gap-1.5">
+                                                                            <div class="flex items-center gap-1.5" x-show="activeInstanceIndex === null">
                                                                                 <div class="flex items-center gap-1 bg-white px-2 py-0.5 rounded-lg border border-slate-200 shadow-2xs">
                                                                                     <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Order</span>
                                                                                     <input 
@@ -832,14 +1151,16 @@
                                                                 </div>
                                                             </template>
 
-                                                            <button 
-                                                                type="button" 
-                                                                onclick="addSubRepeaterItem({{ $comp->id }}, {{ $subComp->id }})" 
-                                                                class="w-full py-2 px-3 rounded-lg border border-dashed border-indigo-300 bg-indigo-50/40 hover:bg-indigo-50 text-indigo-700 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
-                                                            >
-                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                                                                <span>+ Add Another {{ $subComp->component_name }}</span>
-                                                            </button>
+                                                            <div x-show="activeInstanceIndex === null" class="pt-1">
+                                                                <button 
+                                                                    type="button" 
+                                                                    onclick="addSubRepeaterItem({{ $comp->id }}, {{ $subComp->id }})" 
+                                                                    class="w-full py-2 px-3 rounded-lg border border-dashed border-indigo-300 bg-indigo-50/40 hover:bg-indigo-50 text-indigo-700 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                                                                >
+                                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                                                    <span>+ Add Another {{ $subComp->component_name }}</span>
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     @elseif($subFields->isNotEmpty())
                                                         <div class="p-3.5 bg-white rounded-xl border border-indigo-100 shadow-2xs space-y-3">
@@ -970,7 +1291,11 @@
 
                                                 <div id="repeater-comp-{{ $comp->id }}" data-next-index="{{ count($compInstKeys) }}" class="space-y-3.5">
                                                     @foreach($compInstKeys as $pos => $instIdx)
-                                                        <div class="repeater-item p-3.5 bg-slate-50/70 rounded-xl border border-slate-200 relative space-y-3 shadow-2xs">
+                                                        <div 
+                                                            class="repeater-item p-3.5 bg-slate-50/70 rounded-xl border border-slate-200 relative space-y-3 shadow-2xs"
+                                                            data-pos="{{ $pos }}"
+                                                            x-show="activeInstanceIndex === null || activeInstanceIndex === {{ $pos }}"
+                                                        >
                                                             <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/70 repeater-item-header">
                                                                 <div class="flex items-center gap-2">
                                                                     <span class="inline-flex items-center justify-center px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 repeater-index-badge">
@@ -979,7 +1304,7 @@
                                                                     <span class="text-xs font-bold text-slate-700">{{ $comp->component_name }}</span>
                                                                 </div>
                                                                 
-                                                                <div class="flex items-center gap-1.5">
+                                                                <div class="flex items-center gap-1.5" x-show="activeInstanceIndex === null">
                                                                     <div class="flex items-center gap-1 bg-white px-2 py-0.5 rounded-lg border border-slate-200 shadow-2xs">
                                                                         <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Order</span>
                                                                         <input 
@@ -1107,14 +1432,16 @@
                                                     </div>
                                                 </template>
 
-                                                <button 
-                                                    type="button" 
-                                                    onclick="addRepeaterItem({{ $comp->id }})" 
-                                                    class="w-full py-2.5 px-4 rounded-xl border-2 border-dashed border-blue-400 bg-blue-50/40 hover:bg-blue-50 text-blue-600 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-2xs"
-                                                >
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                                                    <span>+ Add Another {{ $comp->component_name }}</span>
-                                                </button>
+                                                <div x-show="activeInstanceIndex === null" class="pt-1">
+                                                    <button 
+                                                        type="button" 
+                                                        onclick="addRepeaterItem({{ $comp->id }})" 
+                                                        class="w-full py-2.5 px-4 rounded-xl border-2 border-dashed border-blue-400 bg-blue-50/40 hover:bg-blue-50 text-blue-600 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-2xs"
+                                                    >
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                                        <span>+ Add Another {{ $comp->component_name }}</span>
+                                                    </button>
+                                                </div>
                                             </div>
                                         @elseif($compFields->isNotEmpty())
                                             <div class="p-4 rounded-xl border border-slate-200/90 bg-white space-y-3.5">
@@ -1227,7 +1554,7 @@
                         <!-- Modal Actions Footer -->
                         <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3 rounded-b-2xl">
                             <button 
-                                @click="openModal = false" 
+                                @click="openModal = false; activeComponentId = null; activeComponentName = ''; activeSubCompId = null; activeInstanceIndex = null; activeInstanceLabel = ''" 
                                 type="button" 
                                 class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-600 text-xs font-bold hover:bg-slate-100 transition-colors"
                             >
@@ -1240,7 +1567,7 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                 </svg>
-                                <span x-text="activeComponentId ? 'Save ' + activeComponentName : 'Save Section Content'">Save Section Content</span>
+                                <span x-text="activeInstanceLabel ? 'Save ' + activeInstanceLabel : (activeComponentId ? 'Save ' + activeComponentName : 'Save Section Content')">Save Section Content</span>
                             </button>
                         </div>
                     </form>
@@ -1406,6 +1733,155 @@ function addSubRepeaterItem(compId, subCompId) {
     container.appendChild(wrapper.firstElementChild);
 
     refreshRepeaterIndices(container, 'subcomp');
+}
+
+// ==========================================
+// In-Table Reordering Functions (Direct Row Reorder)
+// ==========================================
+function moveTableRow(btn, direction) {
+    const row = btn.closest('tr.repeater-table-row');
+    if (!row) return;
+    const groupKey = row.getAttribute('data-group-key');
+    const groupRows = Array.from(document.querySelectorAll(`tr.repeater-table-row[data-group-key="${groupKey}"]`));
+    const currentIndex = groupRows.indexOf(row);
+    if (currentIndex === -1) return;
+
+    if (direction === 'up' && currentIndex > 0) {
+        row.parentNode.insertBefore(row, groupRows[currentIndex - 1]);
+        refreshTableGroupOrder(groupKey, true);
+    } else if (direction === 'down' && currentIndex < groupRows.length - 1) {
+        row.parentNode.insertBefore(row, groupRows[currentIndex + 1].nextSibling);
+        refreshTableGroupOrder(groupKey, true);
+    }
+}
+
+function handleTableOrderChange(input) {
+    const row = input.closest('tr.repeater-table-row');
+    if (!row) return;
+    const groupKey = row.getAttribute('data-group-key');
+    const groupRows = Array.from(document.querySelectorAll(`tr.repeater-table-row[data-group-key="${groupKey}"]`));
+    const currentIndex = groupRows.indexOf(row);
+    if (currentIndex === -1) return;
+
+    let targetNum = parseInt(input.value);
+    if (isNaN(targetNum)) targetNum = currentIndex + 1;
+    targetNum = Math.max(1, Math.min(groupRows.length, targetNum));
+    const targetIndex = targetNum - 1;
+
+    if (targetIndex !== currentIndex) {
+        if (targetIndex > currentIndex) {
+            row.parentNode.insertBefore(row, groupRows[targetIndex].nextSibling);
+        } else {
+            row.parentNode.insertBefore(row, groupRows[targetIndex]);
+        }
+    }
+    refreshTableGroupOrder(groupKey, true);
+}
+
+function refreshTableGroupOrder(groupKey, saveToServer = false) {
+    const groupRows = Array.from(document.querySelectorAll(`tr.repeater-table-row[data-group-key="${groupKey}"]`));
+    const total = groupRows.length;
+    const orderedIndices = [];
+
+    groupRows.forEach((r, idx) => {
+        const displayNum = idx + 1;
+        const prefix = r.getAttribute('data-parent-prefix') || '';
+        
+        // 1. Update sequence number column (e.g. 4.1, 4.2...)
+        const seqCell = r.querySelector('.table-seq-num');
+        if (seqCell) {
+            seqCell.textContent = prefix + displayNum;
+        }
+
+        // 2. Update order input
+        const orderInput = r.querySelector('.table-order-input');
+        if (orderInput) {
+            orderInput.value = displayNum;
+            orderInput.max = total;
+            const originalInstIdx = parseInt(orderInput.getAttribute('data-inst-idx'));
+            orderedIndices.push(originalInstIdx);
+        }
+
+        // 3. Update up/down buttons disabled state
+        const upBtn = r.querySelector('.table-btn-up');
+        if (upBtn) upBtn.disabled = (idx === 0);
+
+        const downBtn = r.querySelector('.table-btn-down');
+        if (downBtn) downBtn.disabled = (idx === total - 1);
+    });
+
+    if (saveToServer && orderedIndices.length > 0) {
+        saveTableReorderToServer(groupKey, orderedIndices);
+    }
+}
+
+function saveTableReorderToServer(groupKey, orderedIndices) {
+    // groupKey format: comp-{compId}-sub-{subCompId}
+    const match = groupKey.match(/^comp-(\d+)-sub-(\d+|null)$/);
+    if (!match) return;
+
+    const compId = parseInt(match[1]);
+    const subCompId = match[2] === 'null' ? null : parseInt(match[2]);
+
+    showReorderToast('Saving new order...', 'loading');
+
+    fetch("{{ route('admin.section.reorderInstances', $section->id) }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            component_id: compId,
+            sub_component_id: subCompId,
+            ordered_indices: orderedIndices
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showReorderToast('Order updated successfully! 🎉', 'success');
+            // Update the data-inst-idx to reflect new positions for future reorders without reloading
+            const groupRows = Array.from(document.querySelectorAll(`tr.repeater-table-row[data-group-key="${groupKey}"]`));
+            groupRows.forEach((r, idx) => {
+                const orderInput = r.querySelector('.table-order-input');
+                if (orderInput) {
+                    orderInput.setAttribute('data-inst-idx', idx);
+                }
+            });
+        } else {
+            showReorderToast(data.message || 'Failed to update order', 'error');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        showReorderToast('Network error while saving order', 'error');
+    });
+}
+
+function showReorderToast(message, type = 'info') {
+    let toast = document.getElementById('table-reorder-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'table-reorder-toast';
+        toast.className = 'fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-xl shadow-xl font-medium text-xs flex items-center gap-2 transition-all transform duration-300';
+        document.body.appendChild(toast);
+    }
+
+    if (type === 'loading') {
+        toast.className = 'fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-xl shadow-xl font-medium text-xs flex items-center gap-2 transition-all transform duration-300 bg-slate-900 text-white';
+        toast.innerHTML = `<svg class="animate-spin -ml-0.5 mr-1 h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>${message}</span>`;
+    } else if (type === 'success') {
+        toast.className = 'fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-xl shadow-xl font-medium text-xs flex items-center gap-2 transition-all transform duration-300 bg-emerald-600 text-white';
+        toast.innerHTML = `<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> <span>${message}</span>`;
+        setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); }, 2500);
+    } else {
+        toast.className = 'fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-xl shadow-xl font-medium text-xs flex items-center gap-2 transition-all transform duration-300 bg-rose-600 text-white';
+        toast.innerHTML = `<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg> <span>${message}</span>`;
+        setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); }, 3500);
+    }
+    toast.classList.remove('opacity-0', 'translate-y-2');
 }
 
 document.addEventListener('DOMContentLoaded', function() {

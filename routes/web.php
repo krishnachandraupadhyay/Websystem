@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
     // Admin accessible assigned section view & content save
     Route::get('/admin/section/{section}', [AdminController::class, 'viewAssignedSection'])->name('admin.section.view');
     Route::post('/admin/section/{section}/content', [AdminController::class, 'saveSectionContent'])->name('admin.section.saveContent');
+    Route::post('/admin/section/{section}/reorder-instances', [AdminController::class, 'reorderInstances'])->name('admin.section.reorderInstances');
 });
 
 // Super Admin Only Protected Routes

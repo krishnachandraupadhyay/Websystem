@@ -937,4 +937,71 @@ class AdminController extends Controller
         return redirect()->route('admin.section.view', $section->id)
                          ->with('success', 'Content saved to database successfully!');
     }
+
+    /**
+     * Reorder repeater instances directly from table or modal via AJAX.
+     */
+    public function reorderInstances(Request $request, Section $section)
+    {
+        $user = Auth::user();
+
+        if ($user->role !== 'Super Admin') {
+            $isAssigned = $user->sections()
+                ->wherePivot('status', 1)
+                ->where('sections.id', $section->id)
+                ->exists();
+
+            if (!$isAssigned) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized access.'], 403);
+            }
+        }
+
+        $validated = $request->validate([
+            'component_id'     => 'required|integer',
+            'sub_component_id' => 'nullable|integer',
+            'ordered_indices'  => 'required|array',
+            'ordered_indices.*'=> 'integer',
+        ]);
+
+        $componentId = (int)$validated['component_id'];
+        $subComponentId = !empty($validated['sub_component_id']) ? (int)$validated['sub_component_id'] : null;
+        $orderedIndices = $validated['ordered_indices'];
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($section, $componentId, $subComponentId, $orderedIndices) {
+            // Step 1: Temporarily shift all affected rows to offset 10000 + newIdx to prevent any collision
+            foreach ($orderedIndices as $newIdx => $oldIdx) {
+                $q = SectionComponentData::where('section_id', $section->id)
+                    ->where('component_id', $componentId)
+                    ->where('instance_index', (int)$oldIdx);
+
+                if ($subComponentId) {
+                    $q->where('sub_component_id', $subComponentId);
+                } else {
+                    $q->whereNull('sub_component_id');
+                }
+
+                $q->update(['instance_index' => 10000 + (int)$newIdx]);
+            }
+
+            // Step 2: Set final instance_index from 0 to N-1
+            foreach ($orderedIndices as $newIdx => $oldIdx) {
+                $q = SectionComponentData::where('section_id', $section->id)
+                    ->where('component_id', $componentId)
+                    ->where('instance_index', 10000 + (int)$newIdx);
+
+                if ($subComponentId) {
+                    $q->where('sub_component_id', $subComponentId);
+                } else {
+                    $q->whereNull('sub_component_id');
+                }
+
+                $q->update(['instance_index' => (int)$newIdx]);
+            }
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order updated successfully.'
+        ]);
+    }
 }
