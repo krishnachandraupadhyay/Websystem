@@ -92,6 +92,7 @@
     fieldsComponentId: null,
     fieldsComponentName: '',
     fieldsComponentTitle: '',
+    fieldsComponentSlug: '',
     fieldsList: [],
     isLoadingFields: false,
     isFieldFormOpen: false,
@@ -138,10 +139,38 @@
         this.fieldsComponentId = comp.id;
         this.fieldsComponentName = comp.component_name || '';
         this.fieldsComponentTitle = comp.component_title || comp.component_name || '';
+        this.fieldsComponentSlug = comp.component_slug || '';
         this.isFieldFormOpen = false;
         this.fieldErrorMsg = '';
         this.openFieldsModal = true;
         this.loadFields();
+    },
+    quickAddPreset(presetKey) {
+        const presets = {
+            'text': { label: 'Title / Label', name: 'label', type: 'text', placeholder: 'e.g. Enter title or label...', default_value: '', help_text: 'Text input displayed in admin form', required: true },
+            'url': { label: 'Link URL (href)', name: 'link_url', type: 'url', placeholder: 'https://example.com, /page, or #section', default_value: '#', help_text: 'Target destination URL or anchor', required: true },
+            'textarea': { label: 'Description Content', name: 'description', type: 'textarea', placeholder: 'Enter description content here...', default_value: '', help_text: 'Multi-line paragraph text', required: false },
+            'image': { label: 'Image File', name: 'image', type: 'image', placeholder: '', default_value: '', help_text: 'Upload JPG, PNG, or WEBP image', required: false },
+            'select': { label: 'Target Window', name: 'target', type: 'select', placeholder: '-- Select Target --', default_value: '_self', help_text: 'Choose where link opens', required: false, options: [{ value: '_self', label: 'Same Tab (_self)' }, { value: '_blank', label: 'New Tab (_blank)' }] },
+            'date': { label: 'Date', name: 'event_date', type: 'date', placeholder: '', default_value: '', help_text: 'Select date (YYYY-MM-DD)', required: false }
+        };
+        let p = presets[presetKey] || presets['text'];
+        this.isEditingField = false;
+        this.fieldErrorMsg = '';
+        this.fieldForm = {
+            id: null,
+            field_label: p.label,
+            field_name: p.name,
+            field_type: p.type,
+            placeholder: p.placeholder || '',
+            default_value: p.default_value || '',
+            help_text: p.help_text || '',
+            is_required: Boolean(p.required),
+            is_active: true,
+            sort_order: (this.fieldsList.length + 1),
+            options: p.options ? JSON.parse(JSON.stringify(p.options)) : [{ value: '', label: '' }]
+        };
+        this.isFieldFormOpen = true;
     },
     async loadFields() {
         this.isLoadingFields = true;
@@ -1045,35 +1074,46 @@
                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 @click.away="openFieldsModal = false"
-                class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-4xl border border-slate-200/90"
+                class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-4xl border border-slate-200/90"
             >
+                <!-- Top Accent Gradient Line -->
+                <div class="h-1.5 w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>
+
                 <!-- Modal Header -->
-                <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4.5 bg-slate-50/70">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center font-bold shadow-2xs">
+                <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4.5 bg-gradient-to-r from-slate-50/90 via-white to-indigo-50/30">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-blue-600 text-white flex items-center justify-center font-bold shadow-md shadow-indigo-500/20 ring-4 ring-indigo-50 shrink-0">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                             </svg>
                         </div>
                         <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-base font-bold text-slate-900">
+                            <div class="flex items-center gap-2.5">
+                                <h3 class="text-base font-bold text-slate-900 tracking-tight">
                                     Field Definitions
                                 </h3>
-                                <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-100/80 text-indigo-700 font-mono" x-text="fieldsList.length + ' fields'"></span>
+                                <span 
+                                    class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all"
+                                    :class="fieldsList.length > 0 ? 'bg-indigo-50 text-indigo-700 border border-indigo-200/70' : 'bg-slate-100 text-slate-500 border border-slate-200'"
+                                >
+                                    <span class="w-1.5 h-1.5 rounded-full" :class="fieldsList.length > 0 ? 'bg-indigo-600 animate-pulse' : 'bg-slate-400'"></span>
+                                    <span x-text="fieldsList.length + ' ' + (fieldsList.length === 1 ? 'field' : 'fields')"></span>
+                                </span>
                             </div>
-                            <p class="text-xs text-slate-500 font-medium">
-                                Component: <span class="font-bold text-slate-800" x-text="fieldsComponentName"></span>
-                            </p>
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <span class="text-xs text-slate-500">Component:</span>
+                                <span class="text-xs font-bold text-slate-800" x-text="fieldsComponentName"></span>
+                                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200" x-show="fieldsComponentSlug" x-text="'/' + fieldsComponentSlug"></span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2.5">
                         <button 
                             type="button" 
                             x-show="!isFieldFormOpen"
                             @click="openNewFieldForm()"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-all shadow-2xs cursor-pointer"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 shadow-sm shadow-indigo-500/20 active:scale-95 transition-all cursor-pointer"
                         >
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
@@ -1083,7 +1123,8 @@
                         <button 
                             type="button" 
                             @click="openFieldsModal = false" 
-                            class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer"
+                            class="w-8 h-8 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer"
+                            aria-label="Close"
                         >
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -1095,19 +1136,26 @@
                 <!-- Modal Body -->
                 <div class="p-6 max-h-[75vh] overflow-y-auto space-y-6">
                     <!-- Error Message Banner -->
-                    <div x-show="fieldErrorMsg" x-cloak class="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center justify-between">
-                        <span x-text="fieldErrorMsg"></span>
+                    <div x-show="fieldErrorMsg" x-cloak class="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center justify-between shadow-2xs">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span x-text="fieldErrorMsg"></span>
+                        </div>
                         <button @click="fieldErrorMsg = ''" type="button" class="text-rose-500 hover:text-rose-700 font-bold ml-2 cursor-pointer">&times;</button>
                     </div>
 
                     <!-- Collapsible Add/Edit Form -->
-                    <div x-show="isFieldFormOpen" x-cloak class="p-5 rounded-2xl bg-indigo-50/40 border border-indigo-100 space-y-4">
+                    <div x-show="isFieldFormOpen" x-cloak class="p-5 sm:p-6 rounded-2xl bg-gradient-to-b from-slate-50/90 to-indigo-50/30 border border-indigo-100/90 space-y-4 shadow-xs">
                         <div class="flex items-center justify-between pb-3 border-b border-indigo-100/80">
-                            <h4 class="text-xs font-bold text-indigo-950 uppercase tracking-wider flex items-center gap-1.5">
-                                <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                </svg>
-                                <span x-text="isEditingField ? 'Edit Field Definition' : 'Add New Field Definition'"></span>
+                            <h4 class="text-xs font-bold text-indigo-950 uppercase tracking-wider flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                </span>
+                                <span x-text="isEditingField ? 'Edit Field Definition' : 'Define New Component Field'"></span>
                             </h4>
                             <button 
                                 type="button" 
@@ -1128,8 +1176,8 @@
                                     type="text" 
                                     x-model="fieldForm.field_label"
                                     @input="onFieldLabelChange()"
-                                    placeholder="e.g. Button Text, Background Image"
-                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                    placeholder="e.g. Button Text, Target URL, Avatar"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-medium"
                                     required
                                 >
                             </div>
@@ -1137,30 +1185,30 @@
                             <!-- Field Name (Machine Key) -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
-                                    <span>Field Name (Database Key) <span class="text-rose-500">*</span></span>
-                                    <span class="text-[10px] text-slate-400 font-mono">snake_case</span>
+                                    <span>Database Field Key <span class="text-rose-500">*</span></span>
+                                    <span class="text-[10px] text-slate-400 font-mono">auto-generated</span>
                                 </label>
                                 <input 
                                     type="text" 
                                     x-model="fieldForm.field_name"
                                     placeholder="e.g. button_text"
-                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white font-mono text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                                     required
                                 >
                             </div>
 
-                            <!-- Field Type -->
+                            <!-- Field Type Selector -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">
-                                    Field Type <span class="text-rose-500">*</span>
+                                    HTML Input / Form Type <span class="text-rose-500">*</span>
                                 </label>
                                 <select 
                                     x-model="fieldForm.field_type"
-                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-medium"
                                 >
                                     <optgroup label="Standard Text & Contact">
                                         <option value="text">Text (Single-line input)</option>
-                                        <option value="textarea">Textarea (Multi-line text)</option>
+                                        <option value="textarea">Textarea (Multi-line paragraph)</option>
                                         <option value="email">Email Address</option>
                                         <option value="password">Password (Masked)</option>
                                         <option value="number">Number (Numeric input)</option>
@@ -1170,7 +1218,7 @@
                                     </optgroup>
                                     <optgroup label="Choice & Selection">
                                         <option value="select">Select (Dropdown options)</option>
-                                        <option value="radio">Radio Buttons (Single choice from list)</option>
+                                        <option value="radio">Radio Buttons (Single choice)</option>
                                         <option value="checkbox">Checkbox (Toggle / Yes-No)</option>
                                         <option value="range">Range (Slider 0-100)</option>
                                         <option value="color">Color (Color Picker)</option>
@@ -1182,17 +1230,17 @@
                                         <option value="month">Month (YYYY-MM)</option>
                                         <option value="week">Week (YYYY-Www)</option>
                                     </optgroup>
-                                    <optgroup label="Media & Attachments">
-                                        <option value="image">Image (Single image file)</option>
+                                    <optgroup label="Media & Uploads">
+                                        <option value="image">Image (PNG, JPG, WEBP upload)</option>
                                         <option value="file">File (Single document)</option>
                                         <option value="multiple_file">Multiple Files (Batch attachment)</option>
-                                        <option value="video">Video (Video file upload)</option>
+                                        <option value="video">Video (MP4, WEBM upload)</option>
                                     </optgroup>
                                     <optgroup label="Buttons & Hidden">
                                         <option value="button">Button (Frontend Button label)</option>
                                         <option value="submit">Submit (Frontend Submit label)</option>
                                         <option value="reset">Reset (Frontend Reset label)</option>
-                                        <option value="hidden">Hidden (Internal constant/token)</option>
+                                        <option value="hidden">Hidden (Constant value)</option>
                                     </optgroup>
                                 </select>
                             </div>
@@ -1200,25 +1248,25 @@
                             <!-- Sort Order -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">
-                                    Sort Order
+                                    Display Order
                                 </label>
                                 <input 
                                     type="number" 
                                     x-model.number="fieldForm.sort_order"
-                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-medium"
                                 >
                             </div>
 
                             <!-- Placeholder -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">
-                                    Placeholder (Optional)
+                                    Placeholder Text (Optional)
                                 </label>
                                 <input 
                                     type="text" 
                                     x-model="fieldForm.placeholder"
-                                    placeholder="e.g. Enter button text..."
-                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                    placeholder="e.g. Enter value here..."
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                                 >
                             </div>
 
@@ -1230,44 +1278,50 @@
                                 <input 
                                     type="text" 
                                     x-model="fieldForm.default_value"
-                                    placeholder="Default value if blank"
-                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                    placeholder="Default value if left blank"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                                 >
                             </div>
 
                             <!-- Help Text -->
                             <div class="sm:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">
-                                    Help Text / Instructions (Optional)
+                                    Helper Note / Instructions (Optional)
                                 </label>
                                 <input 
                                     type="text" 
                                     x-model="fieldForm.help_text"
-                                    placeholder="Helper note displayed under the field in the admin form"
-                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                    placeholder="Hint displayed underneath this field in the Admin edit form"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                                 >
                             </div>
 
-                            <!-- Required & Active Toggles -->
-                            <div class="sm:col-span-2 flex items-center gap-6 pt-1">
-                                <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                            <!-- Required & Active Toggle Cards -->
+                            <div class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                                <label class="flex items-center gap-3 p-3 rounded-xl border cursor-pointer select-none transition-all" :class="fieldForm.is_required ? 'bg-indigo-50/80 border-indigo-300 text-indigo-900' : 'bg-white border-slate-200 text-slate-700'">
                                     <input type="checkbox" x-model="fieldForm.is_required" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300">
-                                    <span class="text-xs font-bold text-slate-700">Required Field</span>
+                                    <div>
+                                        <p class="text-xs font-bold">Required Field</p>
+                                        <p class="text-[10px] text-slate-500">Admin cannot leave this field empty</p>
+                                    </div>
                                 </label>
-                                <label class="inline-flex items-center gap-2 cursor-pointer select-none">
-                                    <input type="checkbox" x-model="fieldForm.is_active" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300">
-                                    <span class="text-xs font-bold text-slate-700">Active (Visible in Admin Form)</span>
+                                <label class="flex items-center gap-3 p-3 rounded-xl border cursor-pointer select-none transition-all" :class="fieldForm.is_active ? 'bg-emerald-50/80 border-emerald-300 text-emerald-900' : 'bg-white border-slate-200 text-slate-700'">
+                                    <input type="checkbox" x-model="fieldForm.is_active" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300">
+                                    <div>
+                                        <p class="text-xs font-bold">Active in Admin Form</p>
+                                        <p class="text-[10px] text-slate-500">Visible and editable in Section editor</p>
+                                    </div>
                                 </label>
                             </div>
 
                             <!-- Select & Radio Options Builder -->
-                            <div x-show="['select', 'radio'].includes(fieldForm.field_type)" x-cloak class="sm:col-span-2 p-3.5 rounded-xl bg-white border border-indigo-100 space-y-2.5">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs font-bold text-indigo-950 uppercase tracking-wider" x-text="fieldForm.field_type === 'radio' ? 'Radio Button Options' : 'Dropdown Options'"></span>
+                            <div x-show="['select', 'radio'].includes(fieldForm.field_type)" x-cloak class="sm:col-span-2 p-4 rounded-xl bg-white border border-indigo-100 space-y-3 shadow-2xs">
+                                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                    <span class="text-xs font-bold text-indigo-950 uppercase tracking-wider" x-text="fieldForm.field_type === 'radio' ? 'Radio Choices' : 'Dropdown Options'"></span>
                                     <button 
                                         type="button" 
                                         @click="addOptionRow()"
-                                        class="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 hover:text-indigo-800 cursor-pointer"
+                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-colors cursor-pointer"
                                     >
                                         + Add Option
                                     </button>
@@ -1278,14 +1332,14 @@
                                             <input 
                                                 type="text" 
                                                 x-model="opt.value" 
-                                                placeholder="Value (e.g. same)" 
-                                                class="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-mono text-slate-800"
+                                                placeholder="Value (e.g. _self)" 
+                                                class="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-mono text-slate-800 focus:outline-none focus:border-indigo-500"
                                             >
                                             <input 
                                                 type="text" 
                                                 x-model="opt.label" 
-                                                placeholder="Display Label (e.g. Same Tab)" 
-                                                class="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-800"
+                                                placeholder="Display Label (e.g. Same Window)" 
+                                                class="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-indigo-500"
                                             >
                                             <button 
                                                 type="button" 
@@ -1301,11 +1355,11 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-end gap-2 pt-2 border-t border-indigo-100/60">
+                        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-indigo-100/70">
                             <button 
                                 type="button" 
                                 @click="isFieldFormOpen = false"
-                                class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-white transition-colors cursor-pointer"
+                                class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-white transition-colors cursor-pointer"
                             >
                                 Cancel
                             </button>
@@ -1313,77 +1367,117 @@
                                 type="button" 
                                 @click="saveField()"
                                 :disabled="isSavingField"
-                                class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-2xs cursor-pointer flex items-center gap-1.5"
+                                class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 disabled:opacity-50 transition-all shadow-sm shadow-indigo-500/20 cursor-pointer flex items-center gap-1.5"
                             >
-                                <span x-show="!isSavingField" x-text="isEditingField ? 'Update Field' : 'Save Field'">Save Field</span>
-                                <span x-show="isSavingField">Saving...</span>
+                                <span x-show="!isSavingField" x-text="isEditingField ? 'Update Field Definition' : 'Save Field Definition'"></span>
+                                <span x-show="isSavingField">Saving Field...</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Fields List Table -->
+                    <!-- Fields List Table & Empty State -->
                     <div>
-                        <div x-show="isLoadingFields" class="py-8 text-center text-xs text-slate-400">
-                            Loading component fields...
+                        <!-- Loading State -->
+                        <div x-show="isLoadingFields" class="py-12 text-center text-xs text-slate-400">
+                            <div class="w-8 h-8 rounded-full border-2 border-indigo-600 border-t-transparent animate-spin mx-auto mb-2.5"></div>
+                            <span>Loading field definitions...</span>
                         </div>
 
-                        <div x-show="!isLoadingFields && fieldsList.length === 0 && !isFieldFormOpen" class="py-10 text-center rounded-2xl border-2 border-dashed border-slate-200">
-                            <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center mx-auto mb-2.5">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                </svg>
+                        <!-- Visually Rich Empty State with Quick Presets -->
+                        <div x-show="!isLoadingFields && fieldsList.length === 0 && !isFieldFormOpen" class="relative overflow-hidden rounded-2xl border border-indigo-100 bg-gradient-to-b from-indigo-50/40 via-white to-slate-50/50 p-8 sm:p-10 text-center shadow-xs">
+                            <!-- Ambient Glow Effect -->
+                            <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-80 h-40 bg-gradient-to-r from-blue-400/15 via-indigo-400/15 to-purple-400/15 rounded-full blur-2xl pointer-events-none"></div>
+
+                            <div class="relative z-10 max-w-lg mx-auto">
+                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/25 ring-8 ring-indigo-50">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                                    </svg>
+                                </div>
+                                
+                                <h4 class="text-base font-bold text-slate-900 tracking-tight">No Fields Defined for <span class="text-indigo-600" x-text="fieldsComponentName"></span></h4>
+                                <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                                    Define the dynamic inputs this component requires (e.g. text, link URL, image, dropdown). When Admins configure website sections, these exact fields will be generated automatically.
+                                </p>
+
+                                <!-- Quick Preset Template Chips -->
+                                <div class="mt-6 pt-5 border-t border-slate-200/70">
+                                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-3">Quick Add Pre-configured Field</p>
+                                    <div class="flex flex-wrap items-center justify-center gap-2">
+                                        <button type="button" @click="quickAddPreset('text')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 hover:border-indigo-300 shadow-2xs transition-all cursor-pointer">
+                                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                            + Text Label
+                                        </button>
+                                        <button type="button" @click="quickAddPreset('url')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 hover:border-indigo-300 shadow-2xs transition-all cursor-pointer">
+                                            <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
+                                            + Link URL (href)
+                                        </button>
+                                        <button type="button" @click="quickAddPreset('textarea')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 hover:border-indigo-300 shadow-2xs transition-all cursor-pointer">
+                                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                                            + Description Area
+                                        </button>
+                                        <button type="button" @click="quickAddPreset('image')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 hover:border-indigo-300 shadow-2xs transition-all cursor-pointer">
+                                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                            + Image File
+                                        </button>
+                                        <button type="button" @click="quickAddPreset('select')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 hover:border-indigo-300 shadow-2xs transition-all cursor-pointer">
+                                            <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                                            + Target Window
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="mt-6 flex items-center justify-center gap-3">
+                                    <button 
+                                        type="button" 
+                                        @click="openNewFieldForm()"
+                                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 shadow-md shadow-indigo-600/25 hover:shadow-indigo-600/35 transition-all cursor-pointer active:scale-95"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                        <span>Create Custom Field</span>
+                                    </button>
+                                </div>
                             </div>
-                            <h5 class="text-sm font-bold text-slate-800">No Fields Defined</h5>
-                            <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-4">
-                                Configure the fields this component needs so admins can fill them in when adding the component to a section.
-                            </p>
-                            <button 
-                                type="button" 
-                                @click="openNewFieldForm()"
-                                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-all shadow-2xs cursor-pointer"
-                            >
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-                                </svg>
-                                <span>Define First Field</span>
-                            </button>
                         </div>
 
-                        <div x-show="!isLoadingFields && fieldsList.length > 0" class="overflow-x-auto rounded-xl border border-slate-200">
+                        <!-- Fields Table -->
+                        <div x-show="!isLoadingFields && fieldsList.length > 0" class="overflow-x-auto rounded-2xl border border-slate-200/90 shadow-2xs bg-white">
                             <table class="w-full text-left text-xs">
                                 <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-[10px] font-bold tracking-wider">
                                     <tr>
-                                        <th class="px-4 py-3 w-16">Order</th>
-                                        <th class="px-4 py-3">Label</th>
-                                        <th class="px-4 py-3">Field Key</th>
-                                        <th class="px-4 py-3">Type</th>
-                                        <th class="px-4 py-3">Required</th>
-                                        <th class="px-4 py-3">Status</th>
-                                        <th class="px-4 py-3 text-right">Actions</th>
+                                        <th class="px-4 py-3.5 w-16">Order</th>
+                                        <th class="px-4 py-3.5">Field Label</th>
+                                        <th class="px-4 py-3.5">Field Key</th>
+                                        <th class="px-4 py-3.5">Input Type</th>
+                                        <th class="px-4 py-3.5">Required</th>
+                                        <th class="px-4 py-3.5">Status</th>
+                                        <th class="px-4 py-3.5 text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100">
                                     <template x-for="(f, fIdx) in fieldsList" :key="f.id">
-                                        <tr class="hover:bg-slate-50/60 transition-colors">
-                                            <td class="px-4 py-3">
+                                        <tr class="hover:bg-indigo-50/30 transition-colors">
+                                            <td class="px-4 py-3.5">
                                                 <input 
                                                     type="number" 
                                                     :value="f.sort_order" 
                                                     @change="updateFieldSortOrder(f.id, $event.target.value)"
-                                                    class="w-14 px-2 py-1 rounded-lg border border-slate-200 text-center font-bold text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
+                                                    class="w-14 px-2 py-1 rounded-lg border border-slate-200 text-center font-bold text-xs text-slate-700 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30"
                                                     title="Change order & press enter"
                                                 >
                                             </td>
-                                            <td class="px-4 py-3 font-bold text-slate-900">
-                                                <span x-text="f.field_label"></span>
+                                            <td class="px-4 py-3.5">
+                                                <p class="font-bold text-slate-900 text-xs" x-text="f.field_label"></p>
                                                 <p x-show="f.help_text" class="text-[10px] font-normal text-slate-400 mt-0.5" x-text="f.help_text"></p>
                                             </td>
-                                            <td class="px-4 py-3 font-mono text-[11px] text-slate-600">
-                                                <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200" x-text="f.field_name"></span>
+                                            <td class="px-4 py-3.5 font-mono text-[11px] text-slate-600">
+                                                <span class="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200" x-text="f.field_name"></span>
                                             </td>
-                                            <td class="px-4 py-3">
+                                            <td class="px-4 py-3.5">
                                                 <span 
-                                                    class="px-2 py-0.5 rounded-full font-bold uppercase text-[10px]"
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full font-bold uppercase text-[10px] shadow-2xs"
                                                     :class="{
                                                         'bg-blue-50 text-blue-700 border border-blue-200': ['text', 'textarea', 'number', 'password', 'email', 'search', 'tel'].includes(f.field_type),
                                                         'bg-emerald-50 text-emerald-700 border border-emerald-200': ['image', 'file', 'video', 'multiple_file'].includes(f.field_type),
@@ -1395,7 +1489,7 @@
                                                     x-text="f.field_type"
                                                 ></span>
                                             </td>
-                                            <td class="px-4 py-3">
+                                            <td class="px-4 py-3.5">
                                                 <span 
                                                     class="inline-flex items-center gap-1 font-bold text-[11px]"
                                                     :class="f.is_required ? 'text-rose-600' : 'text-slate-400'"
@@ -1403,21 +1497,21 @@
                                                     <span x-text="f.is_required ? 'Required *' : 'Optional'"></span>
                                                 </span>
                                             </td>
-                                            <td class="px-4 py-3">
+                                            <td class="px-4 py-3.5">
                                                 <span 
-                                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"
+                                                    class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold"
                                                     :class="f.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500'"
                                                 >
                                                     <span class="w-1.5 h-1.5 rounded-full" :class="f.is_active ? 'bg-emerald-500' : 'bg-slate-400'"></span>
                                                     <span x-text="f.is_active ? 'Active' : 'Inactive'"></span>
                                                 </span>
                                             </td>
-                                            <td class="px-4 py-3 text-right">
-                                                <div class="inline-flex items-center gap-1">
+                                            <td class="px-4 py-3.5 text-right">
+                                                <div class="inline-flex items-center gap-1.5">
                                                     <button 
                                                         type="button" 
                                                         @click="editField(f)"
-                                                        class="w-7 h-7 rounded-lg text-blue-600 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 flex items-center justify-center transition-colors cursor-pointer"
+                                                        class="w-7 h-7 rounded-lg text-blue-600 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 flex items-center justify-center transition-all cursor-pointer shadow-2xs"
                                                         title="Edit Field"
                                                     >
                                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1427,7 +1521,7 @@
                                                     <button 
                                                         type="button" 
                                                         @click="deleteField(f.id)"
-                                                        class="w-7 h-7 rounded-lg text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 flex items-center justify-center transition-colors cursor-pointer"
+                                                        class="w-7 h-7 rounded-lg text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 flex items-center justify-center transition-all cursor-pointer shadow-2xs"
                                                         title="Delete Field"
                                                     >
                                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1445,14 +1539,18 @@
                 </div>
 
                 <!-- Modal Footer -->
-                <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                    <span class="text-xs text-slate-500">
-                        Changes are saved immediately and reflect dynamically in Admin forms.
-                    </span>
+                <div class="px-6 py-4 bg-slate-50/90 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div class="flex items-center gap-2 text-xs text-slate-500 font-medium">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span>Live Dynamic Schema • Configured fields reflect immediately in Admin Section forms</span>
+                    </div>
                     <button 
                         type="button" 
                         @click="openFieldsModal = false"
-                        class="px-5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-300 hover:bg-slate-100 transition-all cursor-pointer shadow-2xs"
+                        class="px-5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-300 hover:bg-slate-100 hover:border-slate-400 transition-all cursor-pointer shadow-2xs self-end sm:self-auto"
                     >
                         Close
                     </button>
