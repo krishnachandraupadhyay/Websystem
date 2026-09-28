@@ -386,6 +386,30 @@
                                             + Add Enabled
                                         </span>
                                     </div>
+
+                                    <!-- Item Count (Auto-Generate Count) -->
+                                    <div 
+                                        x-show="activeComponents[{{ $component->id }}] && multipleComponents[{{ $component->id }}]" 
+                                        x-transition 
+                                        @click.stop
+                                        class="pt-2 border-t border-blue-200/60 flex items-center justify-between gap-2"
+                                    >
+                                        <label class="text-xs font-semibold text-slate-700">
+                                            Fixed / Default Items Count:
+                                        </label>
+                                        <div class="flex items-center gap-1.5">
+                                            <input 
+                                                type="number" 
+                                                name="item_count[{{ $component->id }}]" 
+                                                x-model="itemCounts[{{ $component->id }}]"
+                                                min="0"
+                                                max="50"
+                                                placeholder="e.g. 4"
+                                                class="w-20 px-2 py-1 text-xs border border-slate-300 rounded-lg text-center font-bold text-blue-700 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            >
+                                            <span class="text-[11px] text-slate-400">items</span>
+                                        </div>
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
@@ -806,27 +830,64 @@
                             <div class="divide-y divide-slate-100 rounded-xl border border-slate-200/80 overflow-hidden">
                                 @foreach($components as $subComp)
                                     <template x-if="!currentCardComponent || currentCardComponent.id !== {{ $subComp->id }}">
-                                        <label
-                                            for="card_sub_{{ $subComp->id }}"
-                                            class="flex items-center gap-3 px-4 py-3 bg-white hover:bg-slate-50/70 transition-colors cursor-pointer"
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                id="card_sub_{{ $subComp->id }}"
-                                                x-model="activeCardSubComps[{{ $subComp->id }}]"
-                                                class="w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500 cursor-pointer"
-                                            />
-                                            <div class="flex-1 min-w-0">
-                                                <span class="block text-sm font-bold text-slate-900">{{ $subComp->component_name }}</span>
-                                                <span class="block text-xs text-slate-400 font-mono">/{{ $subComp->component_slug }}</span>
+                                        <div class="p-3.5 bg-white hover:bg-slate-50/70 transition-colors">
+                                            <div 
+                                                class="flex items-center gap-3 cursor-pointer"
+                                                @click="activeCardSubComps[{{ $subComp->id }}] = !activeCardSubComps[{{ $subComp->id }}]"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    id="card_sub_{{ $subComp->id }}"
+                                                    x-model="activeCardSubComps[{{ $subComp->id }}]"
+                                                    class="w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500 cursor-pointer"
+                                                    @click.stop
+                                                />
+                                                <div class="flex-1 min-w-0">
+                                                    <span class="block text-sm font-bold text-slate-900">{{ $subComp->component_name }}</span>
+                                                    <span class="block text-xs text-slate-400 font-mono">/{{ $subComp->component_slug }}</span>
+                                                </div>
+                                                <template x-if="activeCardSubComps[{{ $subComp->id }}]">
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                                        Selected
+                                                    </span>
+                                                </template>
                                             </div>
-                                            <template x-if="activeCardSubComps[{{ $subComp->id }}]">
-                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                                                    Selected
-                                                </span>
-                                            </template>
-                                        </label>
+
+                                            <!-- Subcomponent Repeater Options -->
+                                            <div 
+                                                x-show="activeCardSubComps[{{ $subComp->id }}]" 
+                                                x-transition 
+                                                class="mt-2.5 pt-2.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 pl-7"
+                                                @click.stop
+                                            >
+                                                <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        x-model="cardSubMultiple[{{ $subComp->id }}]"
+                                                        class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer"
+                                                    >
+                                                    <span>Allow Multiple (Repeater)</span>
+                                                </label>
+
+                                                <div 
+                                                    x-show="cardSubMultiple[{{ $subComp->id }}]" 
+                                                    x-transition
+                                                    class="flex items-center gap-2"
+                                                >
+                                                    <span class="text-xs font-medium text-slate-500">Fixed Items Count:</span>
+                                                    <input 
+                                                        type="number" 
+                                                        x-model="cardSubItemCount[{{ $subComp->id }}]"
+                                                        min="0"
+                                                        max="50"
+                                                        placeholder="e.g. 5"
+                                                        class="w-20 px-2 py-1 text-xs border border-slate-300 rounded-lg text-center font-bold text-indigo-700 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                                    >
+                                                    <span class="text-[11px] text-slate-400">items</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </template>
                                 @endforeach
                             </div>
@@ -870,6 +931,8 @@ function manageSectionApp() {
         currentCardSectionId: null,
         currentCardComponent: null,
         activeCardSubComps: {},
+        cardSubMultiple: {},
+        cardSubItemCount: {},
         cardSubCompsLoading: false,
         editSectionId: null,
         editSectionName: '',
@@ -884,8 +947,10 @@ function manageSectionApp() {
         sectionsData: @json($sections->load(['subsections.components', 'components.subcomponents'])->keyBy('id')),
         mappings: @json($sectionComponentsMap ?? []),
         multipleMappings: @json($sectionComponentsMultipleMap ?? []),
+        itemCountMappings: @json($sectionComponentsItemCountMap ?? []),
         activeComponents: {},
         multipleComponents: {},
+        itemCounts: {},
         openView(sectionId) {
             let section = this.sectionsData[sectionId];
             if (!section) return;
@@ -906,16 +971,28 @@ function manageSectionApp() {
             this.currentCardSectionId = sectionId;
             this.currentCardComponent = comp;
             this.activeCardSubComps = {};
+            this.cardSubMultiple = {};
+            this.cardSubItemCount = {};
             this.cardSubCompsLoading = true;
             this.openCardModal = true;
             fetch('/sections/' + sectionId + '/components/' + comp.id + '/subcomponents')
                 .then(r => r.json())
                 .then(data => {
                     this.activeCardSubComps = {};
+                    this.cardSubMultiple = {};
+                    this.cardSubItemCount = {};
                     if (data && data.length > 0) {
-                        data.forEach(c => { this.activeCardSubComps[c.id] = true; });
+                        data.forEach(c => { 
+                            this.activeCardSubComps[c.id] = true; 
+                            this.cardSubMultiple[c.id] = c.is_multiple !== undefined ? Boolean(c.is_multiple) : false;
+                            this.cardSubItemCount[c.id] = c.item_count !== undefined ? c.item_count : null;
+                        });
                     } else if (comp.subcomponents && comp.subcomponents.length > 0) {
-                        comp.subcomponents.forEach(c => { this.activeCardSubComps[c.id] = true; });
+                        comp.subcomponents.forEach(c => { 
+                            this.activeCardSubComps[c.id] = true; 
+                            this.cardSubMultiple[c.id] = c.is_multiple !== undefined ? Boolean(c.is_multiple) : false;
+                            this.cardSubItemCount[c.id] = c.item_count !== undefined ? c.item_count : null;
+                        });
                     }
                     this.cardSubCompsLoading = false;
                 })
@@ -926,7 +1003,13 @@ function manageSectionApp() {
             let compId = this.currentCardComponent.id;
             let ids = Object.keys(this.activeCardSubComps).filter(k => this.activeCardSubComps[k]);
             let form = new FormData();
-            ids.forEach(id => form.append('sub_component_ids[]', id));
+            ids.forEach(id => {
+                form.append('sub_component_ids[]', id);
+                form.append('is_multiple[' + id + ']', this.cardSubMultiple[id] ? '1' : '0');
+                if (this.cardSubItemCount[id] !== null && this.cardSubItemCount[id] !== undefined && this.cardSubItemCount[id] !== '') {
+                    form.append('item_count[' + id + ']', this.cardSubItemCount[id]);
+                }
+            });
             form.append('_token', document.querySelector('meta[name=csrf-token]').content);
             fetch('/sections/' + secId + '/components/' + compId + '/subcomponents', { method: 'POST', body: form })
                 .then(r => r.json())
@@ -967,9 +1050,11 @@ function manageSectionApp() {
             this.editSectionTitle = sectionTitle;
             let secMap = this.mappings[sectionId] || {};
             let mulMap = this.multipleMappings[sectionId] || {};
+            let countMap = this.itemCountMappings[sectionId] || {};
             @foreach($components as $comp)
                 this.activeComponents[{{ $comp->id }}] = secMap[{{ $comp->id }}] !== undefined ? Boolean(secMap[{{ $comp->id }}]) : false;
                 this.multipleComponents[{{ $comp->id }}] = mulMap[{{ $comp->id }}] !== undefined ? Boolean(mulMap[{{ $comp->id }}]) : {{ $comp->is_multiple ? 'true' : 'false' }};
+                this.itemCounts[{{ $comp->id }}] = countMap[{{ $comp->id }}] !== undefined ? countMap[{{ $comp->id }}] : ({{ $comp->item_count ?? 'null' }});
             @endforeach
             this.openModal = true;
         },

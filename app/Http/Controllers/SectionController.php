@@ -8,6 +8,7 @@ use App\Models\SectionComponentSubcomponent;
 use Illuminate\Http\Request;
 use App\Models\Component;
 use App\Models\SectionComponent;
+use App\Models\SectionComponentData;
 
 class SectionController extends Controller
 {
@@ -181,12 +182,14 @@ class SectionController extends Controller
         $allMappings = SectionComponent::all();
         $sectionComponentsMap = [];
         $sectionComponentsMultipleMap = [];
+        $sectionComponentsItemCountMap = [];
         foreach ($allMappings as $mapping) {
             $sectionComponentsMap[$mapping->section_id][$mapping->component_id] = (bool) $mapping->status;
             $sectionComponentsMultipleMap[$mapping->section_id][$mapping->component_id] = (bool) $mapping->is_multiple;
+            $sectionComponentsItemCountMap[$mapping->section_id][$mapping->component_id] = $mapping->item_count;
         }
 
-        return view('superadmin.pages.managesection', compact('sections', 'components', 'selectedSectionId', 'sectionComponentsMap', 'sectionComponentsMultipleMap'));
+        return view('superadmin.pages.managesection', compact('sections', 'components', 'selectedSectionId', 'sectionComponentsMap', 'sectionComponentsMultipleMap', 'sectionComponentsItemCountMap'));
     }
 
     /**
@@ -202,12 +205,15 @@ class SectionController extends Controller
         $sectionId = $validated['section_id'];
         $submittedComponents = $request->input('components', []);
         $submittedMultiple   = $request->input('is_multiple', []);
+        $submittedItemCount  = $request->input('item_count', []);
 
-        // Save status and is_multiple for all available components
         $allComponents = Component::all();
+        $targetSection = Section::find($sectionId);
+
         foreach ($allComponents as $comp) {
             $status     = isset($submittedComponents[$comp->id]) && (string)$submittedComponents[$comp->id] === '1';
             $isMultiple = isset($submittedMultiple[$comp->id]) && (string)$submittedMultiple[$comp->id] === '1';
+            $itemCount  = (!empty($submittedItemCount[$comp->id]) && (int)$submittedItemCount[$comp->id] > 0) ? (int)$submittedItemCount[$comp->id] : null;
 
             SectionComponent::updateOrCreate(
                 [
@@ -217,12 +223,17 @@ class SectionController extends Controller
                 [
                     'status'      => $status,
                     'is_multiple' => $isMultiple,
+                    'item_count'  => $itemCount,
                 ]
             );
+
+            // Auto-seed initial instances if multiple & itemCount is configured
+            if ($status && $isMultiple && $itemCount && $targetSection) {
+                self::autoSeedInstances($targetSection, $comp, null, $itemCount);
+            }
         }
 
-        $section = Section::find($sectionId);
-        $sectionName = $section ? $section->section_name : 'Section';
+        $sectionName = $targetSection ? $targetSection->section_name : 'Section';
 
         if ($request->input('redirect_to') === 'assignsection') {
             return redirect()->route('Superadmin.assignsection')
@@ -321,6 +332,7 @@ class SectionController extends Controller
 
         $ids = $request->input('sub_component_ids', []);
         $multipleMap = $request->input('is_multiple', []);
+        $itemCountMap = $request->input('item_count', []);
 
         // Delete existing entries for this section+component pair
         SectionComponentSubcomponent::where('section_id', $section->id)
@@ -334,6 +346,8 @@ class SectionController extends Controller
                 continue; // skip self-reference
             }
             $isMultiple = !empty($multipleMap[$subCompId]);
+            $itemCount  = (!empty($itemCountMap[$subCompId]) && (int)$itemCountMap[$subCompId] > 0) ? (int)$itemCountMap[$subCompId] : null;
+
             SectionComponentSubcomponent::create([
                 'section_id'       => $section->id,
                 'component_id'     => $component->id,
@@ -341,7 +355,15 @@ class SectionController extends Controller
                 'status'           => true,
                 'order'            => $order++,
                 'is_multiple'      => $isMultiple,
+                'item_count'       => $itemCount,
             ]);
+
+            if ($isMultiple && $itemCount) {
+                $subCompObj = Component::find($subCompId);
+                if ($subCompObj) {
+                    self::autoSeedInstances($section, $component, $subCompObj, $itemCount);
+                }
+            }
         }
 
         $subComponents = SectionComponentSubcomponent::with('subComponent')
@@ -353,6 +375,8 @@ class SectionController extends Controller
                 'id'             => $r->sub_component_id,
                 'component_name' => $r->subComponent->component_name,
                 'component_slug' => $r->subComponent->component_slug,
+                'is_multiple'    => (bool)$r->is_multiple,
+                'item_count'     => $r->item_count,
             ]);
 
         return response()->json([
@@ -379,8 +403,141 @@ class SectionController extends Controller
                 'id'             => $r->sub_component_id,
                 'component_name' => $r->subComponent->component_name,
                 'component_slug' => $r->subComponent->component_slug,
+                'is_multiple'    => (bool)$r->is_multiple,
+                'item_count'     => $r->item_count,
             ]);
 
         return response()->json($subComponents);
+    }
+
+    /**
+     * Ensure that at least $targetCount instances exist for a repeater component or subcomponent.
+     * Preserves existing instances and only generates missing instances.
+     */
+    public static function autoSeedInstances(Section $section, Component $comp, ?Component $subComp = null, int $targetCount = 0)
+    {
+        if ($targetCount <= 0) return;
+
+        $componentId = $comp->id;
+        $subComponentId = $subComp?->id;
+
+        $q = SectionComponentData::where('section_id', $section->id)
+            ->where('component_id', $componentId);
+
+        if ($subComponentId) {
+            $q->where('sub_component_id', $subComponentId);
+        } else {
+            $q->whereNull('sub_component_id');
+        }
+
+        $existingIndices = $q->distinct()->pluck('instance_index')->toArray();
+        $currentCount = count($existingIndices);
+
+        if ($currentCount >= $targetCount) {
+            return;
+        }
+
+        // Check if $comp has subcomponents (e.g. Card with Student Name, Image, Package, etc.) and $subComp is null
+        $secSubRows = SectionComponentSubcomponent::with(['subComponent.fields'])
+            ->where('section_id', $section->id)
+            ->where('component_id', $componentId)
+            ->where('status', true)
+            ->orderBy('order')
+            ->get();
+
+        $subCompEntities = $secSubRows->pluck('subComponent')->filter();
+
+        if ($subCompEntities->isEmpty() && $comp->is_subcomponent && $comp->subcomponents()->exists()) {
+            $subCompEntities = $comp->subcomponents()->with('fields')->get();
+        }
+
+        if (!$subComponentId && $subCompEntities->isNotEmpty()) {
+            // Multi-instance container (e.g. Card 1, Card 2, Card 3, Card 4)
+            for ($idx = $currentCount; $idx < $targetCount; $idx++) {
+                $displayNum = $idx + 1;
+                $cardLabel = $comp->component_name . ' ' . $displayNum;
+
+                foreach ($subCompEntities as $subEntity) {
+                    if (!$subEntity) continue;
+                    $subFields = $subEntity->fields()->where('is_active', true)->orderBy('sort_order', 'asc')->get();
+
+                    if ($subFields->isNotEmpty()) {
+                        foreach ($subFields as $fIdx => $field) {
+                            $fNameLower = strtolower($field->field_name);
+                            $isPrimary = in_array($fNameLower, ['title', 'heading', 'name', 'student_name', 'text', 'label'], true)
+                                || ($fIdx === 0 && !in_array($field->field_type, ['image', 'video', 'file'], true));
+
+                            $val = $isPrimary ? ($cardLabel . ' - ' . $field->field_label) : null;
+                            if ($fNameLower === 'url' || $fNameLower === 'link') {
+                                $val = '#' . \Illuminate\Support\Str::slug($cardLabel);
+                            }
+
+                            SectionComponentData::create([
+                                'section_id'         => $section->id,
+                                'component_id'       => $componentId,
+                                'sub_component_id'   => $subEntity->id,
+                                'component_field_id' => $field->id,
+                                'instance_index'     => $idx,
+                                'field_name'         => $field->field_name,
+                                'content_value'      => $val,
+                            ]);
+                        }
+                    } else {
+                        SectionComponentData::create([
+                            'section_id'         => $section->id,
+                            'component_id'       => $componentId,
+                            'sub_component_id'   => $subEntity->id,
+                            'component_field_id' => null,
+                            'instance_index'     => $idx,
+                            'field_name'         => $subEntity->component_slug,
+                            'content_value'      => $cardLabel . ' ' . $subEntity->component_name,
+                        ]);
+                    }
+                }
+            }
+        } else {
+            // Single repeater component or subcomponent (e.g. Anchor in Nav, or Button, etc.)
+            $targetEntity = $subComp ?: $comp;
+            $fields = $targetEntity->fields()->where('is_active', true)->orderBy('sort_order', 'asc')->get();
+
+            for ($idx = $currentCount; $idx < $targetCount; $idx++) {
+                $displayNum = $idx + 1;
+                $label = $targetEntity->component_name . ' ' . $displayNum;
+
+                if ($fields->isNotEmpty()) {
+                    foreach ($fields as $fIdx => $field) {
+                        $fNameLower = strtolower($field->field_name);
+                        $isPrimary = in_array($fNameLower, ['anchor_text', 'text', 'title', 'heading', 'name', 'label', 'button_text'], true)
+                            || ($fIdx === 0 && !in_array($field->field_type, ['image', 'video', 'file'], true));
+
+                        $val = $isPrimary ? $label : null;
+
+                        if ($fNameLower === 'anchor_url' || $fNameLower === 'url' || $fNameLower === 'link' || $fNameLower === 'href') {
+                            $val = '#' . \Illuminate\Support\Str::slug($label);
+                        }
+
+                        SectionComponentData::create([
+                            'section_id'         => $section->id,
+                            'component_id'       => $componentId,
+                            'sub_component_id'   => $subComponentId,
+                            'component_field_id' => $field->id,
+                            'instance_index'     => $idx,
+                            'field_name'         => $field->field_name,
+                            'content_value'      => $val,
+                        ]);
+                    }
+                } else {
+                    SectionComponentData::create([
+                        'section_id'         => $section->id,
+                        'component_id'       => $componentId,
+                        'sub_component_id'   => $subComponentId,
+                        'component_field_id' => null,
+                        'instance_index'     => $idx,
+                        'field_name'         => $targetEntity->component_slug,
+                        'content_value'      => $label,
+                    ]);
+                }
+            }
+        }
     }
 }
