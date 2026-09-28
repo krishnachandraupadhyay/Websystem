@@ -127,17 +127,14 @@
                                     </td>
                                     <td class="px-5 py-4">
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
-                                            Card ({{ $comp->effective_subcomponents->count() }} Components)
+                                            Card
                                         </span>
                                     </td>
                                     <td class="px-5 py-4">
-                                        <div class="flex flex-wrap gap-1">
-                                            @foreach($comp->effective_subcomponents as $sc)
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-white text-slate-700 border border-slate-200 shadow-2xs">
-                                                    {{ $sc->component_name }}
-                                                </span>
-                                            @endforeach
-                                        </div>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold text-slate-700 bg-slate-100 border border-slate-200">
+                                            <span class="text-slate-500 font-medium">Count:</span>
+                                            <span class="font-bold text-indigo-600">{{ $comp->effective_subcomponents->count() }}</span>
+                                        </span>
                                     </td>
                                     <td class="px-5 py-4 text-center">
                                         <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
