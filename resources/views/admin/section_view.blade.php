@@ -83,13 +83,13 @@
                 <table class="w-full text-left text-sm">
                     <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-[11px] font-bold tracking-wider">
                         <tr>
-                            <th class="px-5 py-3.5">#</th>
-                            <th class="px-5 py-3.5">Component</th>
-                            <th class="px-5 py-3.5">Type</th>
-                            <th class="px-5 py-3.5">Configured Content / Preview</th>
-                            <th class="px-4 py-3.5 text-center">Order</th>
-                            <th class="px-5 py-3.5 text-center">Status</th>
-                            <th class="px-5 py-3.5 text-right">Action</th>
+                            <th class="px-5 py-3.5 w-16">#</th>
+                            <th class="px-5 py-3.5 min-w-[180px]">Component</th>
+                            <th class="px-5 py-3.5 w-32">Type</th>
+                            <th class="px-5 py-3.5 min-w-[240px]">Configured Content / Preview</th>
+                            <th class="px-4 py-3.5 text-center w-28">Order</th>
+                            <th class="px-5 py-3.5 text-center w-28">Status</th>
+                            <th class="px-5 py-3.5 text-right w-24">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
