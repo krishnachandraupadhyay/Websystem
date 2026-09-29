@@ -24,7 +24,7 @@ class Section extends Model
     public function components()
     {
         return $this->belongsToMany(Component::class, 'section_components')
-                    ->withPivot('status', 'is_multiple', 'item_count')
+                    ->withPivot('status', 'is_multiple')
                     ->withTimestamps();
     }
 

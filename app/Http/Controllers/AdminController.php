@@ -181,26 +181,17 @@ class AdminController extends Controller
 
         // Attach effective subcomponents for each component
         foreach ($section->components as $comp) {
-            $secSubRows = SectionComponentSubcomponent::with(['subComponent' => function($q) {
+            $secSubComps = SectionComponentSubcomponent::with(['subComponent' => function($q) {
                     $q->with('fields');
                 }])
                 ->where('section_id', $section->id)
                 ->where('component_id', $comp->id)
                 ->where('status', true)
                 ->orderBy('order')
-                ->get();
-
-            $secSubComps = $secSubRows->map(function ($row) {
-                if ($row->subComponent) {
-                    $row->subComponent->pivot = (object)[
-                        'is_multiple' => (bool)$row->is_multiple,
-                        'item_count' => (int)($row->item_count ?? 0),
-                        'order' => $row->order,
-                    ];
-                    return $row->subComponent;
-                }
-                return null;
-            })->filter()->values();
+                ->get()
+                ->pluck('subComponent')
+                ->filter()
+                ->values();
 
             if ($secSubComps->isNotEmpty()) {
                 $comp->effective_subcomponents = $secSubComps;
@@ -208,21 +199,6 @@ class AdminController extends Controller
                 $comp->effective_subcomponents = $comp->subcomponents;
             } else {
                 $comp->effective_subcomponents = collect();
-            }
-
-            // Auto-seed instances if item_count is set by Superadmin
-            $isCompMultiple = (bool)($comp->pivot->is_multiple ?? $comp->is_multiple);
-            $compItemCount = (int)($comp->pivot->item_count ?? 0);
-            if ($isCompMultiple && $compItemCount > 0) {
-                SectionController::autoSeedInstances($section, $comp, null, $compItemCount);
-            }
-
-            foreach ($comp->effective_subcomponents as $subComp) {
-                $isSubMultiple = (bool)($subComp->pivot->is_multiple ?? $subComp->is_multiple ?? false);
-                $subItemCount = (int)($subComp->pivot->item_count ?? 0);
-                if ($isSubMultiple && $subItemCount > 0) {
-                    SectionController::autoSeedInstances($section, $comp, $subComp, $subItemCount);
-                }
             }
         }
 

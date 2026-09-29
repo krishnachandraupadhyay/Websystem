@@ -11,13 +11,11 @@ class SectionComponent extends Model
         'component_id',
         'status',
         'is_multiple',
-        'item_count',
     ];
 
     protected $casts = [
         'status'      => 'boolean',
         'is_multiple' => 'boolean',
-        'item_count'  => 'integer',
     ];
 
     public function section()
