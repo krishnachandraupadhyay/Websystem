@@ -90,16 +90,13 @@
 <div class="space-y-1.5 {{ $fieldColSpan }}">
     @if(!$hideLabel)
         <!-- Field Label -->
-        <div class="flex items-center justify-between mb-1">
+        <div class="mb-1">
             <label class="block text-xs font-bold text-slate-700 tracking-wide">
                 {{ $field->field_label }}
                 @if($field->is_required)
                     <span class="text-rose-500 font-bold">*</span>
                 @endif
             </label>
-            <span class="text-[10px] font-bold uppercase tracking-wider {{ $badgeStyle }} px-2 py-0.5 rounded-full border">
-                {{ $field->field_type }}
-            </span>
         </div>
     @endif
 
@@ -354,7 +351,6 @@
                     <button type="button" class="px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-blue-600 shadow-2xs select-none cursor-default">
                         {{ $currentVal ?: ($field->default_value ?: $field->field_label) }}
                     </button>
-                    <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-500 border border-slate-200">&lt;button type="{{ $field->field_type }}"&gt;</span>
                 </div>
             </div>
             @break

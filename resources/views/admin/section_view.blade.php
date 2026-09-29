@@ -1376,11 +1376,10 @@
                                                                         $subColSpanClass = $isSubHalfCol ? 'md:col-span-1' : 'md:col-span-2';
                                                                     @endphp
                                                                     <div class="{{ $subColSpanClass }} space-y-1.5">
-                                                                        <div class="flex items-center justify-between mb-1">
+                                                                        <div class="mb-1">
                                                                             <label class="flex items-center gap-1.5 text-xs font-bold text-slate-700 tracking-wide uppercase">
                                                                                 <span>{{ $subComp->component_name }}</span>
                                                                             </label>
-                                                                            <span class="text-[10px] font-mono text-slate-400">/{{ $subComp->component_slug }}</span>
                                                                         </div>
                                                                         <div class="grid grid-cols-1 {{ $subSlug === 'button' ? 'sm:grid-cols-2' : '' }} gap-3">
                                                                             @foreach($subFields as $field)
@@ -1475,11 +1474,10 @@
                                                                     $subColSpanClass = $isSubHalfCol ? 'md:col-span-1' : 'md:col-span-2';
                                                                 @endphp
                                                                 <div class="{{ $subColSpanClass }} space-y-1.5">
-                                                                    <div class="flex items-center justify-between mb-1">
+                                                                    <div class="mb-1">
                                                                         <label class="flex items-center gap-1.5 text-xs font-bold text-slate-700 tracking-wide uppercase">
                                                                             <span>{{ $subComp->component_name }}</span>
                                                                         </label>
-                                                                        <span class="text-[10px] font-mono text-slate-400">/{{ $subComp->component_slug }}</span>
                                                                     </div>
                                                                     <div class="grid grid-cols-1 {{ $subSlug === 'button' ? 'sm:grid-cols-2' : '' }} gap-3">
                                                                         @foreach($subFields as $field)
@@ -1561,7 +1559,6 @@
                                                                     <h5 class="text-xs font-bold text-slate-800 uppercase tracking-wider">{{ $subComp->component_name }}</h5>
                                                                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">Repeater</span>
                                                                 </div>
-                                                                <span class="text-[10px] font-mono text-slate-400">/{{ $subComp->component_slug }}</span>
                                                             </div>
 
                                                             <div id="repeater-subcomp-{{ $comp->id }}-{{ $subComp->id }}" data-next-index="{{ count($subInstKeys) }}" class="space-y-3">
@@ -1726,21 +1723,13 @@
                                                             $subPrimary = $subFields->first();
                                                         @endphp
                                                         <div class="space-y-1.5">
-                                                            <div class="flex items-center justify-between mb-1">
+                                                            <div class="mb-1">
                                                                 <label class="flex items-center gap-1.5 text-xs font-bold text-slate-700 tracking-wide uppercase">
                                                                     <span>{{ $subComp->component_name }}</span>
                                                                     @if($isSubSingle && $subPrimary->is_required)
                                                                         <span class="text-rose-500 font-bold">*</span>
                                                                     @endif
                                                                 </label>
-                                                                <div class="flex items-center gap-1.5">
-                                                                    @if($isSubSingle)
-                                                                        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border bg-indigo-50 text-indigo-700 border-indigo-200/70">
-                                                                            {{ $subPrimary->field_type }}
-                                                                        </span>
-                                                                    @endif
-                                                                    <span class="text-[10px] font-mono text-slate-400">/{{ $subComp->component_slug }}</span>
-                                                                </div>
                                                             </div>
                                                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                                 @foreach($subFields as $field)
@@ -1796,14 +1785,14 @@
                                                         @elseif(str_contains($subNameAndSlug, 'paragraph') || str_contains($subNameAndSlug, 'textarea') || str_contains($subNameAndSlug, 'desc'))
                                                             <div>
                                                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                                    {{ $subComp->component_name }} <span class="text-slate-400 text-[11px] font-normal font-mono">(&lt;textarea&gt;)</span>
+                                                                    {{ $subComp->component_name }}
                                                                 </label>
                                                                 <textarea :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][value]" rows="3" placeholder="Enter paragraph description or content here..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all leading-relaxed bg-white">{{ old('components.'.$comp->id.'.subcomponents.'.$subComp->id.'.value', $subExisting?->content_value) }}</textarea>
                                                             </div>
                                                         @elseif(str_contains($subNameAndSlug, 'image') || str_contains($subNameAndSlug, 'photo') || str_contains($subNameAndSlug, 'banner'))
                                                             <div>
                                                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                                    {{ $subComp->component_name }} <span class="text-slate-400 text-[11px] font-normal font-mono">(Image File)</span>
+                                                                    {{ $subComp->component_name }}
                                                                 </label>
                                                                 <div class="flex flex-col sm:flex-row sm:items-center gap-3">
                                                                     <input type="file" accept="image/*" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][file]" class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer rounded-xl border border-slate-300 p-1.5 bg-white">
@@ -1818,7 +1807,7 @@
                                                         @elseif(str_contains($subNameAndSlug, 'video'))
                                                             <div>
                                                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                                    {{ $subComp->component_name }} <span class="text-slate-400 text-[11px] font-normal font-mono">(Video File)</span>
+                                                                    {{ $subComp->component_name }}
                                                                 </label>
                                                                 <div class="flex flex-col sm:flex-row sm:items-center gap-3">
                                                                     <input type="file" accept="video/*" :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][subcomponents][{{ $subComp->id }}][file]" class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer rounded-xl border border-slate-300 p-1.5 bg-white">
@@ -1863,7 +1852,6 @@
                                                         <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">{{ $comp->component_name }}</h4>
                                                         <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">Repeater</span>
                                                     </div>
-                                                    <span class="text-[10px] font-mono text-slate-400">/{{ $comp->component_slug }}</span>
                                                 </div>
 
                                                 <div id="repeater-comp-{{ $comp->id }}" data-next-index="{{ count($compInstKeys) }}" class="space-y-3.5">
@@ -2053,25 +2041,13 @@
                                                 }
                                             @endphp
                                             <div class="space-y-1.5">
-                                                <div class="flex items-center justify-between mb-1">
+                                                <div class="mb-1">
                                                     <label class="flex items-center gap-1.5 text-xs font-bold text-slate-700 tracking-wide uppercase">
                                                         <span>{{ $comp->component_name }}</span>
                                                         @if($isSingleField && $singleField->is_required)
                                                             <span class="text-rose-500 font-extrabold text-xs" title="Required field">*</span>
                                                         @endif
                                                     </label>
-                                                    <div class="flex items-center gap-2">
-                                                        @if($isSingleField)
-                                                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border {{ $singleField->field_type === 'image' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/70' : ($singleField->field_type === 'video' ? 'bg-purple-50 text-purple-700 border-purple-200/70' : 'bg-blue-50 text-blue-700 border-blue-200/70') }}">
-                                                                {{ $singleField->field_type }}
-                                                            </span>
-                                                        @else
-                                                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border bg-slate-100 text-slate-600 border-slate-200">
-                                                                {{ $compFields->count() }} Fields
-                                                            </span>
-                                                        @endif
-                                                        <span class="text-[10px] font-mono text-slate-400">/{{ $comp->component_slug }}</span>
-                                                    </div>
                                                 </div>
                                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                     @foreach($compFields as $field)
@@ -2128,7 +2104,7 @@
                                                 @elseif(str_contains($nameAndSlug, 'paragraph') || str_contains($nameAndSlug, 'textarea') || str_contains($nameAndSlug, 'desc'))
                                                     <div>
                                                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                            {{ $comp->component_name }} <span class="text-slate-400 text-[11px] font-normal font-mono">(&lt;textarea&gt;)</span>
+                                                            {{ $comp->component_name }}
                                                         </label>
                                                         <textarea :disabled="activeComponentId && activeComponentId !== {{ $comp->id }}" name="components[{{ $comp->id }}][value]" rows="3" placeholder="Enter paragraph description or content here..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/50 hover:bg-white focus:bg-white text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all leading-relaxed">{{ old('components.'.$comp->id.'.value', $existing?->content_value) }}</textarea>
                                                     </div>

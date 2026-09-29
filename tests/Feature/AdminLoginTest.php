@@ -255,7 +255,7 @@ class AdminLoginTest extends TestCase
 
         // Check each input type is rendered
         $viewResponse->assertSee('input type="text"', false);
-        $viewResponse->assertSee('&lt;textarea&gt;', false);
+        $viewResponse->assertSee('<textarea', false);
         $viewResponse->assertSee('input type="button"', false);
         $viewResponse->assertSee('input type="file" accept="image/*"', false);
         $viewResponse->assertSee('input type="file" accept="video/*"', false);
