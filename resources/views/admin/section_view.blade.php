@@ -992,15 +992,26 @@
                         @csrf
                         <input type="hidden" name="active_component_id" :value="activeComponentId">
 
-                        <div class="px-6 py-5 space-y-4 max-h-[72vh] overflow-y-auto bg-slate-50/50">
-                            @foreach($section->components as $index => $comp)
-                                @php
-                                    $nameAndSlug = strtolower($comp->component_name . ' ' . $comp->component_slug);
-                                    $isCompMultiple = (bool)($comp->pivot->is_multiple ?? $comp->is_multiple ?? false);
-                                    $existing = $contentData[$comp->id] ?? null;
-                                @endphp
+                        <div class="px-6 py-6 max-h-[72vh] overflow-y-auto bg-white">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+                                @foreach($section->components as $index => $comp)
+                                    @php
+                                        $nameAndSlug = strtolower($comp->component_name . ' ' . $comp->component_slug);
+                                        $isCompMultiple = (bool)($comp->pivot->is_multiple ?? $comp->is_multiple ?? false);
+                                        $existing = $contentData[$comp->id] ?? null;
+                                        $cSlug = strtolower($comp->component_slug ?? $comp->component_name);
+                                        $hasSubcomps = $comp->effective_subcomponents->isNotEmpty();
+                                        
+                                        // Heading and Subheading are 1 column each so they sit in the same row
+                                        $isHalfCol = ($cSlug === 'heading' || $cSlug === 'subheading' || str_contains($cSlug, 'heading'));
+                                        $colSpanClass = ($isHalfCol && !$hasSubcomps && !$isCompMultiple) ? 'md:col-span-1' : 'md:col-span-2';
+                                    @endphp
 
-                                <div x-show="!activeComponentId || activeComponentId === {{ $comp->id }}" class="space-y-1">
+                                    <div 
+                                        x-show="!activeComponentId || activeComponentId === {{ $comp->id }}" 
+                                        :class="activeComponentId === {{ $comp->id }} ? 'md:col-span-2' : '{{ $colSpanClass }}'"
+                                        class="space-y-1.5"
+                                    >
                                     @if($comp->effective_subcomponents->isNotEmpty())
                                         {{-- CARD CONTAINER WITH ITS SUBCOMPONENTS --}}
                                         <div class="p-4 rounded-2xl border border-indigo-200/90 bg-white shadow-2xs space-y-4">
@@ -1208,16 +1219,15 @@
                                                             $isSubSingle = $subFields->count() === 1;
                                                             $subPrimary = $subFields->first();
                                                         @endphp
-                                                        <div class="p-3.5 bg-slate-50/50 rounded-xl border border-indigo-100/90 shadow-2xs space-y-2.5">
-                                                            <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/60">
-                                                                <div class="flex items-center gap-2">
-                                                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                                                                    <h5 class="text-xs font-bold text-slate-800 uppercase tracking-wider">{{ $subComp->component_name }}</h5>
+                                                        <div class="space-y-1.5">
+                                                            <div class="flex items-center justify-between mb-1">
+                                                                <label class="flex items-center gap-1.5 text-xs font-bold text-slate-700 tracking-wide uppercase">
+                                                                    <span>{{ $subComp->component_name }}</span>
                                                                     @if($isSubSingle && $subPrimary->is_required)
                                                                         <span class="text-rose-500 font-bold">*</span>
                                                                     @endif
-                                                                </div>
-                                                                <div class="flex items-center gap-2">
+                                                                </label>
+                                                                <div class="flex items-center gap-1.5">
                                                                     @if($isSubSingle)
                                                                         <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border bg-indigo-50 text-indigo-700 border-indigo-200/70">
                                                                             {{ $subPrimary->field_type }}
@@ -1226,7 +1236,7 @@
                                                                     <span class="text-[10px] font-mono text-slate-400">/{{ $subComp->component_slug }}</span>
                                                                 </div>
                                                             </div>
-                                                            <div class="space-y-3">
+                                                            <div class="space-y-2">
                                                                 @foreach($subFields as $field)
                                                                     @php
                                                                         $fData = $fieldData[$comp->id . '_' . $subComp->id][$field->id] ?? null;
@@ -1534,23 +1544,14 @@
                                                     $iconSvg = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>';
                                                 }
                                             @endphp
-                                            <div class="group p-4 rounded-2xl border border-slate-200/90 bg-white hover:border-slate-300 shadow-2xs hover:shadow-xs transition-all space-y-3">
-                                                <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
-                                                    <div class="flex items-center gap-2.5">
-                                                        <div class="w-7 h-7 rounded-lg {{ $iconBg }} border flex items-center justify-center shrink-0 shadow-2xs">
-                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                {!! $iconSvg !!}
-                                                            </svg>
-                                                        </div>
-                                                        <div>
-                                                            <div class="flex items-center gap-1.5">
-                                                                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">{{ $comp->component_name }}</h4>
-                                                                @if($isSingleField && $singleField->is_required)
-                                                                    <span class="text-rose-500 font-extrabold text-xs" title="Required field">*</span>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                            <div class="space-y-1.5">
+                                                <div class="flex items-center justify-between mb-1">
+                                                    <label class="flex items-center gap-1.5 text-xs font-bold text-slate-700 tracking-wide uppercase">
+                                                        <span>{{ $comp->component_name }}</span>
+                                                        @if($isSingleField && $singleField->is_required)
+                                                            <span class="text-rose-500 font-extrabold text-xs" title="Required field">*</span>
+                                                        @endif
+                                                    </label>
                                                     <div class="flex items-center gap-2">
                                                         @if($isSingleField)
                                                             <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border {{ $singleField->field_type === 'image' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/70' : ($singleField->field_type === 'video' ? 'bg-purple-50 text-purple-700 border-purple-200/70' : 'bg-blue-50 text-blue-700 border-blue-200/70') }}">
@@ -1561,10 +1562,10 @@
                                                                 {{ $compFields->count() }} Fields
                                                             </span>
                                                         @endif
-                                                        <span class="text-[10px] font-mono text-slate-400 hidden sm:inline">/{{ $comp->component_slug }}</span>
+                                                        <span class="text-[10px] font-mono text-slate-400">/{{ $comp->component_slug }}</span>
                                                     </div>
                                                 </div>
-                                                <div class="space-y-3.5">
+                                                <div class="space-y-3">
                                                     @foreach($compFields as $field)
                                                         @php
                                                             $fData = $fieldData[$comp->id][$field->id] ?? null;
@@ -1583,7 +1584,7 @@
                                             </div>
                                         @else
                                             {{-- Legacy Fallback for top-level component without field definitions --}}
-                                            <div class="p-4 rounded-2xl border border-slate-200/90 bg-white shadow-2xs space-y-3">
+                                            <div class="space-y-1.5">
                                                 @if(str_contains($nameAndSlug, 'subheading'))
                                                     <div>
                                                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
@@ -1667,6 +1668,7 @@
                                 </div>
 
                             @endforeach
+                            </div>
                         </div>
 
                         <!-- Modal Actions Footer -->
