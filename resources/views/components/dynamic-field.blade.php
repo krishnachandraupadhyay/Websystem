@@ -361,10 +361,14 @@
                     <input type="hidden" name="{{ str_replace('[files]', '[existing_files]', $fileInputName) }}" value="{{ $currentFilePath }}">
                 @endif
 
-                @if($currentFilePath && file_exists(public_path($currentFilePath)))
+                @php
+                    $isExternalImg = $currentFilePath && (str_starts_with($currentFilePath, 'http://') || str_starts_with($currentFilePath, 'https://'));
+                    $isLocalImg = $currentFilePath && file_exists(public_path($currentFilePath));
+                @endphp
+                @if($isExternalImg || $isLocalImg)
                     <div class="flex items-center justify-between p-3 bg-slate-50/80 rounded-xl border border-slate-200 shadow-2xs">
                         <div class="flex items-center gap-3 min-w-0">
-                            <img src="{{ asset($currentFilePath) }}" alt="Preview" class="w-12 h-12 object-cover rounded-lg border border-slate-200 shadow-2xs shrink-0 bg-white">
+                            <img src="{{ $isExternalImg ? $currentFilePath : asset($currentFilePath) }}" alt="Preview" class="w-12 h-12 object-cover rounded-lg border border-slate-200 shadow-2xs shrink-0 bg-white">
                             <div class="text-xs min-w-0">
                                 <span class="font-bold text-slate-800 block truncate max-w-[240px]">{{ basename($currentFilePath) }}</span>
                                 <span class="inline-flex items-center gap-1 text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60 mt-0.5">

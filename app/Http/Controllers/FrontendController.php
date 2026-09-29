@@ -71,6 +71,8 @@ class FrontendController extends Controller
                 $card = [
                     'name'        => null,
                     'role'        => null,
+                    'company'     => null,
+                    'package'     => null,
                     'image'       => null,
                     'description' => null,
                     'button_text' => 'View Placement Story',
@@ -80,8 +82,8 @@ class FrontendController extends Controller
 
                 foreach ($records as $r) {
                     $fieldName = strtolower($r->field_name ?? '');
-                    if ($r->file_path && ($fieldName === 'image' || str_contains($fieldName, 'photo') || str_contains($fieldName, 'image'))) {
-                        $card['image'] = $r->file_path;
+                    if (($r->file_path || $r->content_value) && ($fieldName === 'image' || str_contains($fieldName, 'photo') || str_contains($fieldName, 'image'))) {
+                        $card['image'] = $r->file_path ?: $r->content_value;
                     } elseif ($fieldName === 'subheading' || str_contains($fieldName, 'sub')) {
                         if (!empty($r->content_value)) $card['role'] = $r->content_value;
                     } elseif ($fieldName === 'heading' || str_contains($fieldName, 'heading')) {
@@ -95,6 +97,23 @@ class FrontendController extends Controller
                     } elseif ($fieldName === 'target') {
                         if (!empty($r->content_value)) $card['target'] = $r->content_value;
                     }
+                }
+
+                // Parse company from role (e.g. "Software Engineer (Google)" -> "Google")
+                if (!empty($card['role'])) {
+                    if (preg_match('/\((.*?)\)/', $card['role'], $m)) {
+                        $card['company'] = trim($m[1]);
+                    }
+                }
+
+                // Parse package from description or role (e.g. "₹36.50 LPA")
+                $searchText = ($card['description'] ?? '') . ' ' . ($card['role'] ?? '');
+                if (preg_match('/(₹?\s*\d+(?:\.\d+)?\s*LPA)/i', $searchText, $pm)) {
+                    $pkg = trim($pm[1]);
+                    if (!str_starts_with($pkg, '₹')) {
+                        $pkg = '₹' . $pkg;
+                    }
+                    $card['package'] = $pkg;
                 }
 
                 if (!empty($card['name']) || !empty($card['role']) || !empty($card['image'])) {

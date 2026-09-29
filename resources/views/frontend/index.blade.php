@@ -599,11 +599,20 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                 @if(!empty($placementData['cards']))
                     @foreach($placementData['cards'] as $card)
+                        @php
+                            $imgSrc = $card['image'] ?? null;
+                            $hasValidImg = !empty($imgSrc) && (
+                                str_starts_with($imgSrc, 'http://') || 
+                                str_starts_with($imgSrc, 'https://') || 
+                                file_exists(public_path($imgSrc))
+                            );
+                            $finalImgUrl = $hasValidImg ? ((str_starts_with($imgSrc, 'http://') || str_starts_with($imgSrc, 'https://')) ? $imgSrc : asset($imgSrc)) : null;
+                        @endphp
                         <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group">
                             <div class="relative overflow-hidden">
-                                @if(!empty($card['image']) && file_exists(public_path($card['image'])))
+                                @if($finalImgUrl)
                                     <img 
-                                        src="{{ asset($card['image']) }}" 
+                                        src="{{ $finalImgUrl }}" 
                                         alt="{{ $card['name'] ?? 'Placement' }}" 
                                         class="w-full h-52 object-cover object-top group-hover:scale-105 transition-transform duration-500"
                                     />
@@ -616,11 +625,18 @@
                                 @endif
                                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30"></div>
                                 
-                                @if(!empty($card['role']))
-                                    <!-- Company / Role Badge (Top-Left) -->
+                                @if(!empty($card['company']) || !empty($card['role']))
+                                    <!-- Company Badge (Top-Left) -->
                                     <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5 border border-slate-200">
                                         <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                                        <span class="text-[11px] font-black text-slate-900 tracking-tight font-heading">{{ $card['role'] }}</span>
+                                        <span class="text-[11px] font-black text-slate-900 tracking-tight font-heading">{{ $card['company'] ?: $card['role'] }}</span>
+                                    </div>
+                                @endif
+
+                                @if(!empty($card['package']))
+                                    <!-- Package Badge (Top-Right) -->
+                                    <div class="absolute top-3 right-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+                                        <span>{{ $card['package'] }}</span>
                                     </div>
                                 @endif
 
@@ -635,6 +651,14 @@
 
                             <div class="p-4 flex-1 flex flex-col justify-between">
                                 <div>
+                                    @if(!empty($card['package']))
+                                        <!-- Package Callout -->
+                                        <div class="flex items-center justify-between py-2 px-3 bg-emerald-50/70 rounded-xl border border-emerald-200/70 mb-3">
+                                            <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Offered Package</span>
+                                            <span class="text-sm font-black text-emerald-700 font-heading">{{ $card['package'] }}</span>
+                                        </div>
+                                    @endif
+
                                     @if(!empty($card['description']))
                                         <p class="text-slate-600 text-xs leading-relaxed line-clamp-3 mb-4">
                                             {{ $card['description'] }}

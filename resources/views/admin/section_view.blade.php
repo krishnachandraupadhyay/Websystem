@@ -96,7 +96,7 @@
                         @foreach($section->components as $index => $comp)
                             @php
                                 $nameAndSlug = strtolower($comp->component_name . ' ' . $comp->component_slug);
-                                $isCompMultiple = (bool)($comp->pivot->is_multiple ?? $comp->is_multiple ?? false);
+                                $isCompMultiple = (bool)(($comp->pivot->is_multiple ?? null) ?: ($comp->is_multiple ?? false));
                                 $compInstMap = $multiFieldData[$comp->id] ?? [];
                                 $compInstCount = count($compInstMap);
                                 $existing = $contentData[$comp->id] ?? null;
@@ -246,7 +246,7 @@
                                                 <td class="px-5 py-3.5">
                                                     <div class="flex flex-wrap items-center gap-2">
                                                         @if($cardImage)
-                                                            <img src="{{ asset($cardImage) }}" class="w-8 h-8 object-cover rounded-lg border border-slate-200 shadow-2xs" title="Card Image">
+                                                            <img src="{{ (str_starts_with($cardImage, 'http://') || str_starts_with($cardImage, 'https://')) ? $cardImage : asset($cardImage) }}" class="w-8 h-8 object-cover rounded-lg border border-slate-200 shadow-2xs" title="Card Image">
                                                         @endif
                                                         @if($cardHeading)
                                                             <span class="text-[11px] text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200 font-semibold">
@@ -1258,7 +1258,7 @@
                                 @foreach($section->components as $index => $comp)
                                     @php
                                         $nameAndSlug = strtolower($comp->component_name . ' ' . $comp->component_slug);
-                                        $isCompMultiple = (bool)($comp->pivot->is_multiple ?? $comp->is_multiple ?? false);
+                                        $isCompMultiple = (bool)(($comp->pivot->is_multiple ?? null) ?: ($comp->is_multiple ?? false));
                                         $existing = $contentData[$comp->id] ?? null;
                                         $cSlug = strtolower($comp->component_slug ?? $comp->component_name);
                                         $hasSubcomps = $comp->effective_subcomponents->isNotEmpty();
