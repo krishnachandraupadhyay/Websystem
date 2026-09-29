@@ -1029,22 +1029,27 @@
                                                 </span>
                                             </div>
 
-                                            <div class="space-y-4">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 @foreach($comp->effective_subcomponents as $subComp)
                                                     @php
                                                         $subNameAndSlug = strtolower($subComp->component_name . ' ' . $subComp->component_slug);
                                                         $subExisting = $contentData[$comp->id . '_' . $subComp->id] ?? null;
                                                         $subFields = $subComp->fields->where('is_active', true)->sortBy('sort_order');
+                                                        $subSlug = strtolower($subComp->component_slug ?? $subComp->component_name);
+                                                        $isSubHalfCol = ($subSlug === 'heading' || $subSlug === 'subheading' || str_contains($subSlug, 'heading'));
                                                     @endphp
 
                                                     @php
                                                         $isSubMultiple = (bool)($subComp->pivot->is_multiple ?? $subComp->is_multiple);
+                                                        $subColSpanClass = ($isSubHalfCol && !$isSubMultiple) ? 'md:col-span-1' : 'md:col-span-2';
                                                         $subInstMap = $multiFieldData[$comp->id . '_' . $subComp->id] ?? [];
                                                         $subInstKeys = array_keys($subInstMap);
                                                         if (empty($subInstKeys)) {
                                                             $subInstKeys = [0];
                                                         }
                                                     @endphp
+
+                                                    <div class="{{ $subColSpanClass }}">
 
                                                     @if($isSubMultiple && $subFields->isNotEmpty())
                                                         {{-- Repeater Subcomponent (e.g. Nav Anchors) --}}
@@ -1114,7 +1119,7 @@
                                                                                 </button>
                                                                             </div>
                                                                         </div>
-                                                                        <div class="space-y-2.5">
+                                                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                                             @foreach($subFields as $field)
                                                                                 @php
                                                                                     $fData = $multiFieldData[$comp->id . '_' . $subComp->id][$instIdx][$field->id] ?? null;
@@ -1185,7 +1190,7 @@
                                                                             </button>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="space-y-2.5">
+                                                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                                         @foreach($subFields as $field)
                                                                             <x-dynamic-field 
                                                                                 :field="$field" 
@@ -1235,7 +1240,7 @@
                                                                     <span class="text-[10px] font-mono text-slate-400">/{{ $subComp->component_slug }}</span>
                                                                 </div>
                                                             </div>
-                                                            <div class="space-y-2">
+                                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                                 @foreach($subFields as $field)
                                                                     @php
                                                                         $fData = $fieldData[$comp->id . '_' . $subComp->id][$field->id] ?? null;
@@ -1332,6 +1337,7 @@
                                                             </div>
                                                         @endif
                                                     @endif
+                                                    </div>
                                                 @endforeach
                                             </div>
                                         </div>
@@ -1414,7 +1420,7 @@
                                                                     </button>
                                                                 </div>
                                                             </div>
-                                                            <div class="space-y-3">
+                                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                                 @foreach($compFields as $field)
                                                                     @php
                                                                         $fData = $multiFieldData[$comp->id][$instIdx][$field->id] ?? null;
@@ -1485,7 +1491,7 @@
                                                                 </button>
                                                             </div>
                                                         </div>
-                                                        <div class="space-y-3">
+                                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                             @foreach($compFields as $field)
                                                                 <x-dynamic-field 
                                                                     :field="$field" 
@@ -1564,7 +1570,7 @@
                                                         <span class="text-[10px] font-mono text-slate-400">/{{ $comp->component_slug }}</span>
                                                     </div>
                                                 </div>
-                                                <div class="space-y-3">
+                                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                     @foreach($compFields as $field)
                                                         @php
                                                             $fData = $fieldData[$comp->id][$field->id] ?? null;

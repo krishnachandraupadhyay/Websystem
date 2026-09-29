@@ -8,6 +8,7 @@
     'disabledCondition' => null,
     'instanceIndex' => null,
     'hideLabel' => false,
+    'class' => '',
 ])
 
 @php
@@ -74,9 +75,12 @@
         'password' => 'bg-slate-100 text-slate-700 border-slate-200',
     ];
     $badgeStyle = $typeBadgeClasses[$field->field_type] ?? 'bg-slate-100 text-slate-600 border-slate-200';
+    $fName = strtolower($field->field_name ?? '');
+    $isHalfField = in_array($fName, ['button_text', 'button_url', 'anchor_text', 'anchor_url']) && !$hideLabel;
+    $fieldColSpan = $class ?: ($isHalfField ? 'sm:col-span-1' : 'sm:col-span-2');
 @endphp
 
-<div class="space-y-1.5">
+<div class="space-y-1.5 {{ $fieldColSpan }}">
     @if(!$hideLabel)
         <!-- Field Label -->
         <div class="flex items-center justify-between mb-1">
