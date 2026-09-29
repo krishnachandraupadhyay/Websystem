@@ -1022,7 +1022,6 @@
                                                     </span>
                                                     <div>
                                                         <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">{{ $comp->component_name }} Container</h4>
-                                                        <p class="text-[11px] text-slate-400">Configure fields for this container component</p>
                                                     </div>
                                                 </div>
                                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/70">
@@ -1672,15 +1671,8 @@
                         </div>
 
                         <!-- Modal Actions Footer -->
-                        <div class="px-6 py-4 bg-white/95 backdrop-blur-sm border-t border-slate-100 flex items-center justify-between rounded-b-2xl">
-                            <div class="flex items-center gap-2 text-xs text-slate-500">
-                                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
-                                <span class="hidden sm:inline">Database-linked section editor</span>
-                            </div>
-                            <div class="flex items-center gap-2.5">
-                                <button 
+                        <div class="px-6 py-4 bg-white/95 backdrop-blur-sm border-t border-slate-100 flex items-center justify-end gap-2.5 rounded-b-2xl">
+                            <button 
                                     @click="openModal = false; activeComponentId = null; activeComponentName = ''; activeSubCompId = null; activeInstanceIndex = null; activeInstanceLabel = ''" 
                                     type="button" 
                                     class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer shadow-2xs"
@@ -1696,7 +1688,6 @@
                                     </svg>
                                     <span x-text="activeInstanceLabel ? 'Save ' + activeInstanceLabel : (activeComponentId ? 'Save ' + activeComponentName : 'Save Section Content')">Save Section Content</span>
                                 </button>
-                            </div>
                         </div>
                     </form>
                 @endif
