@@ -9,6 +9,7 @@
     'instanceIndex' => null,
     'hideLabel' => false,
     'class' => '',
+    'isParentMultiple' => false,
 ])
 
 @php
@@ -18,7 +19,13 @@
     
     // Naming for normal fields vs file fields
     if ($isSub && $comp) {
-        if ($hasInstance) {
+        if ($isParentMultiple && $hasInstance) {
+            $inputName = "components[{$comp->id}][instances][{$instanceIndex}][subcomponents][{$subComp->id}][fields][{$field->id}]";
+            $fileInputName = "components[{$comp->id}][instances][{$instanceIndex}][subcomponents][{$subComp->id}][files][{$field->id}]";
+            $errorKey = "components.{$comp->id}.instances.{$instanceIndex}.subcomponents.{$subComp->id}.fields.{$field->id}";
+            $fileErrorKey = "components.{$comp->id}.instances.{$instanceIndex}.subcomponents.{$subComp->id}.files.{$field->id}";
+            $currentVal = old("components.{$comp->id}.instances.{$instanceIndex}.subcomponents.{$subComp->id}.fields.{$field->id}", $value ?? $field->default_value);
+        } elseif ($hasInstance) {
             $inputName = "components[{$comp->id}][subcomponents][{$subComp->id}][instances][{$instanceIndex}][fields][{$field->id}]";
             $fileInputName = "components[{$comp->id}][subcomponents][{$subComp->id}][instances][{$instanceIndex}][files][{$field->id}]";
             $errorKey = "components.{$comp->id}.subcomponents.{$subComp->id}.instances.{$instanceIndex}.fields.{$field->id}";

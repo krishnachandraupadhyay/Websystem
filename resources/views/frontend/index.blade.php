@@ -559,15 +559,19 @@
             <div class="text-center max-w-3xl mx-auto mb-10">
                 <div class="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-900 text-xs font-bold px-3.5 py-1.5 rounded-full mb-3 shadow-2xs">
                     <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                    <span class="font-hindi">करियर एवं कैंपस प्लेसमेंट</span>
-                    <span>•</span>
-                    <span class="tracking-wider uppercase">CAMPUS PLACEMENT SUCCESS</span>
+                    @if(!empty($placementData['subheading']))
+                        <span class="font-hindi">{{ $placementData['subheading'] }}</span>
+                    @else
+                        <span class="font-hindi">करियर एवं कैंपस प्लेसमेंट</span>
+                        <span>•</span>
+                        <span class="tracking-wider uppercase">CAMPUS PLACEMENT SUCCESS</span>
+                    @endif
                 </div>
                 <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight font-heading uppercase">
-                    CAMPUS PLACEMENTS
+                    {{ $placementData['heading'] ?? 'CAMPUS PLACEMENTS' }}
                 </h2>
                 <p class="text-slate-600 text-xs sm:text-sm mt-2 leading-relaxed">
-                    Celebrating our brilliant students who secured dream job opportunities and premier packages at leading multinational corporations.
+                    {{ $placementData['paragraph'] ?? 'Celebrating our brilliant students who secured dream job opportunities and premier packages at leading multinational corporations.' }}
                 </p>
             </div>
 
@@ -591,9 +595,68 @@
                 </div>
             </div>
 
-            <!-- Student Placement Cards Grid (8 Students) -->
+            <!-- Student Placement Cards Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                
+                @if(!empty($placementData['cards']))
+                    @foreach($placementData['cards'] as $card)
+                        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group">
+                            <div class="relative overflow-hidden">
+                                @if(!empty($card['image']) && file_exists(public_path($card['image'])))
+                                    <img 
+                                        src="{{ asset($card['image']) }}" 
+                                        alt="{{ $card['name'] ?? 'Placement' }}" 
+                                        class="w-full h-52 object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                @else
+                                    <div class="w-full h-52 bg-gradient-to-br from-[#0e233a] to-blue-950 flex items-center justify-center text-white">
+                                        <div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center font-heading font-black text-2xl border border-white/20">
+                                            {{ strtoupper(substr($card['name'] ?? 'P', 0, 1)) }}
+                                        </div>
+                                    </div>
+                                @endif
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30"></div>
+                                
+                                @if(!empty($card['role']))
+                                    <!-- Company / Role Badge (Top-Left) -->
+                                    <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5 border border-slate-200">
+                                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                        <span class="text-[11px] font-black text-slate-900 tracking-tight font-heading">{{ $card['role'] }}</span>
+                                    </div>
+                                @endif
+
+                                <!-- Floating Name overlay at bottom of image -->
+                                <div class="absolute bottom-2.5 left-3 right-3 text-white">
+                                    <h3 class="text-base font-extrabold font-heading leading-tight drop-shadow-sm">{{ $card['name'] }}</h3>
+                                    @if(!empty($card['role']))
+                                        <span class="text-[11px] text-amber-300 font-semibold drop-shadow-xs">{{ $card['role'] }}</span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="p-4 flex-1 flex flex-col justify-between">
+                                <div>
+                                    @if(!empty($card['description']))
+                                        <p class="text-slate-600 text-xs leading-relaxed line-clamp-3 mb-4">
+                                            {{ $card['description'] }}
+                                        </p>
+                                    @endif
+                                </div>
+
+                                <!-- Action Button -->
+                                <div class="pt-2 border-t border-slate-100 mt-auto">
+                                    <a 
+                                        href="{{ $card['button_url'] ?? '#contact' }}" 
+                                        target="{{ $card['target'] ?? '_self' }}"
+                                        class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0e233a] to-[#1b3b5f] hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs hover:shadow-md transition-all group/btn"
+                                    >
+                                        <span>{{ $card['button_text'] ?? 'View Placement Story' }}</span>
+                                        <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
                 <!-- Card 1: Aarav Sharma (Google) -->
                 <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group">
                     <div class="relative overflow-hidden">
@@ -981,7 +1044,7 @@
                         </div>
                     </div>
                 </div>
-
+                @endif
             </div>
 
             <!-- Lower Activities & Video Highlights Strip (Full Width) -->

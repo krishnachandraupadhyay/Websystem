@@ -104,6 +104,266 @@
                             @endphp
 
                             @if($hasSubComps)
+                                @if($isCompMultiple)
+                                    @php
+                                        $cardInstKeys = collect($comp->effective_subcomponents)
+                                            ->flatMap(fn($sc) => array_keys($multiFieldData[$comp->id . '_' . $sc->id] ?? []))
+                                            ->unique()
+                                            ->sort()
+                                            ->values()
+                                            ->all();
+                                        $cardInstCount = count($cardInstKeys);
+                                    @endphp
+
+                                    {{-- 1. Multi-Card Container Row --}}
+                                    <tr class="bg-indigo-50/30 hover:bg-indigo-50/60 transition-colors border-t-2 border-indigo-200">
+                                        <td class="px-5 py-4 text-xs font-bold text-indigo-700">
+                                            {{ $index + 1 }}
+                                        </td>
+                                        <td class="px-5 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                                                    {{ strtoupper(substr($comp->component_name, 0, 1)) }}
+                                                </div>
+                                                <div>
+                                                    <div class="flex items-center gap-2">
+                                                        <h4 class="font-bold text-slate-900 text-xs">
+                                                            {{ $comp->component_name }}
+                                                        </h4>
+                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800">
+                                                            Card Repeater
+                                                        </span>
+                                                    </div>
+                                                    <p class="text-[10px] text-slate-400 font-mono">
+                                                        /{{ $comp->component_slug }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-5 py-4">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                                Cards
+                                            </span>
+                                        </td>
+                                        <td class="px-5 py-4">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold text-slate-700 bg-slate-100 border border-slate-200">
+                                                <span class="text-slate-500 font-medium">Count:</span>
+                                                <span class="font-bold text-indigo-600">{{ $cardInstCount }} {{ \Illuminate\Support\Str::plural('Card', $cardInstCount) }}</span>
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-4 text-center text-slate-300 font-semibold text-xs">
+                                            -
+                                        </td>
+                                        <td class="px-5 py-4 text-center">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                Active
+                                            </span>
+                                        </td>
+                                        <td class="px-5 py-4 text-right">
+                                            <button 
+                                                @click="openModal = true; activeComponentId = {{ $comp->id }}; activeComponentName = '{{ addslashes($comp->component_name) }}'; activeSubCompId = null; activeInstanceIndex = null; activeInstanceLabel = ''" 
+                                                type="button" 
+                                                class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-blue-600 hover:text-blue-700 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer shadow-2xs"
+                                                title="Manage All {{ $comp->component_name }}s"
+                                            >
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                </svg>
+                                            </button>
+                                        </td>
+                                    </tr>
+
+                                    {{-- 2. Card Repeater Rows --}}
+                                    @if($cardInstCount > 0)
+                                        @foreach($cardInstKeys as $cPos => $cInstIdx)
+                                            @php
+                                                $cardHeading = null;
+                                                $cardSubHeading = null;
+                                                $cardImage = null;
+                                                $cardButtonText = null;
+                                                $cardButtonUrl = null;
+
+                                                foreach($comp->effective_subcomponents as $sc) {
+                                                    $scSlug = strtolower($sc->component_slug ?? $sc->component_name);
+                                                    $instFields = $multiFieldData[$comp->id . '_' . $sc->id][$cInstIdx] ?? [];
+                                                    foreach($sc->fields as $sf) {
+                                                        $fVal = $instFields[$sf->id] ?? null;
+                                                        $fValStr = $fVal?->content_value ?? '';
+                                                        $fNameLower = strtolower($sf->field_name);
+
+                                                        if (!$cardHeading && (str_contains($scSlug, 'heading') && !str_contains($scSlug, 'sub')) && !empty($fValStr)) {
+                                                            $cardHeading = $fValStr;
+                                                        }
+                                                        if (!$cardSubHeading && str_contains($scSlug, 'subheading') && !empty($fValStr)) {
+                                                            $cardSubHeading = $fValStr;
+                                                        }
+                                                        if (!$cardImage && ($sf->field_type === 'image' || str_contains($scSlug, 'image')) && $fVal?->file_path) {
+                                                            $cardImage = $fVal->file_path;
+                                                        }
+                                                        if (!$cardButtonText && str_contains($scSlug, 'button') && in_array($fNameLower, ['button_text', 'text', 'label'], true) && !empty($fValStr)) {
+                                                            $cardButtonText = $fValStr;
+                                                        }
+                                                        if (!$cardButtonUrl && str_contains($scSlug, 'button') && in_array($fNameLower, ['button_url', 'url', 'link', 'href'], true) && !empty($fValStr)) {
+                                                            $cardButtonUrl = $fValStr;
+                                                        }
+                                                    }
+                                                }
+                                                $cardLabel = $cardHeading ?: ('#' . ($cPos + 1) . ' ' . $comp->component_name);
+                                            @endphp
+                                            <tr 
+                                                class="repeater-table-row bg-slate-50/40 hover:bg-indigo-50/40 transition-colors border-l-4 border-l-indigo-500"
+                                                data-group-key="comp-{{ $comp->id }}-sub-null"
+                                                data-parent-prefix="{{ $index + 1 }}."
+                                            >
+                                                <td class="px-5 py-3.5 text-[11px] font-bold text-indigo-700 pl-8 table-seq-num">
+                                                    {{ $index + 1 }}.{{ $cPos + 1 }}
+                                                </td>
+                                                <td class="px-5 py-3.5 pl-8">
+                                                    <div class="flex items-center gap-2.5">
+                                                        <span class="text-indigo-400 font-mono text-xs font-bold">↳</span>
+                                                        <div>
+                                                            <h5 class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+                                                                <span class="item-title text-slate-900">{{ $cardLabel }}</span>
+                                                            </h5>
+                                                            @if($cardSubHeading)
+                                                                <p class="text-[10px] text-slate-500 font-medium">
+                                                                    {{ $cardSubHeading }}
+                                                                </p>
+                                                            @else
+                                                                <p class="text-[10px] text-slate-400 font-mono">
+                                                                    Card Item • /{{ $comp->component_slug }}
+                                                                </p>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-5 py-3.5">
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                        Card #{{ $cPos + 1 }}
+                                                    </span>
+                                                </td>
+                                                <td class="px-5 py-3.5">
+                                                    <div class="flex flex-wrap items-center gap-2">
+                                                        @if($cardImage)
+                                                            <img src="{{ asset($cardImage) }}" class="w-8 h-8 object-cover rounded-lg border border-slate-200 shadow-2xs" title="Card Image">
+                                                        @endif
+                                                        @if($cardHeading)
+                                                            <span class="text-[11px] text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200 font-semibold">
+                                                                {{ $cardHeading }}
+                                                            </span>
+                                                        @endif
+                                                        @if($cardButtonText || $cardButtonUrl)
+                                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-mono font-medium">
+                                                                <svg class="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                                                                <span>{{ $cardButtonText ?: $cardButtonUrl }}</span>
+                                                            </span>
+                                                        @endif
+                                                        @if(!$cardImage && !$cardHeading && !$cardButtonText && !$cardButtonUrl)
+                                                            <span class="text-xs text-slate-400 italic">Configured</span>
+                                                        @endif
+                                                    </div>
+                                                </td>
+                                                <td class="px-4 py-3.5 text-center">
+                                                    <div class="inline-flex items-center justify-center gap-1.5 bg-slate-100/90 p-1 rounded-xl border border-slate-200/90 shadow-2xs">
+                                                        <input 
+                                                            type="number" 
+                                                            min="1" 
+                                                            max="{{ $cardInstCount }}" 
+                                                            value="{{ $cPos + 1 }}" 
+                                                            data-comp-id="{{ $comp->id }}" 
+                                                            data-subcomp-id="" 
+                                                            data-inst-idx="{{ $cInstIdx }}" 
+                                                            data-pos="{{ $cPos }}" 
+                                                            class="table-order-input w-10 h-6 text-center text-xs font-bold text-slate-800 bg-white border border-slate-300 rounded-lg focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                                                            onchange="handleTableOrderChange(this)"
+                                                            title="Change order position"
+                                                        >
+                                                        <div class="flex flex-col gap-0.5">
+                                                            <button 
+                                                                type="button" 
+                                                                onclick="moveTableRow(this, 'up')" 
+                                                                {{ $cPos === 0 ? 'disabled' : '' }} 
+                                                                class="table-btn-up w-5 h-3 rounded flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-white disabled:opacity-20 disabled:pointer-events-none cursor-pointer transition-colors"
+                                                                title="Move Up"
+                                                            >
+                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                                                            </button>
+                                                            <button 
+                                                                type="button" 
+                                                                onclick="moveTableRow(this, 'down')" 
+                                                                {{ $cPos === $cardInstCount - 1 ? 'disabled' : '' }} 
+                                                                class="table-btn-down w-5 h-3 rounded flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-white disabled:opacity-20 disabled:pointer-events-none cursor-pointer transition-colors"
+                                                                title="Move Down"
+                                                            >
+                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-5 py-3.5 text-center">
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                        <span class="w-1 h-1 rounded-full bg-emerald-500"></span>
+                                                        Active
+                                                    </span>
+                                                </td>
+                                                <td class="px-5 py-3.5 text-right">
+                                                    <button 
+                                                        @click="openModal = true; activeComponentId = {{ $comp->id }}; activeComponentName = '{{ addslashes($comp->component_name) }}'; activeSubCompId = null; activeInstanceIndex = {{ $cPos }}; activeInstanceLabel = '{{ addslashes($cardLabel) }}'" 
+                                                        type="button" 
+                                                        class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-blue-600 hover:text-blue-700 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer shadow-2xs"
+                                                        title="Edit {{ $cardLabel }}"
+                                                    >
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                        </svg>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @else
+                                        {{-- Empty Card Repeater Row --}}
+                                        <tr class="bg-slate-50/40 hover:bg-slate-50 transition-colors border-l-4 border-l-indigo-500">
+                                            <td class="px-5 py-3 text-[11px] font-semibold text-slate-400 pl-8">
+                                                {{ $index + 1 }}.1
+                                            </td>
+                                            <td class="px-5 py-3 pl-8">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-indigo-400 font-mono text-xs">↳</span>
+                                                    <div>
+                                                        <h5 class="font-bold text-slate-800 text-xs">{{ $comp->component_name }}</h5>
+                                                        <p class="text-[10px] text-slate-400 font-mono">/{{ $comp->component_slug }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-5 py-3">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                                    Cards (0)
+                                                </span>
+                                            </td>
+                                            <td class="px-5 py-3">
+                                                <span class="text-xs text-slate-400 italic">No cards added yet</span>
+                                            </td>
+                                            <td class="px-4 py-3 text-center text-slate-300 font-semibold text-xs">-</td>
+                                            <td class="px-5 py-3 text-center">
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                    Active
+                                                </span>
+                                            </td>
+                                            <td class="px-5 py-3 text-right">
+                                                <button 
+                                                    @click="openModal = true; activeComponentId = {{ $comp->id }}; activeComponentName = '{{ addslashes($comp->component_name) }}'; activeSubCompId = null; activeInstanceIndex = null; activeInstanceLabel = ''" 
+                                                    type="button" 
+                                                    class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-blue-600 hover:text-blue-700 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer shadow-2xs"
+                                                    title="Add First {{ $comp->component_name }}"
+                                                >
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endif
+                                @else
                                 {{-- 1. Parent Component Container Row (e.g. Card) --}}
                                 <tr class="bg-indigo-50/30 hover:bg-indigo-50/60 transition-colors border-t-2 border-indigo-200">
                                     <td class="px-5 py-4 text-xs font-bold text-indigo-700">
@@ -543,6 +803,7 @@
                                         </tr>
                                     @endif
                                 @endforeach
+                                @endif
                             @else
                                 @php
                                     $nameAndSlug = strtolower($comp->component_name . ' ' . $comp->component_slug);
@@ -1013,6 +1274,247 @@
                                         class="space-y-1.5"
                                     >
                                     @if($comp->effective_subcomponents->isNotEmpty())
+                                        @if($isCompMultiple)
+                                            @php
+                                                $cardInstKeys = collect($comp->effective_subcomponents)
+                                                    ->flatMap(fn($sc) => array_keys($multiFieldData[$comp->id . '_' . $sc->id] ?? []))
+                                                    ->unique()
+                                                    ->sort()
+                                                    ->values()
+                                                    ->all();
+                                                if (empty($cardInstKeys)) {
+                                                    $cardInstKeys = [0];
+                                                }
+                                            @endphp
+
+                                            {{-- MULTI-CARD CONTAINER REPEATER --}}
+                                            <div class="p-4 rounded-2xl border border-indigo-200/90 bg-white shadow-2xs space-y-4">
+                                                <div class="flex items-center justify-between pb-3 border-b border-indigo-100/70">
+                                                    <div class="flex items-center gap-2.5">
+                                                        <span class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                                                            {{ strtoupper(substr($comp->component_name, 0, 1)) }}
+                                                        </span>
+                                                        <div>
+                                                            <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">{{ $comp->component_name }} Container</h4>
+                                                        </div>
+                                                    </div>
+                                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/70">
+                                                        {{ count($cardInstKeys) }} {{ \Illuminate\Support\Str::plural('Card', count($cardInstKeys)) }}
+                                                    </span>
+                                                </div>
+
+                                                {{-- Repeater Cards Container --}}
+                                                <div id="repeater-card-{{ $comp->id }}" data-next-index="{{ count($cardInstKeys) }}" class="space-y-4">
+                                                    @foreach($cardInstKeys as $cPos => $cInstIdx)
+                                                        <div 
+                                                            class="repeater-card-item p-4 bg-slate-50/70 rounded-2xl border border-indigo-200/80 relative space-y-4 shadow-2xs transition-all"
+                                                            data-pos="{{ $cPos }}"
+                                                            x-show="activeInstanceIndex === null || activeInstanceIndex === {{ $cPos }}"
+                                                        >
+                                                            <div class="flex items-center justify-between pb-2 border-b border-indigo-100 repeater-item-header">
+                                                                <div class="flex items-center gap-2">
+                                                                    <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs repeater-index-badge">
+                                                                        #{{ $cPos + 1 }}
+                                                                    </span>
+                                                                    <div>
+                                                                        <h5 class="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                                                                            {{ $comp->component_name }} Item
+                                                                        </h5>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="flex items-center gap-2" x-show="activeInstanceIndex === null">
+                                                                    <div class="flex items-center gap-1 bg-white px-2 py-0.5 rounded-lg border border-slate-200 shadow-2xs">
+                                                                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Order</span>
+                                                                        <input 
+                                                                            type="number" 
+                                                                            min="1" 
+                                                                            max="{{ count($cardInstKeys) }}"
+                                                                            value="{{ $cPos + 1 }}" 
+                                                                            title="Set card order"
+                                                                            onchange="setRepeaterItemOrder(this, 'card')"
+                                                                            class="w-12 h-6 text-center text-xs font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none repeater-order-input"
+                                                                        >
+                                                                        <button 
+                                                                            type="button" 
+                                                                            onclick="moveRepeaterItem(this, 'up', 'card')"
+                                                                            title="Move Up" 
+                                                                            {{ $cPos === 0 ? 'disabled' : '' }}
+                                                                            class="w-6 h-6 rounded flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-25 disabled:pointer-events-none cursor-pointer btn-move-up"
+                                                                        >
+                                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                                                                        </button>
+                                                                        <button 
+                                                                            type="button" 
+                                                                            onclick="moveRepeaterItem(this, 'down', 'card')"
+                                                                            title="Move Down" 
+                                                                            {{ $cPos === count($cardInstKeys) - 1 ? 'disabled' : '' }}
+                                                                            class="w-6 h-6 rounded flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-25 disabled:pointer-events-none cursor-pointer btn-move-down"
+                                                                        >
+                                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                                                        </button>
+                                                                    </div>
+
+                                                                    <button 
+                                                                        type="button" 
+                                                                        onclick="removeRepeaterItem(this, 'card')" 
+                                                                        class="px-2.5 py-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg text-xs font-semibold cursor-pointer transition-colors flex items-center gap-1 btn-remove-item {{ count($cardInstKeys) <= 1 ? 'hidden' : '' }}"
+                                                                    >
+                                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                                        <span>Remove</span>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+
+                                                            {{-- Subcomponents of this card --}}
+                                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                @foreach($comp->effective_subcomponents as $subComp)
+                                                                    @php
+                                                                        $subFields = $subComp->fields->where('is_active', true)->sortBy('sort_order');
+                                                                        $subSlug = strtolower($subComp->component_slug ?? $subComp->component_name);
+                                                                        $isSubHalfCol = ($subSlug === 'heading' || $subSlug === 'subheading' || str_contains($subSlug, 'heading'));
+                                                                        $subColSpanClass = $isSubHalfCol ? 'md:col-span-1' : 'md:col-span-2';
+                                                                    @endphp
+                                                                    <div class="{{ $subColSpanClass }} space-y-1.5">
+                                                                        <div class="flex items-center justify-between mb-1">
+                                                                            <label class="flex items-center gap-1.5 text-xs font-bold text-slate-700 tracking-wide uppercase">
+                                                                                <span>{{ $subComp->component_name }}</span>
+                                                                            </label>
+                                                                            <span class="text-[10px] font-mono text-slate-400">/{{ $subComp->component_slug }}</span>
+                                                                        </div>
+                                                                        <div class="grid grid-cols-1 {{ $subSlug === 'button' ? 'sm:grid-cols-2' : '' }} gap-3">
+                                                                            @foreach($subFields as $field)
+                                                                                @php
+                                                                                    $fData = $multiFieldData[$comp->id . '_' . $subComp->id][$cInstIdx][$field->id] ?? null;
+                                                                                @endphp
+                                                                                <x-dynamic-field 
+                                                                                    :field="$field" 
+                                                                                    :comp="$comp" 
+                                                                                    :subComp="$subComp" 
+                                                                                    :instanceIndex="$cInstIdx"
+                                                                                    :isParentMultiple="true"
+                                                                                    :value="$fData?->content_value" 
+                                                                                    :filePath="$fData?->file_path" 
+                                                                                    :disabledCondition="'activeComponentId && activeComponentId !== ' . $comp->id" 
+                                                                                    :hideLabel="$subFields->count() === 1"
+                                                                                />
+                                                                            @endforeach
+                                                                        </div>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+
+                                                {{-- Template for dynamically adding a new Card --}}
+                                                <template id="template-card-{{ $comp->id }}">
+                                                    <div 
+                                                        class="repeater-card-item p-4 bg-slate-50/70 rounded-2xl border border-indigo-200/80 relative space-y-4 shadow-2xs transition-all"
+                                                        data-pos="__INDEX__"
+                                                    >
+                                                        <div class="flex items-center justify-between pb-2 border-b border-indigo-100 repeater-item-header">
+                                                            <div class="flex items-center gap-2">
+                                                                <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs repeater-index-badge">
+                                                                    #__DISPLAY_INDEX__
+                                                                </span>
+                                                                <div>
+                                                                    <h5 class="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                                                                        {{ $comp->component_name }} Item
+                                                                    </h5>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="flex items-center gap-2">
+                                                                <div class="flex items-center gap-1 bg-white px-2 py-0.5 rounded-lg border border-slate-200 shadow-2xs">
+                                                                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Order</span>
+                                                                    <input 
+                                                                        type="number" 
+                                                                        min="1" 
+                                                                        value="__DISPLAY_NUM__" 
+                                                                        title="Set card order"
+                                                                        onchange="setRepeaterItemOrder(this, 'card')"
+                                                                        class="w-12 h-6 text-center text-xs font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none repeater-order-input"
+                                                                    >
+                                                                    <button 
+                                                                        type="button" 
+                                                                        onclick="moveRepeaterItem(this, 'up', 'card')"
+                                                                        title="Move Up" 
+                                                                        class="w-6 h-6 rounded flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-25 disabled:pointer-events-none cursor-pointer btn-move-up"
+                                                                    >
+                                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                                                                    </button>
+                                                                    <button 
+                                                                        type="button" 
+                                                                        onclick="moveRepeaterItem(this, 'down', 'card')"
+                                                                        title="Move Down" 
+                                                                        class="w-6 h-6 rounded flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-25 disabled:pointer-events-none cursor-pointer btn-move-down"
+                                                                    >
+                                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                                                    </button>
+                                                                </div>
+
+                                                                <button 
+                                                                    type="button" 
+                                                                    onclick="removeRepeaterItem(this, 'card')" 
+                                                                    class="px-2.5 py-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg text-xs font-semibold cursor-pointer transition-colors flex items-center gap-1 btn-remove-item"
+                                                                >
+                                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                                    <span>Remove</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        {{-- Subcomponents template --}}
+                                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            @foreach($comp->effective_subcomponents as $subComp)
+                                                                @php
+                                                                    $subFields = $subComp->fields->where('is_active', true)->sortBy('sort_order');
+                                                                    $subSlug = strtolower($subComp->component_slug ?? $subComp->component_name);
+                                                                    $isSubHalfCol = ($subSlug === 'heading' || $subSlug === 'subheading' || str_contains($subSlug, 'heading'));
+                                                                    $subColSpanClass = $isSubHalfCol ? 'md:col-span-1' : 'md:col-span-2';
+                                                                @endphp
+                                                                <div class="{{ $subColSpanClass }} space-y-1.5">
+                                                                    <div class="flex items-center justify-between mb-1">
+                                                                        <label class="flex items-center gap-1.5 text-xs font-bold text-slate-700 tracking-wide uppercase">
+                                                                            <span>{{ $subComp->component_name }}</span>
+                                                                        </label>
+                                                                        <span class="text-[10px] font-mono text-slate-400">/{{ $subComp->component_slug }}</span>
+                                                                    </div>
+                                                                    <div class="grid grid-cols-1 {{ $subSlug === 'button' ? 'sm:grid-cols-2' : '' }} gap-3">
+                                                                        @foreach($subFields as $field)
+                                                                            <x-dynamic-field 
+                                                                                :field="$field" 
+                                                                                :comp="$comp" 
+                                                                                :subComp="$subComp" 
+                                                                                instanceIndex="__INDEX__"
+                                                                                :isParentMultiple="true"
+                                                                                :value="null" 
+                                                                                :filePath="null" 
+                                                                                :disabledCondition="'activeComponentId && activeComponentId !== ' . $comp->id" 
+                                                                                :hideLabel="$subFields->count() === 1"
+                                                                            />
+                                                                        @endforeach
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </template>
+
+                                                {{-- + Add Another Card Button --}}
+                                                <div x-show="activeInstanceIndex === null" class="pt-2">
+                                                    <button 
+                                                        type="button" 
+                                                        onclick="addCardRepeaterItem({{ $comp->id }})" 
+                                                        class="w-full py-2.5 px-4 rounded-xl border border-dashed border-indigo-400 bg-indigo-50/60 hover:bg-indigo-100/70 text-indigo-700 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-2xs"
+                                                    >
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                                        <span>+ Add Another {{ $comp->component_name }}</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @else
                                         {{-- CARD CONTAINER WITH ITS SUBCOMPONENTS --}}
                                         <div class="p-4 rounded-2xl border border-indigo-200/90 bg-white shadow-2xs space-y-4">
                                             <div class="flex items-center justify-between pb-3 border-b border-indigo-100/70">
@@ -1341,6 +1843,7 @@
                                                 @endforeach
                                             </div>
                                         </div>
+                                        @endif
                                     @else
                                         @php
                                             $compFields = $comp->fields->where('is_active', true)->sortBy('sort_order');
@@ -1705,7 +2208,7 @@
 @push('scripts')
 <script>
 function moveRepeaterItem(btn, direction, type) {
-    const itemClass = type === 'subcomp' ? '.repeater-sub-item' : '.repeater-item';
+    const itemClass = type === 'card' ? '.repeater-card-item' : (type === 'subcomp' ? '.repeater-sub-item' : '.repeater-item');
     const item = btn.closest(itemClass);
     if (!item) return;
     const container = item.parentElement;
@@ -1726,7 +2229,7 @@ function moveRepeaterItem(btn, direction, type) {
 }
 
 function setRepeaterItemOrder(input, type) {
-    const itemClass = type === 'subcomp' ? '.repeater-sub-item' : '.repeater-item';
+    const itemClass = type === 'card' ? '.repeater-card-item' : (type === 'subcomp' ? '.repeater-sub-item' : '.repeater-item');
     const item = input.closest(itemClass);
     if (!item) return;
     const container = item.parentElement;
@@ -1753,7 +2256,7 @@ function setRepeaterItemOrder(input, type) {
 }
 
 function removeRepeaterItem(btn, type) {
-    const itemClass = type === 'subcomp' ? '.repeater-sub-item' : '.repeater-item';
+    const itemClass = type === 'card' ? '.repeater-card-item' : (type === 'subcomp' ? '.repeater-sub-item' : '.repeater-item');
     const item = btn.closest(itemClass);
     if (!item) return;
     const container = item.parentElement;
@@ -1763,7 +2266,7 @@ function removeRepeaterItem(btn, type) {
 
 function refreshRepeaterIndices(container, type) {
     if (!container) return;
-    const itemClass = type === 'subcomp' ? '.repeater-sub-item' : '.repeater-item';
+    const itemClass = type === 'card' ? '.repeater-card-item' : (type === 'subcomp' ? '.repeater-sub-item' : '.repeater-item');
     const items = container.querySelectorAll(itemClass);
     const total = items.length;
 
@@ -1836,6 +2339,10 @@ function addRepeaterItem(compId) {
     wrapper.innerHTML = html.trim();
     container.appendChild(wrapper.firstElementChild);
 
+    if (window.Alpine) {
+        window.Alpine.initTree(wrapper.firstElementChild);
+    }
+
     refreshRepeaterIndices(container, 'comp');
 }
 
@@ -1857,7 +2364,36 @@ function addSubRepeaterItem(compId, subCompId) {
     wrapper.innerHTML = html.trim();
     container.appendChild(wrapper.firstElementChild);
 
+    if (window.Alpine) {
+        window.Alpine.initTree(wrapper.firstElementChild);
+    }
+
     refreshRepeaterIndices(container, 'subcomp');
+}
+
+function addCardRepeaterItem(compId) {
+    const container = document.getElementById('repeater-card-' + compId);
+    const template = document.getElementById('template-card-' + compId);
+    if (!container || !template) return;
+    
+    const existingItems = container.querySelectorAll('.repeater-card-item');
+    const nextIndex = existingItems.length;
+    const displayIndex = nextIndex + 1;
+    
+    let html = template.innerHTML
+        .replace(/__INDEX__/g, nextIndex)
+        .replace(/__DISPLAY_INDEX__/g, '#' + displayIndex)
+        .replace(/__DISPLAY_NUM__/g, displayIndex);
+        
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html.trim();
+    container.appendChild(wrapper.firstElementChild);
+
+    if (window.Alpine) {
+        window.Alpine.initTree(wrapper.firstElementChild);
+    }
+
+    refreshRepeaterIndices(container, 'card');
 }
 
 // ==========================================

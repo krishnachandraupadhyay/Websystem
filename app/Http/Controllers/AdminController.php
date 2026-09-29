@@ -288,15 +288,22 @@ class AdminController extends Controller
 
             if ($secSubComps->isNotEmpty()) {
                 // Container with Subcomponents
+                $isCompMultiple = (bool)($comp->pivot->is_multiple ?? $comp->is_multiple ?? false);
                 foreach ($secSubComps as $subComp) {
                     $subFields = $subComp->fields()->where('is_active', true)->orderBy('sort_order', 'asc')->get();
 
                     $isSubMultiple = (bool)($subComp->pivot->is_multiple ?? $subComp->is_multiple ?? false);
                     foreach ($subFields as $field) {
                         $isFile = in_array($field->field_type, ['image', 'video', 'file'], true);
-                        $key = $isFile
-                            ? ($isSubMultiple ? "components.{$comp->id}.subcomponents.{$subComp->id}.instances.*.files.{$field->id}" : "components.{$comp->id}.subcomponents.{$subComp->id}.files.{$field->id}")
-                            : ($isSubMultiple ? "components.{$comp->id}.subcomponents.{$subComp->id}.instances.*.fields.{$field->id}" : "components.{$comp->id}.subcomponents.{$subComp->id}.fields.{$field->id}");
+                        if ($isCompMultiple) {
+                            $key = $isFile
+                                ? "components.{$comp->id}.instances.*.subcomponents.{$subComp->id}.files.{$field->id}"
+                                : "components.{$comp->id}.instances.*.subcomponents.{$subComp->id}.fields.{$field->id}";
+                        } else {
+                            $key = $isFile
+                                ? ($isSubMultiple ? "components.{$comp->id}.subcomponents.{$subComp->id}.instances.*.files.{$field->id}" : "components.{$comp->id}.subcomponents.{$subComp->id}.files.{$field->id}")
+                                : ($isSubMultiple ? "components.{$comp->id}.subcomponents.{$subComp->id}.instances.*.fields.{$field->id}" : "components.{$comp->id}.subcomponents.{$subComp->id}.fields.{$field->id}");
+                        }
 
                         $existingData = SectionComponentData::where('section_id', $section->id)
                             ->where('component_id', $comp->id)
@@ -968,6 +975,8 @@ class AdminController extends Controller
         $orderedIndices = $validated['ordered_indices'];
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($section, $componentId, $subComponentId, $orderedIndices) {
+            $isContainer = SectionComponentSubcomponent::where('section_id', $section->id)->where('component_id', $componentId)->exists();
+
             // Step 1: Temporarily shift all affected rows to offset 10000 + newIdx to prevent any collision
             foreach ($orderedIndices as $newIdx => $oldIdx) {
                 $q = SectionComponentData::where('section_id', $section->id)
@@ -976,7 +985,7 @@ class AdminController extends Controller
 
                 if ($subComponentId) {
                     $q->where('sub_component_id', $subComponentId);
-                } else {
+                } elseif (!$isContainer) {
                     $q->whereNull('sub_component_id');
                 }
 
@@ -991,7 +1000,7 @@ class AdminController extends Controller
 
                 if ($subComponentId) {
                     $q->where('sub_component_id', $subComponentId);
-                } else {
+                } elseif (!$isContainer) {
                     $q->whereNull('sub_component_id');
                 }
 

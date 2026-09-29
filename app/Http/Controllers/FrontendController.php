@@ -14,8 +14,96 @@ class FrontendController extends Controller
     public function index()
     {
         $headerData = $this->getHeaderData();
+        $placementData = $this->getPlacementData();
 
-        return view('frontend.index', compact('headerData'));
+        return view('frontend.index', compact('headerData', 'placementData'));
+    }
+
+    /**
+     * Fetch and structure configured data for Section 4 (Campus Placement).
+     */
+    protected function getPlacementData()
+    {
+        $placementSection = Section::with(['components' => function($q) {
+            $q->wherePivot('status', 1)->with(['fields', 'subcomponents.fields']);
+        }])->where(function($q) {
+            $q->where('id', 4)->orWhere('section_slug', 'campus-placement');
+        })->first();
+
+        if (!$placementSection) {
+            return [];
+        }
+
+        $allData = SectionComponentData::where('section_id', $placementSection->id)
+            ->orderBy('instance_index', 'asc')
+            ->get();
+
+        $placementData = [
+            'heading'    => null,
+            'subheading' => null,
+            'paragraph'  => null,
+            'cards'      => [],
+        ];
+
+        // 1. Process top-level section Heading, SubHeading, Paragraph
+        foreach ($allData->whereNull('sub_component_id') as $item) {
+            $comp = $placementSection->components->firstWhere('id', $item->component_id);
+            if (!$comp) continue;
+
+            $slug = strtolower($comp->component_slug);
+            if (str_contains($slug, 'subheading')) {
+                if (!empty($item->content_value)) $placementData['subheading'] = $item->content_value;
+            } elseif (str_contains($slug, 'heading')) {
+                if (!empty($item->content_value)) $placementData['heading'] = $item->content_value;
+            } elseif (str_contains($slug, 'paragraph') || str_contains($slug, 'desc')) {
+                if (!empty($item->content_value)) $placementData['paragraph'] = $item->content_value;
+            }
+        }
+
+        // 2. Process Card Container (component 8) instances
+        $cardComp = $placementSection->components->first(function($c) {
+            return str_contains(strtolower($c->component_slug), 'card') || $c->id === 8;
+        });
+
+        if ($cardComp) {
+            $cardItems = $allData->where('component_id', $cardComp->id)->groupBy('instance_index');
+            foreach ($cardItems as $idx => $records) {
+                $card = [
+                    'name'        => null,
+                    'role'        => null,
+                    'image'       => null,
+                    'description' => null,
+                    'button_text' => 'View Placement Story',
+                    'button_url'  => '#contact',
+                    'target'      => '_self',
+                ];
+
+                foreach ($records as $r) {
+                    $fieldName = strtolower($r->field_name ?? '');
+                    if ($r->file_path && ($fieldName === 'image' || str_contains($fieldName, 'photo') || str_contains($fieldName, 'image'))) {
+                        $card['image'] = $r->file_path;
+                    } elseif ($fieldName === 'subheading' || str_contains($fieldName, 'sub')) {
+                        if (!empty($r->content_value)) $card['role'] = $r->content_value;
+                    } elseif ($fieldName === 'heading' || str_contains($fieldName, 'heading')) {
+                        if (!empty($r->content_value)) $card['name'] = $r->content_value;
+                    } elseif ($fieldName === 'description' || str_contains($fieldName, 'desc') || str_contains($fieldName, 'paragraph')) {
+                        if (!empty($r->content_value)) $card['description'] = $r->content_value;
+                    } elseif (in_array($fieldName, ['button_text', 'text', 'label'], true)) {
+                        if (!empty($r->content_value)) $card['button_text'] = $r->content_value;
+                    } elseif (in_array($fieldName, ['button_url', 'url', 'link', 'href'], true)) {
+                        if (!empty($r->content_value)) $card['button_url'] = $r->content_value;
+                    } elseif ($fieldName === 'target') {
+                        if (!empty($r->content_value)) $card['target'] = $r->content_value;
+                    }
+                }
+
+                if (!empty($card['name']) || !empty($card['role']) || !empty($card['image'])) {
+                    $placementData['cards'][] = $card;
+                }
+            }
+        }
+
+        return $placementData;
     }
 
     /**
